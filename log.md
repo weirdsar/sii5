@@ -401,3 +401,10 @@
 - Все **`src/components/*.astro`**: JSDoc у **`Props`** (или блок над компонентом, если пропсов нет).
 - **`summary.md`**: актуализированы структура каталогов, коллекции контента, таблица компонентов, данные/`env-public`, стили и чек-лист агента.
 - Проверка: **`npx astro check`**, **`npm run build`**.
+
+## 2026-04-02 — Git: коммит под деплой, CI проверен локально
+
+- **`.gitignore`**: добавлен **`.yandex.metrika.env`** (локальный файл с ID Метрики не в репозитории).
+- **`origin`**: `https://github.com/weirdsar/sii5.git`; на **`main`**: релизный коммит **`1fa63a3`** и коммит с записью в **`log.md`** о деплое/CI (актуальный хэш — **`git log -1`**).
+- **Push** из этой среды не выполнен: GitHub HTTPS запросил учётные данные. Выполните у себя: **`git push -u origin main`** (или remote **`git@github.com:weirdsar/sii5.git`**).
+- Локально повторён сценарий CI: **`npm ci`** → **`npx astro check`** → **`npm run build`** → **`npm run test`** — успешно.
