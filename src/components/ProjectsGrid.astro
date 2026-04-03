@@ -1,0 +1,56 @@
+---
+import { getCollection } from 'astro:content';
+import { getCasePreview } from '../utils/imageAssets';
+import CaseCard from './CaseCard.astro';
+
+/**
+ * Сетка кейсов из коллекции `cases`, сортировка по `publishDate` (новые сверху).
+ */
+interface Props {
+  title?: string;
+  subtitle?: string;
+}
+
+const {
+  title = 'Мои проекты',
+  subtitle = 'Каждый сайт — решение конкретной бизнес-задачи',
+} = Astro.props;
+
+const caseEntries = await getCollection('cases');
+const cases = caseEntries.sort(
+  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+);
+---
+
+<section class="py-16 md:py-24 bg-surface-light" id="projects">
+  <div class="container-custom">
+    <!-- Заголовок секции -->
+    <div class="text-center mb-12" data-reveal>
+      <h2 class="text-3xl md:text-4xl font-bold text-text-main mb-4">{title}</h2>
+      <p class="text-text-muted text-lg max-w-2xl mx-auto">{subtitle}</p>
+    </div>
+
+    <!-- Сетка карточек -->
+    <div class="grid md:grid-cols-2 gap-8">
+      {cases.map((c) => {
+        const preview = getCasePreview(c.id);
+        return preview ? (
+          <CaseCard
+            slug={c.id}
+            title={c.data.title}
+            shortDesc={c.data.description}
+            image={preview}
+            tags={c.data.tags}
+          />
+        ) : null;
+      })}
+    </div>
+
+    <!-- Кнопка -->
+    <div class="text-center mt-10" data-reveal>
+      <a href="/cases" class="btn-outline">
+        Все проекты →
+      </a>
+    </div>
+  </div>
+</section>

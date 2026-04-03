@@ -1,0 +1,72 @@
+---
+import OptimizedMedia from './OptimizedMedia.astro';
+import type { ImageMetadata } from 'astro';
+
+/**
+ * Карточка кейса в сетке: ссылка на `/cases/[slug]`, превью из `astro:assets`.
+ */
+interface Props {
+  /** `id` записи коллекции `cases` (имя файла без `.md`). */
+  slug: string;
+  title: string;
+  shortDesc: string;
+  /** Превью из `src/utils/imageAssets` или аналог. */
+  image: ImageMetadata;
+  tags: string[];
+}
+
+const { slug, title, shortDesc, image, tags } = Astro.props;
+---
+
+<article
+  class="group relative bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border-subtle"
+  data-reveal
+>
+  <!-- Изображение (shared element → страница кейса) -->
+  <div
+    class="aspect-video overflow-hidden bg-muted-surface"
+    transition:name={`case-image-${slug}`}
+  >
+    <OptimizedMedia
+      src={image}
+      alt={title}
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      loading="lazy"
+      decoding="async"
+      quality="mid"
+    />
+  </div>
+
+  <!-- Контент -->
+  <div class="p-6">
+    <!-- Теги -->
+    <div class="flex flex-wrap gap-2 mb-3">
+      {tags.map((tag) => (
+        <span class="text-xs font-medium px-2 py-1 bg-primary/10 text-primary rounded-full">
+          {tag}
+        </span>
+      ))}
+    </div>
+
+    <h3
+      class="text-lg font-bold text-text-main mb-2 group-hover:text-primary transition-colors"
+      transition:name={`case-title-${slug}`}
+    >
+      {title}
+    </h3>
+
+    <p class="text-text-muted text-sm mb-4">
+      {shortDesc}
+    </p>
+
+    <a
+      href={`/cases/${slug}`}
+      class="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all"
+    >
+      Подробнее
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+</article>

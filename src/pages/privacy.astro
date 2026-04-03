@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteConfig } from '../data/site';
+
+const base = Astro.site ?? new URL(siteConfig.url);
+const canonicalUrl = new URL('/privacy', base).href;
+---
+
+<BaseLayout
+  title="Политика конфиденциальности"
+  description="Политика в отношении обработки персональных данных посетителей сайта и пользователей формы обратной связи."
+  canonicalUrl={canonicalUrl}
+>
+  <section class="py-16 md:py-24">
+    <div class="container-custom max-w-3xl">
+      <h1 class="text-3xl md:text-4xl font-bold text-text-main mb-6">Политика конфиденциальности</h1>
+      <p class="text-sm text-text-muted mb-10">
+        Текст ниже — черновик-заглушка. Юридические реквизиты, цели и сроки обработки данных будут уточнены.
+      </p>
+
+      <div class="prose prose-slate max-w-none space-y-6 text-text-main">
+        <section>
+          <h2 class="text-xl font-bold text-text-main mb-3">1. Общие положения</h2>
+          <p class="text-text-muted leading-relaxed">
+            Настоящая политика описывает порядок обработки персональных данных при использовании сайта и отправке
+            заявок через форму обратной связи. Оператор обрабатывает данные в соответствии с законодательством
+            Российской Федерации, в том числе Федеральным законом № 152-ФЗ «О персональных данных».
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-text-main mb-3">2. Какие данные собираются</h2>
+          <p class="text-text-muted leading-relaxed">
+            При заполнении формы на сайте могут запрашиваться имя, контакт для связи (телефон и/или адрес электронной
+            почты), а также иные сведения, которые вы добровольно укажете в сообщении. Автоматически могут
+            обрабатываться технические данные (например, тип браузера) в объёме, необходимом для работы сайта и
+            аналитики — детали будут дополнены после настройки сервисов.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-text-main mb-3">3. Цели обработки</h2>
+          <p class="text-text-muted leading-relaxed">
+            Персональные данные используются для связи с вами по заявке, подготовки коммерческого предложения и
+            исполнения договорных обязательств. Иные цели — после согласования и отражения в финальной редакции
+            политики.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-text-main mb-3">4. Сроки хранения и передача третьим лицам</h2>
+          <p class="text-text-muted leading-relaxed">
+            Сроки хранения и случаи передачи данных третьим лицам (хостинг, почтовые и мессенджер-сервисы) будут указаны
+            здесь после финализации процессов обработки заявок.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-text-main mb-3">5. Ваши права</h2>
+          <p class="text-text-muted leading-relaxed">
+            Вы вправе запросить уточнение, блокирование или удаление персональных данных, отозвать согласие на
+            обработку — порядок обращения будет добавлен (контакт для запросов: e-mail и почтовый адрес оператора).
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-text-main mb-3">6. Контакты</h2>
+          <p class="text-text-muted leading-relaxed">
+            По вопросам обработки персональных данных: укажите актуальный e-mail и телефон оператора после
+            утверждения документа.
+          </p>
+        </section>
+      </div>
+
+      <p class="mt-12 text-sm text-text-muted">
+        Дата публикации (черновик): 2 апреля 2026 г.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

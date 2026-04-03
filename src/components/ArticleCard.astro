@@ -1,0 +1,71 @@
+---
+import OptimizedMedia from './OptimizedMedia.astro';
+import { formatDate } from '../utils/helpers';
+import { placeholder } from '../utils/imageAssets';
+
+/**
+ * Карточка статьи в списке: ссылка на `/articles/[slug]`, общее превью-изображение.
+ */
+interface Props {
+  /** `id` записи коллекции `articles`. */
+  slug: string;
+  title: string;
+  excerpt: string;
+  /** ISO-дата `YYYY-MM-DD` для `<time>` и форматирования. */
+  date: string;
+  readTime: number;
+  tags: string[];
+}
+
+const { slug, title, excerpt, date, readTime, tags } = Astro.props;
+---
+
+<article
+  class="bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border-subtle"
+  data-reveal
+>
+  <!-- Изображение -->
+  <div class="aspect-video overflow-hidden bg-muted-surface">
+    <OptimizedMedia
+      src={placeholder}
+      alt={title}
+      class="w-full h-full object-cover"
+      loading="lazy"
+      decoding="async"
+      quality="mid"
+    />
+  </div>
+
+  <!-- Контент -->
+  <div class="p-6">
+    <!-- Мета -->
+    <div class="flex items-center gap-4 text-sm text-text-muted mb-3">
+      <time datetime={date}>{formatDate(date)}</time>
+      <span>·</span>
+      <span>{readTime} мин чтения</span>
+    </div>
+
+    <!-- Теги -->
+    <div class="flex flex-wrap gap-2 mb-3">
+      {tags.map((tag) => (
+        <span class="text-xs font-medium px-2 py-1 bg-primary/10 text-primary rounded-full">
+          {tag}
+        </span>
+      ))}
+    </div>
+
+    <h3 class="text-lg font-bold text-text-main mb-2">{title}</h3>
+
+    <p class="text-text-muted text-sm mb-4">{excerpt}</p>
+
+    <a
+      href={`/articles/${slug}`}
+      class="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all"
+    >
+      Читать далее
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+</article>

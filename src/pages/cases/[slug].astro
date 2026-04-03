@@ -1,0 +1,288 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import OptimizedMedia from '../../components/OptimizedMedia.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import ContactForm from '../../components/ContactForm.astro';
+import { siteConfig } from '../../data/site';
+import { getCasePreview } from '../../utils/imageAssets';
+import { ogImagePathForCase } from '../../utils/ogImagePaths';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('cases');
+  return entries.map((entry) => ({
+    params: { slug: entry.id },
+  }));
+}
+
+const { slug } = Astro.params;
+const entry = await getEntry('cases', slug as string);
+
+if (!entry) {
+  return Astro.redirect('/404');
+}
+
+const { data } = entry;
+const caseYear = data.publishDate.getFullYear();
+
+const casePreview = getCasePreview(entry.id);
+const ogImagePath = ogImagePathForCase(entry.id);
+const base = Astro.site ?? new URL(siteConfig.url);
+const canonicalUrl = new URL(`/cases/${entry.id}`, base).href;
+---
+
+<BaseLayout
+  title={data.metaTitle}
+  description={data.metaDescription}
+  ogImage={ogImagePath}
+  canonicalUrl={canonicalUrl}
+  type="website"
+>
+  <JsonLd
+    type="breadcrumb"
+    data={{
+      items: [
+        { name: 'Главная', item: new URL('/', base).href },
+        { name: 'Кейсы', item: new URL('/cases/', base).href },
+        { name: data.title, item: canonicalUrl },
+      ],
+    }}
+  />
+
+  <!-- Шапка с названием проекта -->
+  <section class="bg-surface-dark py-16 md:py-20">
+    <div class="container-custom">
+      <!-- Хлебные крошки -->
+      <nav class="mb-6 text-sm" aria-label="Breadcrumb">
+        <ol class="flex items-center gap-2">
+          <li>
+            <a href="/" class="text-gray-400 hover:text-white transition-colors">Главная</a>
+          </li>
+          <li class="text-gray-600">/</li>
+          <li>
+            <a href="/cases" class="text-gray-400 hover:text-white transition-colors">Кейсы</a>
+          </li>
+          <li class="text-gray-600">/</li>
+          <li class="text-gray-300">{data.title}</li>
+        </ol>
+      </nav>
+
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <!-- Теги -->
+          <div class="flex flex-wrap gap-2 mb-4">
+            {data.tags.map((tag) => (
+              <span class="text-xs font-medium px-3 py-1 bg-primary/20 text-blue-300 rounded-full">
+                {tag}
+              </span>
+            ))}
+          </div>
+          <!-- Заголовок (shared element с карточкой) -->
+          <h1
+            class="text-3xl md:text-4xl lg:text-5xl font-bold text-white"
+            transition:name={`case-title-${entry.id}`}
+          >
+            {data.title}
+          </h1>
+          <!-- Мета -->
+          <p class="text-gray-300 mt-2">
+            Клиент: {data.client} · {caseYear} год
+          </p>
+        </div>
+        <!-- Кнопка на живой сайт -->
+        <a
+          href={data.liveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-accent shrink-0 inline-flex items-center gap-2"
+        >
+          Посмотреть сайт
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Основное изображение -->
+  <section class="py-8">
+    <div class="container-custom">
+      <div
+        class="rounded-2xl overflow-hidden shadow-xl border border-border-subtle"
+        transition:name={`case-image-${entry.id}`}
+      >
+        {casePreview ? (
+          <OptimizedMedia
+            src={casePreview}
+            alt={data.title}
+            class="w-full"
+            loading="eager"
+            decoding="async"
+            quality="mid"
+          />
+        ) : null}
+      </div>
+    </div>
+  </section>
+
+  <!-- Три блока: Задача / Решение / Результат -->
+  <section class="py-12 md:py-16">
+    <div class="container-custom">
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Задача -->
+        <div class="bg-red-50 rounded-2xl p-6 md:p-8" data-reveal>
+          <div class="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-text-main mb-3">Задача</h2>
+          <p class="text-text-muted leading-relaxed">{data.challenge}</p>
+        </div>
+
+        <!-- Решение -->
+        <div class="bg-blue-50 rounded-2xl p-6 md:p-8" data-reveal data-reveal-delay="100">
+          <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-text-main mb-3">Решение</h2>
+          <p class="text-text-muted leading-relaxed">{data.solution}</p>
+        </div>
+
+        <!-- Результат -->
+        <div class="bg-green-50 rounded-2xl p-6 md:p-8" data-reveal data-reveal-delay="200">
+          <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-text-main mb-3">Результат</h2>
+          <p class="text-text-muted leading-relaxed">{data.result}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Галерея (если есть) -->
+  {data.gallery && data.gallery.length > 0 && (
+    <section class="py-8">
+      <div class="container-custom">
+        <h2 class="text-2xl font-bold text-text-main mb-6">Скриншоты</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+          {data.gallery.map((img, index) => (
+            <div class="rounded-xl overflow-hidden border border-border-subtle">
+              <img
+                src={img}
+                alt={`Скриншот сайта «${data.title}», изображение ${index + 1} из ${data.gallery.length}`}
+                class="w-full cursor-pointer hover:opacity-90 transition-opacity"
+                loading="lazy"
+                decoding="async"
+                data-lightbox
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Навигация -->
+  <section class="py-8">
+    <div class="container-custom text-center">
+      <a href="/cases" class="btn-outline">
+        ← Все проекты
+      </a>
+    </div>
+  </section>
+
+  <!-- Форма "Хочу такой же" -->
+  <section class="py-12 md:py-16 bg-surface-light">
+    <div class="container-custom max-w-2xl">
+      <div class="text-center mb-8" data-reveal>
+        <h2 class="text-2xl md:text-3xl font-bold text-text-main mb-3">Хотите похожий проект?</h2>
+        <p class="text-text-muted">Оставьте заявку — обсудим вашу задачу и подберу решение</p>
+      </div>
+      <div class="bg-card rounded-2xl p-6 md:p-8 shadow-lg border border-border-subtle" data-reveal>
+        <ContactForm
+          formName="case-inquiry"
+          showServiceSelect={false}
+          sourcePage={`Кейс: ${data.title}`}
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Лайтбокс галереи (vanilla JS) -->
+  <div
+    id="lightbox"
+    class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Просмотр изображения"
+  >
+    <button
+      type="button"
+      id="lightbox-close"
+      class="absolute top-4 right-4 z-[60] text-white text-4xl leading-none cursor-pointer hover:opacity-80"
+      aria-label="Закрыть просмотр увеличенного изображения"
+    >
+      &times;
+    </button>
+    <img id="lightbox-img" class="max-h-[90vh] max-w-full object-contain" alt="" />
+  </div>
+
+  <script is:inline>
+    function initCaseLightbox() {
+      var lightbox = document.getElementById('lightbox');
+      var lightboxImg = document.getElementById('lightbox-img');
+      var closeBtn = document.getElementById('lightbox-close');
+      if (!lightbox || !lightboxImg || !closeBtn) return;
+
+      function openLightbox(src, altText) {
+        lightboxImg.src = src;
+        lightboxImg.alt = altText || 'Увеличенный скриншот';
+        lightbox.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeLightbox() {
+        lightbox.classList.add('hidden');
+        lightboxImg.removeAttribute('src');
+        document.body.style.overflow = '';
+      }
+
+      document.querySelectorAll('img[data-lightbox]').forEach(function (el) {
+        el.onclick = function () {
+          openLightbox(el.getAttribute('src') || '', el.getAttribute('alt') || '');
+        };
+      });
+
+      closeBtn.onclick = function (e) {
+        e.stopPropagation();
+        closeLightbox();
+      };
+
+      lightbox.onclick = function (e) {
+        if (e.target === lightbox) closeLightbox();
+      };
+    }
+
+    if (!window.__sii5LightboxEscapeBound) {
+      window.__sii5LightboxEscapeBound = true;
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        var lightbox = document.getElementById('lightbox');
+        if (!lightbox || lightbox.classList.contains('hidden')) return;
+        var lightboxImg = document.getElementById('lightbox-img');
+        lightbox.classList.add('hidden');
+        if (lightboxImg) lightboxImg.removeAttribute('src');
+        document.body.style.overflow = '';
+      });
+    }
+
+    document.addEventListener('astro:page-load', initCaseLightbox);
+  </script>
+</BaseLayout>

@@ -1,0 +1,229 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import OptimizedMedia from '../../components/OptimizedMedia.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import CTA from '../../components/CTA.astro';
+import { siteConfig } from '../../data/site';
+import { formatDate } from '../../utils/helpers';
+import { placeholder } from '../../utils/imageAssets';
+import { ogImagePathForArticle } from '../../utils/ogImagePaths';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('articles');
+  return entries.map((e) => ({ params: { slug: e.id } }));
+}
+
+const { slug } = Astro.params;
+const entry = await getEntry('articles', slug as string);
+
+if (!entry) {
+  return Astro.redirect('/404');
+}
+
+const { Content } = await render(entry);
+const article = entry.data;
+const dateStr = article.date.toISOString().slice(0, 10);
+
+const ogImagePath = ogImagePathForArticle(entry.id);
+const base = Astro.site ?? new URL(siteConfig.url);
+const canonicalUrl = new URL(`/articles/${entry.id}/`, base).href;
+---
+
+<BaseLayout
+  title={article.metaTitle}
+  description={article.metaDescription}
+  ogImage={ogImagePath}
+  canonicalUrl={canonicalUrl}
+  type="article"
+>
+  <!-- Индикатор прочтения статьи (ширина задаётся скриптом) -->
+  <div
+    class="fixed top-0 left-0 right-0 z-[100] h-1 pointer-events-none"
+    aria-hidden="true"
+  >
+    <div
+      data-reading-progress
+      class="h-full w-0 bg-primary shadow-[0_1px_0_rgba(37,99,235,0.35)] transition-[width] duration-150 ease-out"
+    ></div>
+  </div>
+
+  <JsonLd
+    type="article"
+    data={{
+      title: article.title,
+      description: article.metaDescription,
+      date: dateStr,
+    }}
+  />
+  <JsonLd
+    type="breadcrumb"
+    data={{
+      items: [
+        { name: 'Главная', item: new URL('/', base).href },
+        { name: 'Статьи', item: new URL('/articles/', base).href },
+        { name: article.title, item: canonicalUrl },
+      ],
+    }}
+  />
+  <article class="py-16 md:py-24" data-article-reading>
+    <div class="container-custom max-w-3xl">
+      <!-- Хлебные крошки -->
+      <nav class="mb-8 text-sm" aria-label="Breadcrumb">
+        <ol class="flex items-center gap-2 text-text-muted">
+          <li>
+            <a href="/" class="hover:text-primary transition-colors">Главная</a>
+          </li>
+          <li>/</li>
+          <li>
+            <a href="/articles" class="hover:text-primary transition-colors">Статьи</a>
+          </li>
+          <li>/</li>
+          <li class="text-text-main">{article.title}</li>
+        </ol>
+      </nav>
+
+      <!-- Метаданные -->
+      <div class="flex items-center gap-4 text-sm text-text-muted mb-6">
+        <time datetime={dateStr}>{formatDate(dateStr)}</time>
+        <span>·</span>
+        <span>{article.readTime} мин чтения</span>
+      </div>
+
+      <!-- Теги -->
+      <div class="flex flex-wrap gap-2 mb-6">
+        {article.tags.map((tag) => (
+          <span class="text-xs font-medium px-3 py-1 bg-primary/10 text-primary rounded-full">
+            {tag}
+          </span>
+        ))}
+      </div>
+
+      <!-- Заголовок -->
+      <h1 class="text-3xl md:text-4xl font-bold text-text-main mb-8">{article.title}</h1>
+
+      <!-- Изображение -->
+      <div class="rounded-2xl overflow-hidden mb-8">
+        <OptimizedMedia
+          src={placeholder}
+          alt={article.title}
+          class="w-full"
+          loading="eager"
+          decoding="async"
+          quality="mid"
+        />
+      </div>
+
+      <!-- Контент статьи -->
+      <div class="prose article-prose max-w-none">
+        <Content />
+      </div>
+
+      <!-- Навигация -->
+      <div class="mt-12 pt-8 border-t border-border-subtle text-center">
+        <a href="/articles" class="btn-outline">← Все статьи</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- CTA -->
+  <CTA />
+
+  <script is:inline>
+    (function () {
+      let disposeArticleUi = function () {};
+
+      function articleReadingPercent(articleEl) {
+        const scrollTop = window.scrollY;
+        const articleTop = articleEl.getBoundingClientRect().top + scrollTop;
+        const articleHeight = articleEl.offsetHeight;
+        const vh = window.innerHeight;
+        const start = articleTop;
+        const end = articleTop + articleHeight - vh;
+        if (end <= start) {
+          return scrollTop >= start ? 100 : 0;
+        }
+        const p = ((scrollTop - start) / (end - start)) * 100;
+        return Math.min(100, Math.max(0, p));
+      }
+
+      function initArticleReadingUi() {
+        disposeArticleUi();
+        disposeArticleUi = function () {};
+
+        const articleRoot = document.querySelector('[data-article-reading]');
+        const progressEl = document.querySelector('[data-reading-progress]');
+        const prose = document.querySelector('.article-prose');
+
+        if (!articleRoot || !progressEl) {
+          return;
+        }
+
+        const onScroll = function () {
+          progressEl.style.width = articleReadingPercent(articleRoot) + '%';
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        const disposers = [];
+        disposers.push(function () {
+          window.removeEventListener('scroll', onScroll);
+        });
+
+        if (prose) {
+          prose.querySelectorAll('pre').forEach(function (pre) {
+            if (pre.dataset.sii5CodeBlock === '1') return;
+            pre.dataset.sii5CodeBlock = '1';
+
+            var wrap = document.createElement('div');
+            wrap.className =
+              'relative group my-4 overflow-hidden rounded-lg border border-gray-200 bg-[#0f172a] shadow-sm';
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.setAttribute('aria-label', 'Копировать код');
+            btn.className =
+              'absolute right-2 top-2 z-10 rounded-md border border-white/15 bg-surface-dark/95 px-2.5 py-1.5 text-xs font-medium text-white shadow-md opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-[#0f172a]';
+            btn.textContent = 'Копировать';
+
+            var copyTimer = null;
+            function onCopyClick() {
+              var text = pre.textContent || '';
+              navigator.clipboard.writeText(text).then(
+                function () {
+                  btn.textContent = 'Скопировано!';
+                  btn.classList.add('bg-primary', 'border-primary', 'opacity-100');
+                  if (copyTimer) clearTimeout(copyTimer);
+                  copyTimer = setTimeout(function () {
+                    btn.textContent = 'Копировать';
+                    btn.classList.remove('bg-primary', 'border-primary');
+                    copyTimer = null;
+                  }, 2000);
+                },
+                function (err) {
+                  console.warn('[article] clipboard', err);
+                }
+              );
+            }
+            btn.addEventListener('click', onCopyClick);
+            disposers.push(function () {
+              btn.removeEventListener('click', onCopyClick);
+              if (copyTimer) clearTimeout(copyTimer);
+            });
+
+            pre.parentNode.insertBefore(wrap, pre);
+            wrap.appendChild(btn);
+            wrap.appendChild(pre);
+          });
+        }
+
+        disposeArticleUi = function () {
+          disposers.forEach(function (fn) {
+            fn();
+          });
+        };
+      }
+
+      document.addEventListener('astro:page-load', initArticleReadingUi);
+    })();
+  </script>
+</BaseLayout>

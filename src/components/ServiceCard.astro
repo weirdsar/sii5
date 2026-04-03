@@ -1,0 +1,66 @@
+---
+/**
+ * Тарифная карточка: данные из коллекции `services` (см. `ServiceCardProps` в `src/types/index.ts`).
+ */
+import type { ServiceCardProps } from '../types/index';
+
+interface Props extends ServiceCardProps {}
+
+const { name, subtitle, price, features, highlighted, cta, id } = Astro.props;
+---
+
+<div
+  class:list={[
+    'relative rounded-2xl p-8 border-2 transition-all duration-300',
+    highlighted
+      ? 'border-primary bg-card shadow-xl scale-105 z-10'
+      : 'border-border-subtle bg-card hover:border-primary/30 hover:shadow-lg',
+  ]}
+  data-reveal
+>
+  <!-- Бейдж "Популярный" -->
+  {highlighted && (
+    <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+      <span class="bg-primary text-white text-sm font-bold px-4 py-1 rounded-full">
+        Популярный
+      </span>
+    </div>
+  )}
+
+  <!-- Название и подзаголовок -->
+  <div class="text-center mb-6">
+    <h3 class="text-2xl font-bold text-text-main mb-1">{name}</h3>
+    <p class="text-text-muted text-sm">{subtitle}</p>
+  </div>
+
+  <!-- Цена -->
+  <div class="text-center mb-6">
+    <span class="text-4xl font-bold text-text-main">{price}</span>
+  </div>
+
+  <!-- Разделитель -->
+  <hr class="border-border-subtle mb-6" />
+
+  <!-- Список фич -->
+  <ul class="space-y-3 mb-8">
+    {features.map((f) => (
+      <li class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span class="text-text-muted text-sm">{f}</span>
+      </li>
+    ))}
+  </ul>
+
+  <!-- Кнопка -->
+  <a
+    href={`/contact?service=${id}`}
+    class:list={[
+      'w-full text-center py-3 rounded-lg font-semibold transition-colors block',
+      highlighted ? 'btn-primary' : 'btn-outline',
+    ]}
+  >
+    {cta}
+  </a>
+</div>

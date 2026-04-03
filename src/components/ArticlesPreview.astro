@@ -1,0 +1,60 @@
+---
+import { getCollection } from 'astro:content';
+import ArticleCard from './ArticleCard.astro';
+
+/**
+ * Блок из двух последних статей (по `date`) на главной.
+ */
+interface Props {
+  title?: string;
+  subtitle?: string;
+}
+
+const {
+  title = 'Полезные статьи',
+  subtitle = 'Делюсь знаниями о веб-разработке и продвижении бизнеса в интернете',
+} = Astro.props;
+
+const entries = await getCollection('articles');
+const latestArticles = [...entries]
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 2);
+---
+
+<section class="py-16 md:py-24 bg-surface-light" id="articles">
+  <div class="container-custom">
+    <!-- Заголовок секции -->
+    <div class="text-center mb-12" data-reveal>
+      <h2 class="text-3xl md:text-4xl font-bold text-text-main mb-4">{title}</h2>
+      <p class="text-text-muted text-lg max-w-2xl mx-auto">{subtitle}</p>
+    </div>
+
+    <!-- Карточки статей -->
+    {latestArticles.length > 0 ? (
+      <div class="grid md:grid-cols-2 gap-8">
+        {latestArticles.map((entry) => {
+          const dateStr = entry.data.date.toISOString().slice(0, 10);
+          return (
+            <ArticleCard
+              slug={entry.id}
+              title={entry.data.title}
+              excerpt={entry.data.excerpt}
+              date={dateStr}
+              readTime={entry.data.readTime}
+              tags={entry.data.tags}
+            />
+          );
+        })}
+      </div>
+    ) : (
+      <p class="text-center text-text-muted">Статьи скоро появятся</p>
+    )}
+
+    <!-- Кнопка -->
+    <div class="text-center mt-10" data-reveal>
+      <a href="/articles" class="btn-outline">
+        Все статьи →
+      </a>
+    </div>
+  </div>
+</section>

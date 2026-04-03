@@ -1,0 +1,314 @@
+---
+import { getPublicMaxBotUrl } from '../data/env-public';
+
+/**
+ * Форма заявки: Netlify Forms + опционально дублирование в MAX (`PUBLIC_MAX_BOT_URL`).
+ */
+interface Props {
+  /** Атрибут `name` формы и значение скрытого `form-name` для Netlify. */
+  formName?: string;
+  /** Совпадение с `value` опций select (`start` / `business` / `vip`) для предвыбора тарифа. */
+  prefilledService?: string;
+  /** Показывать ли блок выбора услуги. */
+  showServiceSelect?: boolean;
+  /** Скрытое поле `source` (например «Кейс: …»). */
+  sourcePage?: string;
+}
+
+const {
+  formName = 'contact',
+  prefilledService = '',
+  showServiceSelect = true,
+  sourcePage = '',
+} = Astro.props;
+
+const maxBotUrl = getPublicMaxBotUrl();
+---
+
+<!-- Форма -->
+<form
+  id={`contact-form-${formName}`}
+  name={formName}
+  method="POST"
+  data-netlify="true"
+  netlify-honeypot="bot-field"
+  class="relative space-y-6"
+>
+  <!-- Honeypot Netlify: не заполнять (боты часто заполняют скрытые поля) -->
+  <p class="hidden" aria-hidden="true">
+    <label>
+      Не заполняйте:
+      <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
+    </label>
+  </p>
+  <!-- Доп. honeypot (только проверка в JS; визуально скрыто) -->
+  <div class="absolute left-0 top-0 -z-10 h-px w-px overflow-hidden opacity-0" aria-hidden="true">
+    <label for={`gotcha-${formName}`}>Website</label>
+    <input
+      type="text"
+      id={`gotcha-${formName}`}
+      name="_gotcha"
+      tabindex="-1"
+      autocomplete="off"
+    />
+  </div>
+  <input type="hidden" name="form-name" value={formName} />
+  {sourcePage && <input type="hidden" name="source" value={sourcePage} />}
+
+  <!-- Имя -->
+  <div>
+    <label for={`name-${formName}`} class="block text-sm font-medium text-text-main mb-2">
+      Ваше имя <span class="text-red-500">*</span>
+    </label>
+    <input
+      type="text"
+      id={`name-${formName}`}
+      name="name"
+      required
+      placeholder="Как к вам обращаться"
+      class="w-full px-4 py-3 rounded-lg border border-border-subtle bg-input-bg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-text-main placeholder:text-text-muted/70"
+    />
+  </div>
+
+  <!-- Телефон или Email -->
+  <div>
+    <label for={`contact-${formName}`} class="block text-sm font-medium text-text-main mb-2">
+      Телефон или Email <span class="text-red-500">*</span>
+    </label>
+    <input
+      type="text"
+      id={`contact-${formName}`}
+      name="contact"
+      required
+      placeholder="+7 (999) 123-45-67 или email@example.ru"
+      class="w-full px-4 py-3 rounded-lg border border-border-subtle bg-input-bg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-text-main placeholder:text-text-muted/70"
+    />
+  </div>
+
+  <!-- Выбор услуги -->
+  {showServiceSelect && (
+    <div>
+      <label for={`service-${formName}`} class="block text-sm font-medium text-text-main mb-2">
+        Что вас интересует
+      </label>
+      <select
+        id={`service-${formName}`}
+        name="service"
+        class="w-full px-4 py-3 rounded-lg border border-border-subtle bg-input-bg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-text-main"
+      >
+        <option value="">Выберите услугу</option>
+        <option value="landing" selected={prefilledService === 'start'}>Лендинг (от 25 000 ₽)</option>
+        <option value="corporate" selected={prefilledService === 'business'}>Корпоративный сайт (от 50 000 ₽)</option>
+        <option value="custom" selected={prefilledService === 'vip'}>Индивидуальный проект</option>
+        <option value="redesign">Редизайн сайта</option>
+        <option value="support">Техподдержка</option>
+        <option value="other">Другое</option>
+      </select>
+    </div>
+  )}
+
+  <!-- Сообщение -->
+  <div>
+    <label for={`message-${formName}`} class="block text-sm font-medium text-text-main mb-2">
+      Расскажите о проекте
+    </label>
+    <textarea
+      id={`message-${formName}`}
+      name="message"
+      rows="4"
+      placeholder="Опишите вашу задачу: какой сайт нужен, для какого бизнеса, есть ли дедлайн"
+      class="w-full px-4 py-3 rounded-lg border border-border-subtle bg-input-bg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-text-main placeholder:text-text-muted/70 resize-vertical"
+    ></textarea>
+  </div>
+
+  <!-- Кнопка -->
+  <button
+    type="submit"
+    class="btn-primary w-full py-4 text-lg"
+  >
+    <span class="btn-text">Отправить заявку</span>
+    <span class="btn-spinner hidden inline-flex items-center gap-2">
+      <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Отправляю...
+    </span>
+  </button>
+
+  <!-- Согласие с политикой (обязательно для отправки) -->
+  <div class="pt-1">
+    <label
+      for={`privacy-consent-${formName}`}
+      class="flex items-start gap-2.5 justify-center text-left max-w-xl mx-auto cursor-pointer"
+    >
+      <input
+        type="checkbox"
+        id={`privacy-consent-${formName}`}
+        name="privacy-consent"
+        value="yes"
+        required
+        class="mt-1 h-4 w-4 shrink-0 rounded border-border-subtle text-primary focus:ring-primary"
+      />
+      <span class="text-xs text-text-muted leading-snug">
+        Нажимая кнопку, вы соглашаетесь с
+        <a href="/privacy" class="underline underline-offset-2 decoration-gray-400 hover:text-primary hover:decoration-primary transition-colors">
+          Политикой конфиденциальности
+        </a>
+      </span>
+    </label>
+  </div>
+</form>
+
+<!-- Сообщение об успехе -->
+<div class="form-success hidden text-center py-8" data-form={formName}>
+  <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+    <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+    </svg>
+  </div>
+  <h3 class="text-xl font-bold text-text-main mb-2">Спасибо за заявку!</h3>
+  <p class="text-text-muted">Я свяжусь с вами в течение 2 часов в рабочее время.</p>
+</div>
+
+<!-- Сообщение об ошибке -->
+<div class="form-error hidden text-center py-4" data-form={formName}>
+  <p class="text-red-500">
+    Произошла ошибка. Попробуйте позже или напишите мне напрямую в
+    <a href="https://t.me/weirdsar" class="underline font-semibold">Telegram</a>.
+  </p>
+</div>
+
+<script is:inline define:vars={{ maxBotUrl }}>
+  function initNetlifyContactForms() {
+    // Предвыбор услуги из ?service= в URL (SSG не видит query при сборке)
+    const params = new URLSearchParams(window.location.search);
+    const serviceParam = params.get('service');
+    if (serviceParam) {
+      const tariffToOption = { start: 'landing', business: 'corporate', vip: 'custom' };
+      const selectValue = tariffToOption[serviceParam] || serviceParam;
+      document.querySelectorAll('select[name="service"]').forEach((select) => {
+        const option = Array.from(select.options).find((o) => o.value === selectValue);
+        if (option) select.value = selectValue;
+      });
+    }
+
+    // Обработчик для всех форм с data-netlify (после View Transitions — новый DOM)
+    const forms = document.querySelectorAll('form[data-netlify="true"]');
+
+    forms.forEach((form) => {
+      if (form.dataset.vtFormBound === '1') return;
+      form.dataset.vtFormBound = '1';
+
+      const formName = form.getAttribute('name');
+      const btnText = form.querySelector('.btn-text');
+      const btnSpinner = form.querySelector('.btn-spinner');
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const successEl = document.querySelector(`.form-success[data-form="${formName}"]`);
+      const errorEl = document.querySelector(`.form-error[data-form="${formName}"]`);
+
+      if (!form || !btnText || !btnSpinner || !submitBtn) return;
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const botField = form.querySelector('[name="bot-field"]');
+        const gotchaField = form.querySelector('[name="_gotcha"]');
+        const botFilled =
+          (botField instanceof HTMLInputElement && botField.value.trim() !== '') ||
+          (gotchaField instanceof HTMLInputElement && gotchaField.value.trim() !== '');
+        if (botFilled) {
+          console.log(
+            '[ContactForm] Honeypot triggered — simulated success, Netlify/MAX not called'
+          );
+          return;
+        }
+
+        // Валидация
+        const nameInput = form.querySelector('[name="name"]');
+        const contactInput = form.querySelector('[name="contact"]');
+        const nameVal = nameInput ? nameInput.value.trim() : '';
+        const contactVal = contactInput ? contactInput.value.trim() : '';
+
+        if (!nameVal || nameVal.length < 2) {
+          alert('Пожалуйста, укажите ваше имя');
+          return;
+        }
+
+        if (!contactVal || contactVal.length < 5) {
+          alert('Пожалуйста, укажите телефон или email');
+          return;
+        }
+
+        const privacyCheckbox = form.querySelector('[name="privacy-consent"]');
+        if (privacyCheckbox instanceof HTMLInputElement && !privacyCheckbox.checked) {
+          alert('Необходимо согласие с Политикой конфиденциальности');
+          privacyCheckbox.focus();
+          return;
+        }
+
+        // UI: спиннер
+        btnText.classList.add('hidden');
+        btnSpinner.classList.remove('hidden');
+        submitBtn.disabled = true;
+
+        const formData = new FormData(form);
+
+        const messageEl = form.querySelector('[name="message"]');
+        const maxPayload = {
+          name: nameVal,
+          contact: contactVal,
+          message: messageEl ? messageEl.value.trim() : '',
+        };
+        const serviceField = form.querySelector('[name="service"]');
+        if (serviceField) {
+          maxPayload.service = serviceField.value;
+        }
+        const sourceField = form.querySelector('[name="source"]');
+        if (sourceField && sourceField.value) {
+          maxPayload.source = sourceField.value;
+        }
+
+        // Зеркало в MAX — опционально; ошибки не блокируют отправку в Netlify
+        if (maxBotUrl) {
+          void fetch(maxBotUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(maxPayload),
+          })
+            .then((res) => {
+              if (!res.ok) {
+                console.warn('[ContactForm] MAX bot mirror HTTP', res.status);
+              }
+            })
+            .catch((maxErr) => {
+              console.warn('[ContactForm] MAX bot mirror failed:', maxErr);
+            });
+        }
+
+        try {
+          const response = await fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(formData).toString(),
+          });
+
+          if (response.ok) {
+            form.classList.add('hidden');
+            if (successEl) successEl.classList.remove('hidden');
+          } else {
+            throw new Error('Ошибка отправки');
+          }
+        } catch (err) {
+          console.error('Form error:', err);
+          if (errorEl) errorEl.classList.remove('hidden');
+          btnText.classList.remove('hidden');
+          btnSpinner.classList.add('hidden');
+          submitBtn.disabled = false;
+        }
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initNetlifyContactForms);
+</script>

@@ -1,0 +1,150 @@
+---
+/**
+ * Шапка: логотип, десктоп-меню (`navItems`), переключатель темы, CTA, бургер и полноэкранное меню.
+ * Пропсов нет — путь берётся из `Astro.url`.
+ */
+import { siteConfig } from '../data/site';
+import { navItems } from '../data/navigation';
+import ThemeSwitcher from './ThemeSwitcher.astro';
+
+const currentPath = Astro.url.pathname;
+
+function isActive(href: string): boolean {
+  if (href === '/') return currentPath === '/';
+  return currentPath.startsWith(href);
+}
+---
+
+<header
+  class="sticky top-0 z-50 border-b border-border-subtle bg-page/80 backdrop-blur-md transition-colors duration-200"
+>
+  <nav class="container-custom flex items-center justify-between gap-3 h-16 md:h-20">
+    <!-- Логотип -->
+    <a href="/" class="font-bold text-xl text-primary hover:text-primary-dark transition-colors">
+      {siteConfig.name}
+    </a>
+
+    <!-- Десктоп навигация -->
+    <ul class="hidden md:flex items-center gap-8">
+      {navItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class:list={[
+              'text-sm font-medium uppercase tracking-wide transition-colors',
+              isActive(item.href)
+                ? 'text-primary border-b-2 border-primary pb-1'
+                : 'text-text-muted hover:text-primary',
+            ]}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="flex items-center gap-2 md:gap-3 shrink-0">
+      <ThemeSwitcher />
+      <a href="/contact" class="btn-primary text-sm hidden md:inline-flex">
+        Обсудить проект
+      </a>
+      <button
+        id="burger-btn"
+        type="button"
+        class="md:hidden relative w-8 h-8 flex flex-col items-center justify-center gap-1.5 cursor-pointer"
+        aria-label="Открыть главное меню навигации"
+        aria-expanded="false"
+      >
+        <span class="burger-line block w-6 h-0.5 bg-text-main transition-all duration-300 origin-center"></span>
+        <span class="burger-line block w-6 h-0.5 bg-text-main transition-all duration-300 origin-center"></span>
+        <span class="burger-line block w-6 h-0.5 bg-text-main transition-all duration-300 origin-center"></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Мобильное меню -->
+  <div
+    id="mobile-menu"
+    class="md:hidden fixed inset-x-0 top-16 bottom-0 bg-page z-40 hidden transition-colors duration-200"
+  >
+    <ul class="flex flex-col items-center justify-center gap-8 h-full">
+      {navItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class:list={[
+              'mobile-nav-link text-2xl font-bold transition-colors',
+              isActive(item.href) ? 'text-primary' : 'text-text-main hover:text-primary',
+            ]}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+      <li class="mt-4">
+        <a href="/contact" class="btn-primary text-lg px-8 py-4 mobile-nav-link">
+          Обсудить проект
+        </a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<style>
+  /* Бургер → крестик анимация */
+  #burger-btn.open .burger-line:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  #burger-btn.open .burger-line:nth-child(2) {
+    opacity: 0;
+  }
+  #burger-btn.open .burger-line:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+</style>
+
+<script is:inline>
+  function closeMobileMenu(burgerBtn, mobileMenu) {
+    burgerBtn.classList.remove('open');
+    mobileMenu.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+    burgerBtn.setAttribute('aria-expanded', 'false');
+    burgerBtn.setAttribute('aria-label', 'Открыть главное меню навигации');
+  }
+
+  function initMobileHeader() {
+    var burgerBtn = document.getElementById('burger-btn');
+    var mobileMenu = document.getElementById('mobile-menu');
+    if (!burgerBtn || !mobileMenu) return;
+
+    burgerBtn.onclick = function () {
+      var isOpen = burgerBtn.classList.toggle('open');
+      mobileMenu.classList.toggle('hidden');
+      document.body.classList.toggle('overflow-hidden');
+      burgerBtn.setAttribute('aria-expanded', String(isOpen));
+      burgerBtn.setAttribute(
+        'aria-label',
+        isOpen ? 'Закрыть главное меню навигации' : 'Открыть главное меню навигации'
+      );
+    };
+
+    mobileMenu.querySelectorAll('.mobile-nav-link').forEach(function (link) {
+      link.onclick = function () {
+        closeMobileMenu(burgerBtn, mobileMenu);
+      };
+    });
+  }
+
+  if (!window.__sii5HeaderResizeBound) {
+    window.__sii5HeaderResizeBound = true;
+    window.addEventListener('resize', function () {
+      if (window.innerWidth < 768) return;
+      var burgerBtn = document.getElementById('burger-btn');
+      var mobileMenu = document.getElementById('mobile-menu');
+      if (!burgerBtn || !mobileMenu) return;
+      closeMobileMenu(burgerBtn, mobileMenu);
+    });
+  }
+
+  document.addEventListener('astro:page-load', initMobileHeader);
+</script>

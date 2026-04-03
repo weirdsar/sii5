@@ -1,0 +1,60 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import CTA from '../../components/CTA.astro';
+
+const entries = await getCollection('articles');
+const articles = [...entries].sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+---
+
+<BaseLayout
+  title="Статьи о веб-разработке"
+  description="Полезные статьи о создании сайтов, продвижении и развитии бизнеса в интернете."
+>
+  <!-- Шапка -->
+  <section class="bg-surface-dark py-16 md:py-24">
+    <div class="container-custom text-center">
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Статьи</h1>
+      <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+        Делюсь опытом и полезными знаниями о веб-разработке,
+        продвижении бизнеса в интернете и цифровых инструментах.
+      </p>
+    </div>
+  </section>
+
+  <!-- Список статей -->
+  <section class="py-16 md:py-24">
+    <div class="container-custom">
+      {articles.length > 0 ? (
+        <div class="grid md:grid-cols-2 gap-8">
+          {articles.map((entry) => {
+            const dateStr = entry.data.date.toISOString().slice(0, 10);
+            return (
+              <ArticleCard
+                slug={entry.id}
+                title={entry.data.title}
+                excerpt={entry.data.excerpt}
+                date={dateStr}
+                readTime={entry.data.readTime}
+                tags={entry.data.tags}
+              />
+            );
+          })}
+        </div>
+      ) : (
+        <p class="text-center text-text-muted text-lg">
+          Статьи скоро появятся. Следите за обновлениями!
+        </p>
+      )}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <CTA
+    title="Есть вопросы по разработке?"
+    subtitle="Напишите — помогу разобраться и подскажу лучшее решение"
+  />
+</BaseLayout>

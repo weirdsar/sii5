@@ -1,0 +1,35 @@
+# Проверки перед деплоем: типы Astro, сборка + проверка ссылок, unit-тесты
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Astro check
+        run: npx astro check
+
+      - name: Build (и проверка внутренних ссылок)
+        run: npm run build
+
+      - name: Unit tests (Vitest)
+        run: npm run test

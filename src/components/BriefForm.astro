@@ -1,0 +1,254 @@
+---
+import { getPublicMaxBotUrl } from '../data/env-public';
+
+/** Форма брифа: Netlify `project-brief` + опционально MAX (`getPublicMaxBotUrl()`). */
+const maxBotUrl = getPublicMaxBotUrl();
+---
+
+<form
+  id="brief-form-project-brief"
+  name="project-brief"
+  method="POST"
+  data-netlify="true"
+  netlify-honeypot="bot-field"
+  class="brief-screen-only space-y-5"
+>
+  <p class="hidden" aria-hidden="true">
+    <label>
+      Не заполняйте:
+      <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
+    </label>
+  </p>
+  <div class="absolute left-0 top-0 -z-10 h-px w-px overflow-hidden opacity-0" aria-hidden="true">
+    <label for="brief-gotcha">Website</label>
+    <input type="text" id="brief-gotcha" name="_gotcha" tabindex="-1" autocomplete="off" />
+  </div>
+  <input type="hidden" name="form-name" value="project-brief" />
+
+  <div>
+    <label for="brief-company" class="block text-sm font-medium text-text-main mb-1">Компания / ИП</label>
+    <input
+      id="brief-company"
+      name="company"
+      type="text"
+      class="w-full px-4 py-2.5 rounded-lg border border-border-subtle bg-input-bg text-text-main focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+      placeholder="Название"
+    />
+  </div>
+  <div class="grid sm:grid-cols-2 gap-4">
+    <div>
+      <label for="brief-name" class="block text-sm font-medium text-text-main mb-1">Ваше имя <span class="text-red-500">*</span></label>
+      <input
+        id="brief-name"
+        name="name"
+        type="text"
+        required
+        class="w-full px-4 py-2.5 rounded-lg border border-border-subtle bg-input-bg text-text-main focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+      />
+    </div>
+    <div>
+      <label for="brief-contact" class="block text-sm font-medium text-text-main mb-1">Телефон или email <span class="text-red-500">*</span></label>
+      <input
+        id="brief-contact"
+        name="contact"
+        type="text"
+        required
+        class="w-full px-4 py-2.5 rounded-lg border border-border-subtle bg-input-bg text-text-main focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+      />
+    </div>
+  </div>
+  <div>
+    <label for="brief-type" class="block text-sm font-medium text-text-main mb-1">Тип проекта</label>
+    <select
+      id="brief-type"
+      name="project_type"
+      class="w-full px-4 py-2.5 rounded-lg border border-border-subtle bg-input-bg text-text-main focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+    >
+      <option value="">Выберите</option>
+      <option value="landing">Лендинг</option>
+      <option value="corporate">Корпоративный сайт</option>
+      <option value="shop">Интернет-магазин</option>
+      <option value="redesign">Редизайн / доработка</option>
+      <option value="other">Другое</option>
+    </select>
+  </div>
+  <div>
+    <label for="brief-goals" class="block text-sm font-medium text-text-main mb-1">Цели и задачи сайта</label>
+    <textarea
+      id="brief-goals"
+      name="goals"
+      rows="3"
+      class="w-full px-4 py-2.5 rounded-lg border border-border-subtle bg-input-bg text-text-main focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none resize-y"
+      placeholder="Заявки, каталог, имидж…"
+    ></textarea>
+  </div>
+  <div>
+    <label for="brief-pages" class="block text-sm font-medium text-text-main mb-1">Страницы и функции</label>
+    <textarea
+      id="brief-pages"
+      name="pages_features"
+      rows="3"
+      class="w-full px-4 py-2.5 rounded-lg border border-border-subtle bg-input-bg text-text-main focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none resize-y"
+      placeholder="Примерный список разделов, формы, личный кабинет…"
+    ></textarea>
+  </div>
+  <div class="grid sm:grid-cols-2 gap-4">
+    <div>
+      <label for="brief-deadline" class="block text-sm font-medium text-text-main mb-1">Желаемые сроки</label>
+      <input
+        id="brief-deadline"
+        name="deadline"
+        type="text"
+        class="w-full px-4 py-2.5 rounded-lg border border-border-subtle bg-input-bg text-text-main focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+        placeholder="Например: к марту 2026"
+      />
+    </div>
+    <div>
+      <label for="brief-budget" class="block text-sm font-medium text-text-main mb-1">Ориентир по бюджету</label>
+      <input
+        id="brief-budget"
+        name="budget"
+        type="text"
+        class="w-full px-4 py-2.5 rounded-lg border border-border-subtle bg-input-bg text-text-main focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+        placeholder="Диапазон в ₽"
+      />
+    </div>
+  </div>
+  <div>
+    <label for="brief-refs" class="block text-sm font-medium text-text-main mb-1">Референсы (ссылки)</label>
+    <textarea
+      id="brief-refs"
+      name="references"
+      rows="2"
+      class="w-full px-4 py-2.5 rounded-lg border border-border-subtle bg-input-bg text-text-main focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none resize-y"
+      placeholder="Сайты, которые нравятся"
+    ></textarea>
+  </div>
+  <div>
+    <label for="brief-extra" class="block text-sm font-medium text-text-main mb-1">Дополнительно</label>
+    <textarea
+      id="brief-extra"
+      name="extra"
+      rows="2"
+      class="w-full px-4 py-2.5 rounded-lg border border-border-subtle bg-input-bg text-text-main focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none resize-y"
+    ></textarea>
+  </div>
+  <div class="pt-1">
+    <label class="flex items-start gap-2.5 cursor-pointer text-sm text-text-muted">
+      <input type="checkbox" name="privacy-consent" value="yes" required class="mt-1 h-4 w-4 rounded border-border-subtle text-primary" />
+      <span>
+        Согласен с
+        <a href="/privacy" class="underline hover:text-primary">Политикой конфиденциальности</a>
+      </span>
+    </label>
+  </div>
+  <button type="submit" class="btn-primary w-full py-3">
+    <span class="brief-btn-text">Отправить бриф</span>
+    <span class="brief-btn-spinner hidden">Отправляю…</span>
+  </button>
+</form>
+
+<div class="brief-screen-only form-success hidden text-center py-6 rounded-xl bg-green-50 border border-green-100" data-form="project-brief">
+  <p class="font-semibold text-text-main">Бриф отправлен. Свяжусь с вами в ближайшее время.</p>
+</div>
+<div class="brief-screen-only form-error hidden text-center py-4 text-red-600" data-form="project-brief">
+  <p>Не удалось отправить. Напишите в <a href="https://t.me/weirdsar" class="underline font-semibold">Telegram</a>.</p>
+</div>
+
+<script is:inline define:vars={{ maxBotUrl }}>
+  function initBriefForm() {
+    var form = document.getElementById('brief-form-project-brief');
+    if (!form || form.dataset.vtBound === '1') return;
+    form.dataset.vtBound = '1';
+
+    var btnText = form.querySelector('.brief-btn-text');
+    var btnSpinner = form.querySelector('.brief-btn-spinner');
+    var submitBtn = form.querySelector('button[type="submit"]');
+    var successEl = document.querySelector('.form-success[data-form="project-brief"]');
+    var errorEl = document.querySelector('.form-error[data-form="project-brief"]');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var botField = form.querySelector('[name="bot-field"]');
+      var gotcha = form.querySelector('[name="_gotcha"]');
+      if (
+        (botField instanceof HTMLInputElement && botField.value.trim() !== '') ||
+        (gotcha instanceof HTMLInputElement && gotcha.value.trim() !== '')
+      ) {
+        return;
+      }
+
+      var fd = new FormData(form);
+      var name = String(fd.get('name') || '').trim();
+      var contact = String(fd.get('contact') || '').trim();
+      if (name.length < 2 || contact.length < 5) {
+        alert('Укажите имя и контакт');
+        return;
+      }
+      var privacy = form.querySelector('[name="privacy-consent"]');
+      if (privacy instanceof HTMLInputElement && !privacy.checked) {
+        alert('Нужно согласие с политикой');
+        return;
+      }
+
+      if (btnText) btnText.classList.add('hidden');
+      if (btnSpinner) btnSpinner.classList.remove('hidden');
+      if (submitBtn) submitBtn.disabled = true;
+
+      var lines = [
+        'Форма: бриф проекта',
+        'Компания: ' + (fd.get('company') || ''),
+        'Тип: ' + (fd.get('project_type') || ''),
+        'Цели: ' + (fd.get('goals') || ''),
+        'Страницы/функции: ' + (fd.get('pages_features') || ''),
+        'Сроки: ' + (fd.get('deadline') || ''),
+        'Бюджет: ' + (fd.get('budget') || ''),
+        'Референсы: ' + (fd.get('references') || ''),
+        'Дополнительно: ' + (fd.get('extra') || ''),
+      ];
+      var messageBody = lines.join('\n');
+
+      if (maxBotUrl) {
+        void fetch(maxBotUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            contact: contact,
+            message: messageBody,
+            service: 'project-brief',
+            source: 'Страница /brief',
+          }),
+        }).catch(function () {});
+      }
+
+      try {
+        var res = await fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(fd).toString(),
+        });
+        if (res.ok) {
+          form.classList.add('hidden');
+          if (successEl) successEl.classList.remove('hidden');
+        } else {
+          throw new Error('netlify');
+        }
+      } catch (err) {
+        if (errorEl) errorEl.classList.remove('hidden');
+        if (btnText) btnText.classList.remove('hidden');
+        if (btnSpinner) btnSpinner.classList.add('hidden');
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', initBriefForm);
+</script>
+
+<style>
+  /* обёртка с position для honeypot внутри формы */
+  form#brief-form-project-brief {
+    position: relative;
+  }
+</style>

@@ -1,0 +1,126 @@
+/* Локальные вариативные шрифты (без Google Fonts, font-display: swap в пакетах) */
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
+
+@import "tailwindcss";
+
+/* Тёмная тема по классу на <html> (совместимо с FOUC-скриптом и View Transitions) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: #2563EB;
+  --color-primary-dark: #1E40AF;
+  --color-primary-light: #3B82F6;
+
+  --color-accent: #F59E0B;
+  --color-accent-dark: #D97706;
+
+  --color-surface-light: #F8FAFC;
+  --color-surface-dark: #0F172A;
+
+  --color-text-main: #1E293B;
+  --color-text-muted: #64748B;
+
+  /* Семантика страницы: светлая тема по умолчанию */
+  --color-page: #ffffff;
+  --color-card: #ffffff;
+  --color-border-subtle: #e2e8f0;
+  --color-muted-surface: #f1f5f9;
+  --color-input-bg: #ffffff;
+
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+}
+
+/* Тёмная палитра: переопределение тех же токенов (color-scheme — нативные скроллбары и form controls) */
+html.dark {
+  color-scheme: dark;
+
+  --color-surface-light: #1e293b;
+  --color-text-main: #f1f5f9;
+  --color-text-muted: #94a3b8;
+
+  --color-page: #0f172a;
+  --color-card: #1e293b;
+  --color-border-subtle: #334155;
+  --color-muted-surface: #334155;
+  --color-input-bg: #1e293b;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color-scheme: light;
+}
+
+body {
+  @apply bg-page text-text-main font-sans;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold tracking-tight;
+}
+
+/* Утилитарные компоненты */
+.container-custom {
+  @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-page cursor-pointer;
+}
+
+.btn-accent {
+  @apply inline-flex items-center justify-center px-6 py-3 bg-accent text-surface-dark font-semibold rounded-lg hover:bg-accent-dark transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-page cursor-pointer;
+}
+
+.btn-outline {
+  @apply inline-flex items-center justify-center px-6 py-3 border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-page cursor-pointer;
+}
+
+/* Типографика статей */
+.prose h2 {
+  @apply text-2xl font-bold text-text-main mt-8 mb-4;
+}
+
+.prose h3 {
+  @apply text-xl font-bold text-text-main mt-6 mb-3;
+}
+
+.prose p {
+  @apply text-text-muted leading-relaxed mb-4;
+}
+
+.prose ul {
+  @apply list-disc list-inside space-y-2 mb-4 text-text-muted;
+}
+
+.prose ol {
+  @apply list-decimal list-inside space-y-2 mb-4 text-text-muted;
+}
+
+.prose li {
+  @apply leading-relaxed;
+}
+
+.prose a {
+  @apply text-primary underline hover:text-primary-dark;
+}
+
+.prose strong {
+  @apply text-text-main font-semibold;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-primary pl-4 italic text-text-muted my-4;
+}
+
+/* Блоки кода в статьях (обёртка + pre задаются в разметке/скрипте страницы статьи) */
+.article-prose pre {
+  @apply my-0 overflow-x-auto bg-transparent p-4 text-sm leading-relaxed text-gray-100 font-mono;
+}
+
+.article-prose pre code {
+  @apply bg-transparent p-0 text-inherit font-mono;
+}

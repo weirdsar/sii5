@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sii5.ru/sitemap-index.xml

@@ -1,0 +1,256 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BriefForm from '../components/BriefForm.astro';
+import { siteConfig } from '../data/site';
+---
+
+<BaseLayout
+  title="Бриф на разработку сайта"
+  description="Шаблон технического задания для заказа сайта: распечатайте или сохраните как PDF, либо отправьте заполненную форму онлайн."
+  robots="noindex, follow"
+>
+  <article class="brief-print-page bg-page transition-colors duration-200">
+    <!-- Панель только на экране: печать / PDF -->
+    <div
+      class="brief-screen-only sticky top-16 md:top-20 z-30 border-b border-border-subtle bg-page/95 backdrop-blur supports-[backdrop-filter]:bg-page/80"
+    >
+      <div class="container-custom py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <p class="text-sm text-text-muted">
+          В диалоге печати выберите «Сохранить как PDF», чтобы скачать бриф.
+        </p>
+        <div class="flex flex-wrap gap-2 shrink-0">
+          <button type="button" class="btn-primary text-sm py-2 px-4 brief-print-trigger">
+            Распечатать / PDF
+          </button>
+          <a href="/contact" class="btn-outline text-sm py-2 px-4"> Оставить заявку </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-custom max-w-3xl py-10 md:py-14 brief-print-inner">
+      <header class="mb-10 pb-6 border-b-2 border-text-main">
+        <p class="text-sm font-semibold uppercase tracking-wider text-primary mb-2">SII5 — веб-разработка</p>
+        <h1 class="text-3xl md:text-4xl font-bold text-text-main tracking-tight">Бриф на разработку сайта</h1>
+        <p class="text-text-muted mt-3 text-sm md:text-base leading-relaxed">
+          Заполните бланк от руки или в редакторе, сохраните в PDF — так мы быстрее согласуем объём работ и оценку. Ниже
+          можно отправить те же данные через форму.
+        </p>
+      </header>
+
+      <!-- Печатный шаблон -->
+      <div class="brief-printable space-y-10 text-text-main">
+        <section class="brief-print-section">
+          <h2 class="brief-h2">1. О компании</h2>
+          <dl class="brief-fields">
+            <div class="brief-row">
+              <dt>Название, сфера деятельности</dt>
+              <dd><span class="brief-line"></span></dd>
+            </div>
+            <div class="brief-row">
+              <dt>Сайт / соцсети (если есть)</dt>
+              <dd><span class="brief-line"></span></dd>
+            </div>
+            <div class="brief-row">
+              <dt>Контактное лицо, телефон, email</dt>
+              <dd><span class="brief-line"></span></dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="brief-print-section">
+          <h2 class="brief-h2">2. Цели сайта</h2>
+          <p class="brief-hint text-text-muted text-sm mb-3">Заявки, каталог, имидж, поддержка клиентов…</p>
+          <div class="brief-lines-block" aria-hidden="true">
+            <span class="brief-line"></span>
+            <span class="brief-line"></span>
+            <span class="brief-line"></span>
+          </div>
+        </section>
+
+        <section class="brief-print-section">
+          <h2 class="brief-h2">3. Аудитория</h2>
+          <p class="brief-hint text-text-muted text-sm mb-3">Кто заказчик услуги / товара, регион, типичный запрос</p>
+          <div class="brief-lines-block">
+            <span class="brief-line"></span>
+            <span class="brief-line"></span>
+          </div>
+        </section>
+
+        <section class="brief-print-section">
+          <h2 class="brief-h2">4. Структура и функции</h2>
+          <p class="brief-hint text-text-muted text-sm mb-3">Страницы, формы, фильтры, личный кабинет, оплата…</p>
+          <div class="brief-lines-block">
+            <span class="brief-line"></span>
+            <span class="brief-line"></span>
+            <span class="brief-line"></span>
+            <span class="brief-line"></span>
+          </div>
+        </section>
+
+        <section class="brief-print-section">
+          <h2 class="brief-h2">5. Контент и материалы</h2>
+          <dl class="brief-fields">
+            <div class="brief-row">
+              <dt>Тексты, фото, логотип — кто готовит</dt>
+              <dd><span class="brief-line"></span></dd>
+            </div>
+            <div class="brief-row">
+              <dt>Референсы (сайты, которые нравятся)</dt>
+              <dd><span class="brief-line"></span></dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="brief-print-section">
+          <h2 class="brief-h2">6. Сроки и бюджет</h2>
+          <dl class="brief-fields">
+            <div class="brief-row">
+              <dt>К какой дате нужен запуск</dt>
+              <dd><span class="brief-line"></span></dd>
+            </div>
+            <div class="brief-row">
+              <dt>Ориентир по бюджету (₽)</dt>
+              <dd><span class="brief-line"></span></dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="brief-print-section">
+          <h2 class="brief-h2">7. Дополнительно</h2>
+          <div class="brief-lines-block">
+            <span class="brief-line"></span>
+            <span class="brief-line"></span>
+          </div>
+        </section>
+
+        <footer class="brief-print-footer pt-6 mt-8 border-t border-border-subtle text-sm text-text-muted">
+          <p>
+            {siteConfig.name} · {siteConfig.phone} · {siteConfig.email}
+          </p>
+          <p class="mt-1">После заполнения можно отправить бриф через форму на этой же странице или на странице «Контакты».</p>
+        </footer>
+      </div>
+
+      <!-- Онлайн-форма (скрыта при печати) -->
+      <div class="brief-screen-only mt-16 pt-12 border-t border-border-subtle">
+        <h2 class="text-2xl font-bold text-text-main mb-2">Отправить бриф онлайн</h2>
+        <p class="text-text-muted text-sm mb-6">
+          Те же пункты в виде формы — дублируйте информацию из бланка или заполните с нуля.
+        </p>
+        <div class="bg-surface-light rounded-2xl p-6 md:p-8 border border-border-subtle">
+          <BriefForm />
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <script is:inline>
+    document.addEventListener('astro:page-load', function () {
+      document.querySelectorAll('.brief-print-trigger').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          window.print();
+        });
+      });
+    });
+  </script>
+
+  <style is:global>
+    .brief-print-page .brief-h2 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+      color: var(--color-text-main, #1e293b);
+    }
+
+    .brief-print-page .brief-fields .brief-row {
+      margin-bottom: 1rem;
+    }
+
+    .brief-print-page .brief-fields dt {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-main, #1e293b);
+      margin-bottom: 0.35rem;
+    }
+
+    .brief-print-page .brief-line {
+      display: block;
+      min-height: 1.5rem;
+      border-bottom: 1px solid #94a3b8;
+      margin-top: 0.25rem;
+    }
+
+    .brief-print-page .brief-lines-block {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .brief-print-section {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    @media print {
+      @page {
+        margin: 14mm 16mm;
+        size: A4 portrait;
+      }
+
+      html {
+        scroll-behavior: auto !important;
+      }
+
+      body {
+        background: #fff !important;
+        color: #0f172a !important;
+        font-size: 11pt;
+        line-height: 1.45;
+      }
+
+      body header,
+      body footer,
+      .brief-screen-only,
+      astro-dev-toolbar {
+        display: none !important;
+      }
+
+      body main {
+        padding: 0 !important;
+        min-height: 0 !important;
+        flex: none !important;
+      }
+
+      .brief-print-page {
+        background: #fff !important;
+      }
+
+      .brief-print-inner {
+        max-width: 100% !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+      }
+
+      .brief-print-page .brief-h2 {
+        color: #000 !important;
+        font-size: 12pt;
+        border-bottom: none;
+      }
+
+      .brief-print-page .brief-line {
+        border-bottom-color: #64748b !important;
+        min-height: 1.25rem;
+      }
+
+      .brief-print-footer {
+        color: #475569 !important;
+        font-size: 9pt;
+      }
+
+      .brief-print-page a[href]::after {
+        content: none !important;
+      }
+    }
+  </style>
+</BaseLayout>

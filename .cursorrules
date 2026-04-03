@@ -1,0 +1,139 @@
+# .cursorrules
+
+## Проект
+Одностраничный/многостраничный сайт-портфолио веб-разработчика.
+Репозиторий: https://github.com/weirdsar/sii5
+Деплой: Netlify (авто-деплой из main-ветки). https://app.netlify.com/start/repos/weirdsar
+
+## Стек
+- Astro v4+ (SSG, output: "static")
+- Tailwind CSS v3 через @astrojs/tailwind
+- TypeScript (strict: true в tsconfig)
+- Форма заявки: Netlify Forms (атрибут data-netlify) + клиентский fetch-перехват
+- Дополнительно: @astrojs/sitemap для sitemap.xml
+
+## Языковые и региональные настройки
+- Весь контент на русском языке (lang="ru")
+- Целевая аудитория: малый бизнес в РФ
+- Валюта: рубли (₽)
+- Телефонный формат: +7 (927) 226-80-33
+
+## Архитектурные принципы
+1. Zero JavaScript по умолчанию. Клиентский JS только для:
+   - бургер-меню (client:load)
+   - перехват формы (is:inline скрипт)
+   - анимация появления (Intersection Observer, is:inline)
+2. Данные кейсов хранятся в src/data/cases.ts (типизированный массив).
+3. Все компоненты — .astro файлы (не React, не Vue).
+4. Изображения: Astro <Image /> компонент, формат WebP, lazy loading.
+5. Mobile-first подход во всех стилях.
+6. Семантическая HTML5 разметка (header, nav, main, section, article, footer).
+
+## Стиль кода
+- Отступы: 2 пробела
+- Кавычки: двойные в HTML/Astro, одинарные в TS/JS
+- Tailwind: утилитарные классы напрямую, без @apply (кроме globals.css)
+- Именование файлов компонентов: PascalCase (Hero.astro, CaseCard.astro)
+- Именование страниц: kebab-case или стандартное Astro (index.astro, [slug].astro)
+- CSS-переменные для брендовых цветов определяются в tailwind.config.mjs
+
+## Цветовая палитра (расширять по необходимости)
+- primary: #2563EB (синий)
+- primary-dark: #1E40AF
+- accent: #F59E0B (янтарный)
+- bg-light: #F8FAFC
+- bg-dark: #0F172A
+- text-main: #1E293B
+- text-muted: #64748B
+
+## Типографика
+- Шрифты: Inter Variable, JetBrains Mono Variable — `@fontsource-variable` (локально, без Google Fonts)
+- Базовый размер: 16px
+- Заголовки: жирные, с отрицательным letter-spacing
+
+## SEO-требования
+- Уникальный <title> и <meta description> на каждой странице
+- Open Graph теги (og:title, og:description, og:image)
+- JSON-LD микроразметка для WebSite и LocalBusiness
+- Файл robots.txt в public/
+- Sitemap через @astrojs/sitemap
+
+## Производительность
+- Lighthouse mobile ≥ 90
+- Все изображения оптимизированы и в WebP
+- Никаких внешних CSS-фреймворков кроме Tailwind
+- Preload для критических шрифтов
+
+## Структура файлов (целевая)
+src/
+├── layouts/
+│   └── BaseLayout.astro
+├── pages/
+│   ├── index.astro
+│   ├── cases/
+│   │   ├── index.astro
+│   │   └── [slug].astro
+│   ├── services.astro
+│   ├── articles/
+│   │   ├── index.astro
+│   │   └── [slug].astro
+│   └── contact.astro
+├── components/
+│   ├── Header.astro
+│   ├── MobileMenu.astro
+│   ├── Footer.astro
+│   ├── Hero.astro
+│   ├── ProjectsGrid.astro
+│   ├── CaseCard.astro
+│   ├── ServiceCard.astro
+│   ├── ServicesList.astro
+│   ├── ArticleCard.astro
+│   ├── ArticlesPreview.astro
+│   ├── ContactForm.astro
+│   ├── CTA.astro
+│   ├── ScrollReveal.astro
+│   └── JsonLd.astro
+├── data/
+│   ├── cases.ts
+│   ├── services.ts
+│   └── articles.ts
+├── types/
+│   └── index.ts
+├── styles/
+│   └── globals.css
+└── utils/
+    └── helpers.ts
+public/
+├── images/
+│   ├── cases/
+│   ├── hero/
+│   └── og/
+├── robots.txt
+└── favicon.svg
+
+## Обработка форм — MAX Bot
+Заявки из формы должны отправляться в мессенджер MAX.
+Подробные инструкции — в файле max_bot_instrukt.md в корне проекта.
+При генерации ContactForm.astro учитывай:
+- Основной канал: fetch POST на endpoint MAX-бота
+- Fallback: Netlify Forms (data-netlify="true")
+- Оба канала работают параллельно
+
+## Tailwind CSS v4
+- Проект использует Tailwind CSS v4 с @tailwindcss/vite
+- НЕТ файла tailwind.config.mjs — вся конфигурация в src/styles/globals.css
+- Кастомные цвета и шрифты заданы через @theme в globals.css
+- Используй @import "tailwindcss" вместо @tailwind директив
+- @apply работает как в v3
+- Кастомные цвета доступны как: bg-primary, text-text-main, bg-surface-dark и т.д.
+
+
+## Правила для Cursor
+- Не используй React, Vue, Svelte или любой UI-фреймворк
+- Не добавляй зависимости без явного указания в промте
+- Каждый файл должен быть самодостаточным (все импорты явные)
+- Комментируй сложную логику на русском
+- При создании нового файла показывай полный путь от корня проекта
+- Если промт просит изменить существующий файл — показывай полный файл после изменений
+
+Веди отчёт в `log.md` после каждого существенного изменения: дата, заголовок, список затронутых файлов, кратко суть, результаты проверок при необходимости. Используй `log.md` как постоянную память проекта между сессиями; отчёт также нужен для внешнего контроля архитектора за проектом.

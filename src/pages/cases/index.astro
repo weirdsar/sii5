@@ -1,0 +1,54 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import CTA from '../../components/CTA.astro';
+import { getCasePreview } from '../../utils/imageAssets';
+
+const caseEntries = await getCollection('cases');
+const cases = caseEntries.sort(
+  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+);
+---
+
+<BaseLayout
+  title="Кейсы — Портфолио проектов"
+  description="Мои работы: лендинги, корпоративные сайты, интернет-магазины для малого бизнеса. Реальные результаты для реальных клиентов."
+>
+  <!-- Шапка страницы -->
+  <section class="bg-surface-dark py-16 md:py-24">
+    <div class="container-custom text-center">
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Мои проекты</h1>
+      <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+        Каждый проект — это решение конкретной бизнес-задачи.
+        Нажмите на проект, чтобы узнать подробности.
+      </p>
+    </div>
+  </section>
+
+  <!-- Сетка кейсов -->
+  <section class="py-16 md:py-24">
+    <div class="container-custom">
+      <div class="grid md:grid-cols-2 gap-8">
+        {cases.map((c) => {
+          const preview = getCasePreview(c.id);
+          return preview ? (
+            <CaseCard
+              slug={c.id}
+              title={c.data.title}
+              shortDesc={c.data.description}
+              image={preview}
+              tags={c.data.tags}
+            />
+          ) : null;
+        })}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <CTA
+    title="Хотите такой же результат?"
+    subtitle="Расскажите о вашем проекте — подберу оптимальное решение"
+  />
+</BaseLayout>

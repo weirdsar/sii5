@@ -1,0 +1,114 @@
+---
+/**
+ * Кнопка light/dark: класс на `<html>`, `localStorage` (`sii5-theme`), синхронизация между вкладками и `astro:page-load`.
+ * Пропсов нет.
+ */
+const STORAGE_KEY = 'sii5-theme';
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  class="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border-subtle bg-page/60 text-text-main hover:bg-muted-surface hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page"
+  aria-label="Переключить тему"
+  aria-pressed="false"
+>
+  <!-- Светлая тема активна: показать иконку «луна» (перейти в тёмную) -->
+  <svg
+    class="h-5 w-5 dark:hidden"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+  </svg>
+  <!-- Тёмная тема активна: показать иконку «солнце» -->
+  <svg
+    class="hidden h-5 w-5 dark:block"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+  </svg>
+</button>
+
+<script is:inline define:vars={{ STORAGE_KEY }}>
+  function applyTheme(mode) {
+    var root = document.documentElement;
+    var dark = mode === 'dark';
+    root.classList.toggle('dark', dark);
+    root.style.colorScheme = dark ? 'dark' : 'light';
+    try {
+      localStorage.setItem(STORAGE_KEY, mode);
+    } catch (e) {}
+  }
+
+  function getMode() {
+    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  }
+
+  function syncToggleUi() {
+    var dark = getMode() === 'dark';
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (btn) {
+      btn.setAttribute('aria-pressed', String(dark));
+      btn.setAttribute(
+        'aria-label',
+        dark ? 'Включить светлую тему' : 'Включить тёмную тему'
+      );
+    });
+  }
+
+  function toggleTheme() {
+    applyTheme(getMode() === 'dark' ? 'light' : 'dark');
+    syncToggleUi();
+  }
+
+  function onStorage(e) {
+    if (e.key !== STORAGE_KEY) return;
+    if (e.newValue !== 'dark' && e.newValue !== 'light') return;
+    applyTheme(e.newValue);
+    syncToggleUi();
+  }
+
+  function onPrefersChange(e) {
+    try {
+      if (localStorage.getItem(STORAGE_KEY)) return;
+    } catch (err) {}
+    applyTheme(e.matches ? 'dark' : 'light');
+    syncToggleUi();
+  }
+
+  function bindToggles() {
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (btn) {
+      btn.onclick = function () {
+        toggleTheme();
+      };
+    });
+    syncToggleUi();
+  }
+
+  if (!window.__sii5ThemeBound) {
+    window.__sii5ThemeBound = true;
+    window.addEventListener('storage', onStorage);
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', onPrefersChange);
+  }
+
+  bindToggles();
+  document.addEventListener('astro:page-load', bindToggles);
+</script>

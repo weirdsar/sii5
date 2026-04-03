@@ -1,0 +1,108 @@
+---
+/**
+ * Один JSON-LD блок на вызов: WebSite, ProfessionalService, Article или BreadcrumbList.
+ */
+import { siteConfig } from '../data/site';
+
+/** Элемент цепочки хлебных крошек (абсолютные URL). */
+export interface BreadcrumbSchemaItem {
+  name: string;
+  /** Абсолютный URL пункта крошек */
+  item: string;
+}
+
+/** Поля для `type="article"` (обычно из frontmatter статьи). */
+interface ArticleData {
+  title?: string;
+  description?: string;
+  date?: string;
+}
+
+interface Props {
+  /** Какую схему вывести; `website` и `localBusiness` не требуют `data`. */
+  type: 'website' | 'localBusiness' | 'article' | 'breadcrumb';
+  /**
+   * `article`: `ArticleData`.
+   * `breadcrumb`: `{ items: BreadcrumbSchemaItem[] }`.
+   */
+  data?: ArticleData | { items: BreadcrumbSchemaItem[] };
+}
+
+const { type, data = {} } = Astro.props;
+
+let jsonLd: Record<string, unknown> = {};
+
+if (type === 'website') {
+  jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteConfig.name,
+    url: siteConfig.url,
+    description: siteConfig.description,
+    author: {
+      '@type': 'Person',
+      name: siteConfig.author,
+      url: siteConfig.url,
+    },
+  };
+}
+
+if (type === 'localBusiness') {
+  jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfessionalService',
+    name: siteConfig.name,
+    url: siteConfig.url,
+    description: siteConfig.description,
+    telephone: siteConfig.phone,
+    email: siteConfig.email,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: siteConfig.city,
+      addressCountry: 'RU',
+    },
+    areaServed: {
+      '@type': 'Country',
+      name: 'Россия',
+    },
+    priceRange: '₽₽',
+  };
+}
+
+if (type === 'article' && 'title' in data && data.title) {
+  const d = data as ArticleData;
+  jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: d.title,
+    description: d.description || '',
+    datePublished: d.date || '',
+    author: {
+      '@type': 'Person',
+      name: siteConfig.author,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: siteConfig.name,
+      url: siteConfig.url,
+    },
+  };
+}
+
+if (type === 'breadcrumb' && 'items' in data && Array.isArray(data.items) && data.items.length > 0) {
+  jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: data.items.map((entry, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: entry.name,
+      item: entry.item,
+    })),
+  };
+}
+
+const hasLd = Object.keys(jsonLd).length > 0;
+---
+
+{hasLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}

@@ -1,0 +1,213 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { siteConfig } from '../data/site';
+import {
+  getPublicMetrikaId,
+  YANDEX_METRIKA_TAG_SCRIPT_URL,
+  yandexMetrikaWatchPixelUrl,
+} from '../data/env-public';
+import '../styles/globals.css';
+
+interface Props {
+  /** Заголовок страницы (без суффикса с именем сайта). */
+  title: string;
+  /** Meta description для SEO и соцсетей. */
+  description: string;
+  /**
+   * Путь или полный URL обложки для OG/Twitter (по умолчанию — SVG в public/).
+   * Кейсы/статьи: сгенерированные PNG (`/open-graph/cases/…`, `/open-graph/articles/…`).
+   */
+  ogImage?: string;
+  /** Абсолютный канонический URL страницы */
+  canonicalUrl?: string;
+  /** Тип объекта Open Graph */
+  type?: 'website' | 'article';
+  /** Переопределение ID Метрики; иначе см. `getPublicMetrikaId()` в `src/data/env-public.ts` и `PUBLIC_METRIKA_ID`. */
+  metrikaId?: string;
+  /** Например `noindex, follow` для служебных страниц */
+  robots?: string;
+}
+
+const {
+  title,
+  description,
+  ogImage = '/images/og/og-default.svg',
+  canonicalUrl,
+  type = 'website',
+  metrikaId: metrikaIdProp,
+  robots,
+} = Astro.props;
+
+const metrikaId = getPublicMetrikaId(metrikaIdProp);
+const metrikaTagUrl = YANDEX_METRIKA_TAG_SCRIPT_URL;
+const metrikaNoscriptSrc = yandexMetrikaWatchPixelUrl(metrikaId);
+
+const fullTitle = `${title} | ${siteConfig.name}`;
+
+const siteOrigin = Astro.site ?? new URL(siteConfig.url);
+const canonical =
+  canonicalUrl != null && canonicalUrl !== ''
+    ? canonicalUrl.startsWith('http')
+      ? canonicalUrl
+      : new URL(canonicalUrl.replace(/^\//, ''), siteOrigin).href
+    : new URL(Astro.url.pathname, siteOrigin).href;
+
+const absoluteOgImage = new URL(ogImage, siteOrigin).href;
+---
+
+<!doctype html>
+<html lang="ru" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Тема до CSS: убирает FOUC; тот же ключ, что в ThemeSwitcher.astro -->
+    <script is:inline>
+      (function () {
+        var KEY = 'sii5-theme';
+        var root = document.documentElement;
+        var stored = null;
+        try {
+          stored = localStorage.getItem(KEY);
+        } catch (e) {}
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var mode =
+          stored === 'dark' || stored === 'light' ? stored : prefersDark ? 'dark' : 'light';
+        root.classList.toggle('dark', mode === 'dark');
+        root.style.colorScheme = mode === 'dark' ? 'dark' : 'light';
+      })();
+    </script>
+    <ClientRouter />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={siteConfig.author} />
+    {robots && <meta name="robots" content={robots} />}
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={absoluteOgImage} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content={type} />
+    <meta property="og:locale" content="ru_RU" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteOgImage} />
+
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- JSON-LD микроразметка -->
+    <JsonLd type="website" />
+    <JsonLd type="localBusiness" />
+
+    <!-- Yandex.Metrika: Partytown (web worker) — снижает блокировку основного потока -->
+    <script is:inline type="text/partytown" define:vars={{ metrikaId, metrikaTagUrl }}>
+      (function (m, e, t, r, i, k, a) {
+        m[i] =
+          m[i] ||
+          function () {
+            (m[i].a = m[i].a || []).push(arguments);
+          };
+        m[i].l = 1 * new Date();
+        for (var j = 0; j < document.scripts.length; j++) {
+          if (document.scripts[j].src === r) {
+            return;
+          }
+        }
+        (k = e.createElement(t)),
+          (a = e.getElementsByTagName(t)[0]),
+          (k.async = 1),
+          (k.src = r),
+          a.parentNode.insertBefore(k, a);
+      })(window, document, 'script', metrikaTagUrl, 'ym');
+
+      ym(metrikaId, 'init', {
+        clickmap: true,
+        trackLinks: true,
+        accurateTrackBounce: true,
+        webvisor: true,
+      });
+    </script>
+    <noscript>
+      <div>
+        <img
+          src={metrikaNoscriptSrc}
+          style="position:absolute; left:-9999px;"
+          alt=""
+        />
+      </div>
+    </noscript>
+    <!-- /Yandex.Metrika counter -->
+  </head>
+  <body class="min-h-screen flex flex-col bg-page text-text-main font-sans transition-colors duration-200">
+    <!-- Пропуск навигации: видна при фокусировке с клавиатуры -->
+    <a
+      href="#main-content"
+      class="absolute left-[-9999px] top-0 z-[200] overflow-hidden whitespace-nowrap border-0 bg-primary px-4 py-3 text-sm font-semibold text-white shadow-lg outline-none ring-2 ring-white ring-offset-2 ring-offset-primary focus:left-4 focus:top-4 focus:h-auto focus:w-auto focus:overflow-visible focus:rounded-md"
+    >
+      Перейти к содержимому
+    </a>
+
+    <Header />
+
+    <main
+      id="main-content"
+      class="flex-grow outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      tabindex="-1"
+    >
+      <slot />
+    </main>
+
+    <Footer />
+
+    <!-- Появление секций: IntersectionObserver + классы Tailwind (astro:page-load — после View Transitions) -->
+    <script is:inline>
+      function initRevealAnimations() {
+        var hidden = ['opacity-0', 'translate-y-4'];
+        var shown = ['opacity-100', 'translate-y-0'];
+        var revealElements = document.querySelectorAll('[data-reveal]');
+
+        if (!revealElements.length) return;
+
+        revealElements.forEach(function (el) {
+          el.classList.add.apply(el.classList, hidden);
+          el.classList.add('transition-all', 'duration-500', 'ease-out');
+        });
+
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (!entry.isIntersecting) return;
+              var el = entry.target;
+              var delay = el.getAttribute('data-reveal-delay') || '0';
+              el.style.transitionDelay = delay + 'ms';
+              hidden.forEach(function (c) {
+                el.classList.remove(c);
+              });
+              shown.forEach(function (c) {
+                el.classList.add(c);
+              });
+              observer.unobserve(el);
+            });
+          },
+          {
+            threshold: window.innerWidth < 768 ? 0.05 : 0.15,
+            rootMargin: '0px 0px -50px 0px',
+          }
+        );
+
+        revealElements.forEach(function (el) {
+          observer.observe(el);
+        });
+      }
+
+      document.addEventListener('astro:page-load', initRevealAnimations);
+    </script>
+  </body>
+</html>
