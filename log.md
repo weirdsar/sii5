@@ -408,3 +408,22 @@
 - **`origin`**: `https://github.com/weirdsar/sii5.git`; на **`main`**: релизный коммит **`1fa63a3`** и коммит с записью в **`log.md`** о деплое/CI (актуальный хэш — **`git log -1`**).
 - **Push** из этой среды не выполнен: GitHub HTTPS запросил учётные данные. Выполните у себя: **`git push -u origin main`** (или remote **`git@github.com:weirdsar/sii5.git`**).
 - Локально повторён сценарий CI: **`npm ci`** → **`npx astro check`** → **`npm run build`** → **`npm run test`** — успешно.
+
+## 2026-04-02 — Netlify (sii64): переменные, домены, Forms
+
+1. **Environment variables** (раздел **Project configuration → Environment variables**): в списке подтверждена **`PUBLIC_METRIKA_ID`** (значение счётчика Метрики, все контексты). **`PUBLIC_MAX_BOT_URL`** в панели не задана — при необходимости дублирования заявок в MAX добавить вручную (секретный URL из инструкции бота), см. **`.env.example`**. После изменения env — **Deploy** (при желании **Clear cache and deploy**), чтобы ID попал в клиентский бандл.
+2. **Domain management**: **`sii5.ru`** — primary, **`www.sii5.ru`** — редирект на primary; у обоих статус **Pending DNS verification**. Блок **SSL/TLS**: **Waiting on DNS propagation** — сертификат Let’s Encrypt выдастся после корректной привязки DNS к Netlify и распространения записей; доступна кнопка **Verify DNS configuration**.
+3. **Forms**: обнаружение форм было выключено — в UI нажато **Enable form detection**, показано **Form detection is enabled** (сканирование деплоев на **`data-netlify`**). Список имён форм в дашборде появится после следующего успешного деплоя. Локальная проверка **`dist`**: в HTML есть **`contact`** (**`/contact/`**), **`case-inquiry`** (страницы кейсов), **`project-brief`** (**`/brief/`**), атрибуты **`data-netlify="true"`** и **`form-name`** на месте.
+
+## 2026-04-03 — Проверка публичного домена sii5.ru (DNS / HTTP / HTTPS)
+
+- **DNS**: **`sii5.ru`** и **`www.sii5.ru`** → **A 87.236.16.177** (хостинг **Beget**). **MX** — **`mx1.beget.com`** / **`mx2.beget.com`**.
+- **HTTP** (`http://sii5.ru/`): **200**, сервер **`nginx-reuseport`**, контент — заглушка Beget: «домен не прилинкован к директории на сервере» (не сайт из Netlify).
+- **HTTPS** (`https://sii5.ru/`): ошибка проверки сертификата (**CN=`beget.com`**, не совпадает с **`sii5.ru`**); при **`curl -k`** отдаётся тот же HTML Beget.
+- **Вывод**: домен **не направлен на Netlify**; статус **Pending DNS verification** в панели Netlify согласуется с текущими записями. Чтобы открывался деплой **sii64**, у регистратора нужно выставить DNS по инструкции Netlify (или перенести DNS на Netlify), для **www** — **CNAME** на **`sii64.netlify.app`** (или как указано в **Domain management**), для apex — **A**-записи Netlify / **ALIAS**. Почту на Beget при смене веб-записей можно сохранить отдельными **MX** (не трогать, если не меняете почтовый хостинг).
+
+## 2026-04-03 — Контакты: замечания по UX / a11y
+
+- **`src/pages/contact.astro`**: у блока «Что будет дальше?» у **`<ol>`** добавлены **`list-none pl-0 m-0`**, **`role="list"`** — без встроенной нумерации браузера при кастомных шагах 1–3; для WebKit сохранена семантика списка.
+- Убран эмодзи в строке города; остаётся текст **`{city}, Россия`**.
+- Канонический домен в коде по-прежнему **`https://sii5.ru`** (**`astro.config.mjs`**, **`siteConfig.url`**); редирект **www → apex** настраивается в **Netlify → Domain management** (primary domain), дублирующий **`netlify.toml`** не добавлялся.
