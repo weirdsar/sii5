@@ -513,3 +513,9 @@
 - **Превью**: **`ArticleCard`**, **`ArticlesPreview`**, **`articles/[slug].astro`** используют **`/open-graph/articles/{slug}.png`** (те же файлы, что и для OG — **`astro-og-canvas`** при сборке).
 - **`ArticleCard.astro`**: опциональный проп **`coverUrl`**; без него — прежняя заглушка **`placeholder.svg`**.
 - **Пагинация**: **`src/utils/articles-pagination.ts`** — **`ARTICLES_PER_PAGE = 6`**; **`/articles/`** — первая страница, **`/articles/page/2/`** и далее — остальные (маршрут **`src/pages/articles/page/[page].astro`**); сетка **`sm:2` / `lg:3`** колонки.
+
+## 2026-04-04 — OG / превью статей: квадраты вместо кириллицы
+
+- **Проблема**: на PNG превью и OG вместо текста отображались символы **«□□□□»** (нет глифов в CanvasKit).
+- **Причина**: шрифты подгружались по **HTTPS с api.fontsource.org**; при сбое или ограничении сети на билде данные шрифта не попадали в PNG.
+- **`src/pages/open-graph/[...route].ts`**: локальные **`inter-cyrillic-wght-normal.woff2`** и **`inter-latin-wght-normal.woff2`** из **`node_modules/@fontsource-variable/inter/files/`**; семейство **`Inter`** вместо **Noto Sans**.

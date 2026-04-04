@@ -1,9 +1,22 @@
 /**
  * Генерация Open Graph (1200×630 PNG) на этапе сборки через astro-og-canvas.
  * Кэш: `node_modules/.astro-og-canvas` (хэш от текста и стилей).
+ *
+ * Шрифты — локальные WOFF2 из @fontsource-variable/inter (кириллица + латиница).
+ * Раньше использовались URL api.fontsource.org: на CI без сети или при сбое fetch текст на PNG превращался в «□□□□».
  */
 import { getCollection } from 'astro:content';
+import path from 'node:path';
 import { OGImageRoute } from 'astro-og-canvas';
+
+const interDir = path.join(
+  process.cwd(),
+  'node_modules/@fontsource-variable/inter/files'
+);
+const ogFontFiles = [
+  path.join(interDir, 'inter-cyrillic-wght-normal.woff2'),
+  path.join(interDir, 'inter-latin-wght-normal.woff2'),
+];
 
 const caseEntries = await getCollection('cases');
 const articleEntries = await getCollection('articles');
@@ -70,20 +83,17 @@ export const { getStaticPaths, GET } = await OGImageRoute({
           weight: 'Bold',
           color: [248, 250, 252],
           lineHeight: 1.12,
-          families: ['Noto Sans'],
+          families: ['Inter'],
         },
         description: {
           size: 36,
           weight: 'Normal',
           color: [148, 163, 184],
           lineHeight: 1.3,
-          families: ['Noto Sans'],
+          families: ['Inter'],
         },
       },
-      fonts: [
-        'https://api.fontsource.org/v1/fonts/noto-sans/cyrillic-700-normal.ttf',
-        'https://api.fontsource.org/v1/fonts/noto-sans/cyrillic-400-normal.ttf',
-      ],
+      fonts: ogFontFiles,
       format: 'PNG',
       quality: 90,
     };
