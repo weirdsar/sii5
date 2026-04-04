@@ -116,6 +116,28 @@ h1, h2, h3, h4, h5, h6 {
   @apply border-l-4 border-primary pl-4 italic text-text-muted my-4;
 }
 
+/* Встроенный CTA в теле статьи (HTML в .md) */
+.article-prose .article-inline-cta {
+  @apply my-8 rounded-2xl border border-primary/25 bg-primary/5 p-6 md:p-8 shadow-sm;
+}
+
+.article-prose .article-inline-cta h3 {
+  @apply text-xl md:text-2xl font-bold text-text-main mt-0 mb-3;
+}
+
+.article-prose .article-inline-cta > p {
+  @apply text-text-muted text-base leading-relaxed mb-5 last:mb-0;
+}
+
+.article-prose .article-inline-cta .article-inline-cta-actions {
+  @apply flex flex-col sm:flex-row flex-wrap gap-3;
+}
+
+.article-prose .article-inline-cta a.btn-accent,
+.article-prose .article-inline-cta a.btn-outline {
+  @apply no-underline text-center;
+}
+
 /* Блоки кода в статьях (обёртка + pre задаются в разметке/скрипте страницы статьи) */
 .article-prose pre {
   @apply my-0 overflow-x-auto bg-transparent p-4 text-sm leading-relaxed text-gray-100 font-mono;

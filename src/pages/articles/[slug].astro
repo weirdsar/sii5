@@ -125,8 +125,19 @@ const canonicalUrl = new URL(`/articles/${entry.id}/`, base).href;
     </div>
   </article>
 
-  <!-- CTA -->
-  <CTA />
+  <!-- CTA: для статьи про CRM — контекстный оффер (аудит воронки заявок), иначе дефолт -->
+  {entry.id === 'sajt-kak-chast-crm-2026' ? (
+    <CTA
+      title="Потеряли заявку — потеряли деньги"
+      subtitle="Бесплатный короткий аудит: как сейчас у вас проходит путь лида от сайта до сделки и что автоматизировать в первую очередь. Без навязанного контракта."
+      ctaText="Запросить аудит процесса"
+      ctaHref="/contact/?service=vip"
+      secondaryCtaText="Скачать бриф (PDF)"
+      secondaryCtaHref="/brief/"
+    />
+  ) : (
+    <CTA />
+  )}
 
   <script is:inline>
     (function () {

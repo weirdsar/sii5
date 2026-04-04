@@ -594,3 +594,10 @@
 - **Перелинковка в `.md`**: **`zachem-malomu-biznesu-sajt.md`** — ссылки на лендинг vs многостраничник и стоимость; **`skorost-sajta-2026.md`**, **`tehnicheskoe-seo-2026.md`** — разделы со ссылками на кейсы **razumnyeokna**, **gidravlika64** (цифры из **`result`** кейсов).
 - **`src/utils/articles-pagination.ts`**: комментарий о неиспользовании пагинации.
 - Проверка: `npm run build`, `check-internal-links` OK.
+
+## 2026-04-04 — Статья CRM: контекстный CTA (аудит заявок) + стили inline-блока
+
+- **`src/content/articles/sajt-kak-chast-crm-2026.md`**: перед «В итоге» — HTML-блок **article-inline-cta** (бесплатный аудит процесса заявок, кнопки на **`/contact/?service=vip`** и **`/brief/`**); финальный абзац переписан под тот же оффер.
+- **`src/pages/articles/[slug].astro`**: для **`sajt-kak-chast-crm-2026`** нижний **`<CTA>`** с тем же смыслом + вторичная кнопка на PDF-бриф.
+- **`src/styles/globals.css`**: стили **`.article-inline-cta`** внутри **`.article-prose`**.
+- Проверка: `npm run build`, `check-internal-links` OK.
