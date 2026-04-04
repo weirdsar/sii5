@@ -520,3 +520,11 @@
 - **Причина**: шрифты подгружались по **HTTPS с api.fontsource.org**; при сбое или ограничении сети на билде данные шрифта не попадали в PNG.
 - **`src/pages/open-graph/[...route].ts`**: локальные **`inter-cyrillic-wght-normal.woff2`** и **`inter-latin-wght-normal.woff2`** из **`node_modules/@fontsource-variable/inter/files/`**; семейство **`Inter`** вместо **Noto Sans**.
 - Дополнение: на PNG оставались **NO GLYPH** для **2026**, **:** и т.д. — сабсет **cyrillic** без цифр и базовой пунктуации; порядок шрифтов изменён: **latin → latin-ext → cyrillic → cyrillic-ext**.
+
+## 2026-04-04 — OG статей: окончательный фикс NO GLYPH
+
+- **Проблема**: даже после смены порядка сабсетов Inter часть кириллицы/цифр продолжала выпадать в **NO GLYPH**.
+- **Причина**: CanvasKit/FontMgr некорректно объединял сабсеты одного семейства (`Inter`).
+- **Решение**: добавлены полноценные локальные шрифты **`src/assets/fonts/og/NotoSans-Regular.ttf`** и **`src/assets/fonts/og/NotoSans-Bold.ttf`**.
+- **`src/pages/open-graph/[...route].ts`**: для генерации OG теперь используются именно эти TTF и семейство **`Noto Sans`**.
+- Проверка: `npm run build` — в логе `astro-og-canvas` загружаются локальные TTF из `src/assets/fonts/og/`; линк-чек успешен.

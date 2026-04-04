@@ -2,23 +2,16 @@
  * Генерация Open Graph (1200×630 PNG) на этапе сборки через astro-og-canvas.
  * Кэш: `node_modules/.astro-og-canvas` (хэш от текста и стилей).
  *
- * Шрифты — локальные WOFF2 из @fontsource-variable/inter.
- * Порядок важен: `inter-cyrillic-*` — сабсет без ASCII-цифр и пунктуации → на PNG были «NO GLYPH» в «2026», «:» и т.п.
- * Сначала латиница (цифры, лат. буквы в metaTitle), затем кириллица.
+ * Важно: используем локальные полноценные TTF (Noto Sans), а не сабсеты Inter.
+ * В CanvasKit сабсеты Inter давали «NO GLYPH» для части символов в кириллице/цифрах.
  */
 import { getCollection } from 'astro:content';
 import path from 'node:path';
 import { OGImageRoute } from 'astro-og-canvas';
 
-const interDir = path.join(
-  process.cwd(),
-  'node_modules/@fontsource-variable/inter/files'
-);
 const ogFontFiles = [
-  path.join(interDir, 'inter-latin-wght-normal.woff2'),
-  path.join(interDir, 'inter-latin-ext-wght-normal.woff2'),
-  path.join(interDir, 'inter-cyrillic-wght-normal.woff2'),
-  path.join(interDir, 'inter-cyrillic-ext-wght-normal.woff2'),
+  path.join(process.cwd(), 'src/assets/fonts/og/NotoSans-Regular.ttf'),
+  path.join(process.cwd(), 'src/assets/fonts/og/NotoSans-Bold.ttf'),
 ];
 
 const caseEntries = await getCollection('cases');
@@ -86,14 +79,14 @@ export const { getStaticPaths, GET } = await OGImageRoute({
           weight: 'Bold',
           color: [248, 250, 252],
           lineHeight: 1.12,
-          families: ['Inter'],
+          families: ['Noto Sans'],
         },
         description: {
           size: 36,
           weight: 'Normal',
           color: [148, 163, 184],
           lineHeight: 1.3,
-          families: ['Inter'],
+          families: ['Noto Sans'],
         },
       },
       fonts: ogFontFiles,
