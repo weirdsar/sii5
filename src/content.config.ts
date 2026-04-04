@@ -32,6 +32,8 @@ const articles = defineCollection({
     tags: z.array(z.string()),
     metaTitle: z.string(),
     metaDescription: z.string(),
+    /** Смысловой хаб на `/articles/` для перелинковки и навигации */
+    hub: z.enum(['strategy', 'tech', 'marketing']),
   }),
 });
 

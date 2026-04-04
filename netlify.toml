@@ -2,6 +2,12 @@
   command = "npm run build"
   publish = "dist"
 
+# Список статей перенесён на одну страницу с хабами; старые URL пагинации ведут на /articles/
+[[redirects]]
+  from = "/articles/page/*"
+  to = "/articles/"
+  status = 301
+
 # Прокси заявок в MAX: POST /.netlify/functions/max-lead-mirror (см. .env.example)
 [functions]
   directory = "netlify/functions"

@@ -584,3 +584,13 @@
 
 - **`src/content/articles/dizajn-sajta-2026.md`**: «дорого-богато» vs чистота, тёмная тема/типографика/микроанимации, эмоциональный дизайн, доступность, FAQ; `date: 2026-07-01`; разделы **`##`**; блок **доступность**: уточнено, что **нет отдельного балла за WCAG**, связь с **отказами и поведением**; контраст **4,5:1** привязан к **WCAG** как ориентир.
 - Проверка: `npm run build` — успешно, OG **`/open-graph/articles/dizajn-sajta-2026.png`**, `check-internal-links` OK.
+
+## 2026-04-04 — Статьи: хабы на `/articles/` и внутренняя перелинковка
+
+- **`src/content.config.ts`**: у коллекции **`articles`** поле **`hub`**: `strategy` | `tech` | `marketing`.
+- **`src/utils/article-hubs.ts`**: порядок хабов, подписи (**Стратегия и цены**, **Технологии и SEO**, **Маркетинг и тексты**), **`groupArticlesByHub`**.
+- **`src/pages/articles/index.astro`**: три смысловых блока с якорями **`#hub-strategy`**, **`#hub-tech`**, **`#hub-marketing`**, навигация-кнопки в шапке; пагинация убрана (все карточки на одной странице).
+- **`src/pages/articles/page/[page].astro`**: удалён; **`netlify.toml`** — редирект **`/articles/page/*` → `/articles/`** (301).
+- **Перелинковка в `.md`**: **`zachem-malomu-biznesu-sajt.md`** — ссылки на лендинг vs многостраничник и стоимость; **`skorost-sajta-2026.md`**, **`tehnicheskoe-seo-2026.md`** — разделы со ссылками на кейсы **razumnyeokna**, **gidravlika64** (цифры из **`result`** кейсов).
+- **`src/utils/articles-pagination.ts`**: комментарий о неиспользовании пагинации.
+- Проверка: `npm run build`, `check-internal-links` OK.

@@ -1,4 +1,7 @@
-/** Сколько карточек на одной странице списка `/articles/` (дальше — `/articles/page/N/`). */
+/**
+ * Ранее использовалось для `/articles/page/N/`. Сейчас список статей — одна страница с хабами
+ * (`src/utils/article-hubs.ts`). Константы оставлены на случай возврата пагинации.
+ */
 export const ARTICLES_PER_PAGE = 6;
 
 export function getTotalArticlePages(count: number): number {

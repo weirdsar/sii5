@@ -3,15 +3,18 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import CTA from '../../components/CTA.astro';
-import { getTotalArticlePages, sliceArticlesForListPage } from '../../utils/articles-pagination';
 import { ogImagePathForArticle } from '../../utils/ogImagePaths';
+import {
+  ARTICLE_HUB_ORDER,
+  ARTICLE_HUB_LABELS,
+  groupArticlesByHub,
+} from '../../utils/article-hubs';
 
 const entries = await getCollection('articles');
 const sorted = [...entries].sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
 );
-const totalPages = getTotalArticlePages(sorted.length);
-const articles = sliceArticlesForListPage(sorted, 1);
+const byHub = groupArticlesByHub(sorted);
 ---
 
 <BaseLayout
@@ -22,53 +25,60 @@ const articles = sliceArticlesForListPage(sorted, 1);
   <section class="bg-surface-dark py-16 md:py-24">
     <div class="container-custom text-center">
       <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Статьи</h1>
-      <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+      <p class="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
         Делюсь опытом и полезными знаниями о веб-разработке,
         продвижении бизнеса в интернете и цифровых инструментах.
       </p>
+      <nav
+        class="flex flex-wrap justify-center gap-2 md:gap-3"
+        aria-label="Разделы статей"
+      >
+        {ARTICLE_HUB_ORDER.map((hub) => (
+          <a
+            href={`#hub-${hub}`}
+            class="text-sm md:text-base px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-accent hover:text-bg-dark transition-colors border border-white/15"
+          >
+            {ARTICLE_HUB_LABELS[hub].title}
+          </a>
+        ))}
+      </nav>
     </div>
   </section>
 
-  <!-- Список статей -->
+  <!-- Хабы: стратегия → технологии → маркетинг -->
   <section class="py-16 md:py-24">
-    <div class="container-custom">
-      {articles.length > 0 ? (
-        <>
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {articles.map((entry) => {
-              const dateStr = entry.data.date.toISOString().slice(0, 10);
-              return (
-                <ArticleCard
-                  slug={entry.id}
-                  title={entry.data.title}
-                  excerpt={entry.data.excerpt}
-                  date={dateStr}
-                  readTime={entry.data.readTime}
-                  tags={entry.data.tags}
-                  coverUrl={ogImagePathForArticle(entry.id)}
-                />
-              );
-            })}
-          </div>
-          {totalPages > 1 && (
-            <nav
-              class="mt-12 flex flex-wrap items-center justify-center gap-2"
-              aria-label="Навигация по страницам статей"
-            >
-              <span class="text-sm text-text-muted px-3 py-2 rounded-lg bg-primary/10 text-primary font-medium">
-                1
-              </span>
-              {Array.from({ length: totalPages - 1 }, (_, i) => i + 2).map((num) => (
-                <a
-                  href={`/articles/page/${num}/`}
-                  class="text-sm text-text-muted hover:text-primary px-3 py-2 rounded-lg border border-border-subtle hover:border-primary/40 transition-colors"
-                >
-                  {num}
-                </a>
-              ))}
-            </nav>
-          )}
-        </>
+    <div class="container-custom space-y-20 md:space-y-24">
+      {sorted.length > 0 ? (
+        ARTICLE_HUB_ORDER.map((hub) => {
+          const hubArticles = byHub[hub];
+          const label = ARTICLE_HUB_LABELS[hub];
+          return (
+            <div id={`hub-${hub}`} class="scroll-mt-24">
+              <header class="mb-8 md:mb-10 max-w-3xl">
+                <h2 class="text-2xl md:text-3xl font-bold text-text-main mb-3">
+                  {label.title}
+                </h2>
+                <p class="text-text-muted text-lg">{label.description}</p>
+              </header>
+              <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {hubArticles.map((entry) => {
+                  const dateStr = entry.data.date.toISOString().slice(0, 10);
+                  return (
+                    <ArticleCard
+                      slug={entry.id}
+                      title={entry.data.title}
+                      excerpt={entry.data.excerpt}
+                      date={dateStr}
+                      readTime={entry.data.readTime}
+                      tags={entry.data.tags}
+                      coverUrl={ogImagePathForArticle(entry.id)}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })
       ) : (
         <p class="text-center text-text-muted text-lg">
           Статьи скоро появятся. Следите за обновлениями!
