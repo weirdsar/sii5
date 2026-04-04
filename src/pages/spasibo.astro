@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteConfig } from '../data/site';
+
+const title = 'Заявка отправлена';
+const description =
+  'Мы получили вашу заявку и свяжемся с вами в ближайшее рабочее время. Спасибо за обращение.';
+---
+
+<BaseLayout title={title} description={description} robots="noindex, follow">
+  <section class="min-h-[60vh] flex items-center py-16 md:py-24 bg-surface-light">
+    <div class="container-custom max-w-2xl mx-auto text-center px-4">
+      <div
+        class="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center"
+        aria-hidden="true"
+      >
+        <svg class="w-10 h-10 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+
+      <h1 class="text-3xl md:text-4xl font-bold text-text-main mb-4 tracking-tight">
+        Спасибо, заявка принята
+      </h1>
+
+      <p class="text-lg text-text-muted mb-2 leading-relaxed">
+        Ваше сообщение дошло до меня. Обычно отвечаю <strong class="text-text-main font-semibold">в течение 2 часов</strong> в рабочее время
+        (пн–пт, по Саратову).
+      </p>
+      <p class="text-text-muted text-sm mb-10">
+        Если вопрос срочный — напишите в Telegram, так быстрее всего договоримся.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center">
+        <a href="/" class="btn-primary justify-center">На главную</a>
+        <a
+          href="/contact/"
+          class="btn-outline justify-center"
+        >
+          Страница контактов
+        </a>
+      </div>
+
+      <p class="mt-10 text-sm text-text-muted">
+        <a
+          href={siteConfig.socials.telegram}
+          class="text-primary font-semibold underline underline-offset-2 hover:no-underline"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Написать в Telegram
+        </a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
