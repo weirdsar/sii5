@@ -519,3 +519,4 @@
 - **Проблема**: на PNG превью и OG вместо текста отображались символы **«□□□□»** (нет глифов в CanvasKit).
 - **Причина**: шрифты подгружались по **HTTPS с api.fontsource.org**; при сбое или ограничении сети на билде данные шрифта не попадали в PNG.
 - **`src/pages/open-graph/[...route].ts`**: локальные **`inter-cyrillic-wght-normal.woff2`** и **`inter-latin-wght-normal.woff2`** из **`node_modules/@fontsource-variable/inter/files/`**; семейство **`Inter`** вместо **Noto Sans**.
+- Дополнение: на PNG оставались **NO GLYPH** для **2026**, **:** и т.д. — сабсет **cyrillic** без цифр и базовой пунктуации; порядок шрифтов изменён: **latin → latin-ext → cyrillic → cyrillic-ext**.

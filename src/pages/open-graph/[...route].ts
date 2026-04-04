@@ -2,8 +2,9 @@
  * Генерация Open Graph (1200×630 PNG) на этапе сборки через astro-og-canvas.
  * Кэш: `node_modules/.astro-og-canvas` (хэш от текста и стилей).
  *
- * Шрифты — локальные WOFF2 из @fontsource-variable/inter (кириллица + латиница).
- * Раньше использовались URL api.fontsource.org: на CI без сети или при сбое fetch текст на PNG превращался в «□□□□».
+ * Шрифты — локальные WOFF2 из @fontsource-variable/inter.
+ * Порядок важен: `inter-cyrillic-*` — сабсет без ASCII-цифр и пунктуации → на PNG были «NO GLYPH» в «2026», «:» и т.п.
+ * Сначала латиница (цифры, лат. буквы в metaTitle), затем кириллица.
  */
 import { getCollection } from 'astro:content';
 import path from 'node:path';
@@ -14,8 +15,10 @@ const interDir = path.join(
   'node_modules/@fontsource-variable/inter/files'
 );
 const ogFontFiles = [
-  path.join(interDir, 'inter-cyrillic-wght-normal.woff2'),
   path.join(interDir, 'inter-latin-wght-normal.woff2'),
+  path.join(interDir, 'inter-latin-ext-wght-normal.woff2'),
+  path.join(interDir, 'inter-cyrillic-wght-normal.woff2'),
+  path.join(interDir, 'inter-cyrillic-ext-wght-normal.woff2'),
 ];
 
 const caseEntries = await getCollection('cases');
