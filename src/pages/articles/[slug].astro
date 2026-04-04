@@ -1,12 +1,10 @@
 ---
 import { getCollection, getEntry, render } from 'astro:content';
-import OptimizedMedia from '../../components/OptimizedMedia.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import CTA from '../../components/CTA.astro';
 import { siteConfig } from '../../data/site';
 import { formatDate } from '../../utils/helpers';
-import { placeholder } from '../../utils/imageAssets';
 import { ogImagePathForArticle } from '../../utils/ogImagePaths';
 
 export async function getStaticPaths() {
@@ -102,15 +100,16 @@ const canonicalUrl = new URL(`/articles/${entry.id}/`, base).href;
       <!-- Заголовок -->
       <h1 class="text-3xl md:text-4xl font-bold text-text-main mb-8">{article.title}</h1>
 
-      <!-- Изображение -->
-      <div class="rounded-2xl overflow-hidden mb-8">
-        <OptimizedMedia
-          src={placeholder}
+      <!-- Обложка: тот же PNG, что и для Open Graph -->
+      <div class="rounded-2xl overflow-hidden mb-8 aspect-[1200/630] bg-muted-surface">
+        <img
+          src={ogImagePath}
           alt={article.title}
-          class="w-full"
+          width={1200}
+          height={630}
+          class="w-full h-full object-cover object-top"
           loading="eager"
           decoding="async"
-          quality="mid"
         />
       </div>
 

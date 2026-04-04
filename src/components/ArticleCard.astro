@@ -4,7 +4,8 @@ import { formatDate } from '../utils/helpers';
 import { placeholder } from '../utils/imageAssets';
 
 /**
- * Карточка статьи в списке: ссылка на `/articles/[slug]`, общее превью-изображение.
+ * Карточка статьи в списке: ссылка на `/articles/[slug]`.
+ * Превью: `coverUrl` (OG PNG с билда) или заглушка.
  */
 interface Props {
   /** `id` записи коллекции `articles`. */
@@ -15,25 +16,39 @@ interface Props {
   date: string;
   readTime: number;
   tags: string[];
+  /** Например `/open-graph/articles/{slug}.png` — совпадает с OG. */
+  coverUrl?: string;
 }
 
-const { slug, title, excerpt, date, readTime, tags } = Astro.props;
+const { slug, title, excerpt, date, readTime, tags, coverUrl } = Astro.props;
 ---
 
 <article
   class="bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border-subtle"
   data-reveal
 >
-  <!-- Изображение -->
+  <!-- Изображение: OG-карточка статьи (1200×630) или заглушка -->
   <div class="aspect-video overflow-hidden bg-muted-surface">
-    <OptimizedMedia
-      src={placeholder}
-      alt={title}
-      class="w-full h-full object-cover"
-      loading="lazy"
-      decoding="async"
-      quality="mid"
-    />
+    {coverUrl ? (
+      <img
+        src={coverUrl}
+        alt={title}
+        width={1200}
+        height={630}
+        class="w-full h-full object-cover object-top"
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <OptimizedMedia
+        src={placeholder}
+        alt={title}
+        class="w-full h-full object-cover"
+        loading="lazy"
+        decoding="async"
+        quality="mid"
+      />
+    )}
   </div>
 
   <!-- Контент -->

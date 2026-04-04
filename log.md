@@ -506,3 +506,10 @@
 - **Проблема**: форма уходила **нативным POST** → редирект на `/spasibo/`, вызов `max-lead-mirror` **не происходил**.
 - **Причина**: JS искал формы по **`form[data-netlify="true"]`**, но **Netlify при деплое удаляет** атрибут `data-netlify` из HTML (он «потребляется» для регистрации формы). Селектор находил **0 форм**, обработчик submit не привязывался.
 - **`ContactForm.astro`**: добавлен кастомный атрибут **`data-contact-form`** на `<form>`, JS ищет по **`form[data-contact-form]`** — Netlify его не трогает.
+
+## 2026-04-04 — Статьи: превью из OG-PNG и пагинация списка
+
+- **Проблема**: в карточках и на странице статьи была заглушка **Placeholder**; список не готов к **10+** материалам.
+- **Превью**: **`ArticleCard`**, **`ArticlesPreview`**, **`articles/[slug].astro`** используют **`/open-graph/articles/{slug}.png`** (те же файлы, что и для OG — **`astro-og-canvas`** при сборке).
+- **`ArticleCard.astro`**: опциональный проп **`coverUrl`**; без него — прежняя заглушка **`placeholder.svg`**.
+- **Пагинация**: **`src/utils/articles-pagination.ts`** — **`ARTICLES_PER_PAGE = 6`**; **`/articles/`** — первая страница, **`/articles/page/2/`** и далее — остальные (маршрут **`src/pages/articles/page/[page].astro`**); сетка **`sm:2` / `lg:3`** колонки.
