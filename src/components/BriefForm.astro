@@ -152,6 +152,10 @@ const maxLeadMirrorPath = '/.netlify/functions/max-lead-mirror';
 
 <div class="brief-screen-only form-success hidden text-center py-6 rounded-xl bg-green-50 border border-green-100" data-form="project-brief">
   <p class="font-semibold text-text-main">Бриф отправлен. Свяжусь с вами в ближайшее время.</p>
+  <p class="hidden text-amber-900/90 text-sm mt-3 max-w-md mx-auto" data-max-warning>
+    Уведомление в MAX не доставилось — отвечу по контактам из брифа или в
+    <a href="https://t.me/weirdsar" class="underline font-medium">Telegram</a>.
+  </p>
 </div>
 <div class="brief-screen-only form-error hidden text-center py-4 text-red-600" data-form="project-brief">
   <p>Не удалось отправить. Напишите в <a href="https://t.me/weirdsar" class="underline font-semibold">Telegram</a>.</p>
@@ -221,35 +225,50 @@ const maxLeadMirrorPath = '/.netlify/functions/max-lead-mirror';
       var messageBody = lines.join('\n');
 
       var maxUrl = resolveMaxLeadUrl();
-      if (maxUrl) {
-        void fetch(maxUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: name,
-            contact: contact,
-            message: messageBody,
-            service: 'project-brief',
-            source: 'Страница /brief',
-          }),
-        })
-          .then(function (res) {
-            if (!res.ok) console.warn('[BriefForm] MAX mirror HTTP', res.status, maxUrl);
-          })
-          .catch(function (err) {
-            console.warn('[BriefForm] MAX mirror failed:', err);
+      var maxPayload = {
+        name: name,
+        contact: contact,
+        message: messageBody,
+        service: 'project-brief',
+        source: 'Страница /brief',
+      };
+      async function postMaxMirror() {
+        if (!maxUrl) return { ok: true, skipped: true };
+        try {
+          var r = await fetch(maxUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(maxPayload),
+            keepalive: true,
           });
+          var t = await r.text();
+          if (!r.ok) console.warn('[BriefForm] max-lead-mirror', r.status, t);
+          return { ok: r.ok };
+        } catch (e) {
+          console.warn('[BriefForm] max-lead-mirror network', e);
+          return { ok: false };
+        }
       }
 
       try {
-        var res = await fetch('/', {
+        var maxP = postMaxMirror();
+        var netlifyP = fetch('/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams(fd).toString(),
         });
+        var pair = await Promise.all([maxP, netlifyP]);
+        var maxResult = pair[0];
+        var res = pair[1];
         if (res.ok) {
           form.classList.add('hidden');
-          if (successEl) successEl.classList.remove('hidden');
+          if (successEl) {
+            successEl.classList.remove('hidden');
+            var mw = successEl.querySelector('[data-max-warning]');
+            if (mw && maxUrl && maxResult && maxResult.ok !== true) {
+              mw.classList.remove('hidden');
+            }
+          }
         } else {
           throw new Error('netlify');
         }

@@ -175,6 +175,10 @@ const maxLeadMirrorPath = '/.netlify/functions/max-lead-mirror';
   </div>
   <h3 class="text-xl font-bold text-text-main mb-2">Спасибо за заявку!</h3>
   <p class="text-text-muted">Я свяжусь с вами в течение 2 часов в рабочее время.</p>
+  <p class="hidden text-amber-900/90 dark:text-amber-200/90 text-sm mt-4 max-w-md mx-auto leading-snug" data-max-warning>
+    Заявка сохранена на сайте. Уведомление в MAX не доставилось — отвечу по телефону или email из формы. Если срочно, напишите в
+    <a href="https://t.me/weirdsar" class="underline font-medium">Telegram</a>.
+  </p>
 </div>
 
 <!-- Сообщение об ошибке -->
@@ -285,34 +289,48 @@ const maxLeadMirrorPath = '/.netlify/functions/max-lead-mirror';
           maxPayload.source = sourceField.value;
         }
 
-        // MAX: на проде — Netlify Function (нет CORS); локально — прямой URL из PUBLIC_MAX_BOT_URL
+        // MAX + Netlify параллельно и с await: раньше был `void fetch` без ожидания — запрос к зеркалу мог не успеть завершиться
         var maxUrl = resolveMaxLeadUrl();
-        if (maxUrl) {
-          void fetch(maxUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(maxPayload),
-          })
-            .then((res) => {
-              if (!res.ok) {
-                console.warn('[ContactForm] MAX mirror HTTP', res.status, maxUrl);
-              }
-            })
-            .catch((maxErr) => {
-              console.warn('[ContactForm] MAX mirror failed:', maxErr);
+        async function postMaxMirror() {
+          if (!maxUrl) return { ok: true, skipped: true };
+          try {
+            var res = await fetch(maxUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(maxPayload),
+              keepalive: true,
             });
+            var txt = await res.text();
+            if (!res.ok) {
+              console.warn('[ContactForm] max-lead-mirror', res.status, txt);
+            }
+            return { ok: res.ok, status: res.status };
+          } catch (err) {
+            console.warn('[ContactForm] max-lead-mirror network', err);
+            return { ok: false };
+          }
         }
 
         try {
-          const response = await fetch('/', {
+          var maxPromise = postMaxMirror();
+          var netlifyPromise = fetch('/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams(formData).toString(),
           });
+          var results = await Promise.all([maxPromise, netlifyPromise]);
+          var maxResult = results[0];
+          var response = results[1];
 
           if (response.ok) {
             form.classList.add('hidden');
-            if (successEl) successEl.classList.remove('hidden');
+            if (successEl) {
+              successEl.classList.remove('hidden');
+              var maxWarn = successEl.querySelector('[data-max-warning]');
+              if (maxWarn && maxUrl && maxResult && maxResult.ok !== true) {
+                maxWarn.classList.remove('hidden');
+              }
+            }
           } else {
             throw new Error('Ошибка отправки');
           }

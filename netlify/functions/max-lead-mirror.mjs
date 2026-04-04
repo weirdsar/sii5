@@ -88,7 +88,8 @@ async function sendToMaxPlatform(token, chatIdRaw, userIdRaw, text) {
       Authorization: token,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ text, notify: true }),
+    // Как в PHP Gidra / доках MAX: format опционален, но стабилизирует разбор текста
+    body: JSON.stringify({ text, notify: true, format: 'markdown' }),
   });
 
   const raw = await res.text();

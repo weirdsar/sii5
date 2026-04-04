@@ -492,3 +492,11 @@
 - **Проблема**: при отправке без JS (или в отдельных сценариях Netlify) показывалась англоязычная заглушка *Thank you / Back to our site*.
 - **`src/pages/spasibo.astro`**: русская страница «Заявка отправлена», срок ответа, ссылки **На главную**, **Страница контактов**, **Telegram**; **`robots: noindex, follow`**.
 - **`ContactForm.astro`**, **`BriefForm.astro`**: **`action="/spasibo/"`** — редирект на эту страницу после обработки Netlify Forms; при работающем JS по-прежнему показ успеха на месте (**`fetch('/')`** без смены URL).
+
+## 2026-04-04 — MAX: дождаться `max-lead-mirror`, тело API, подсказка при сбое
+
+- **Проблема**: заявка не доходила в MAX при том что форма «успешна».
+- **Код**: вызов зеркала был **`void fetch(...)`** без **`await`** — запрос к **`/.netlify/functions/max-lead-mirror`** мог не завершиться до конца сценария; плюс **`Promise.all`** с Netlify Forms для параллели и **`keepalive: true`**.
+- **`ContactForm.astro`**, **`BriefForm.astro`**: при ответе зеркала **≠ OK** показывается скрытый блок **`[data-max-warning]`** (жёлтый текст + Telegram).
+- **`netlify/functions/max-lead-mirror.mjs`**: в теле к MAX добавлено **`format: 'markdown'`** (как в PHP Gidra / доках).
+- **`MAX_LEADS_SETUP.md`**: §**12.1** — чеклист «Netlify есть, MAX нет» (env, логи Functions, отправка без JS).
