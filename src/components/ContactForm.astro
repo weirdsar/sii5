@@ -35,6 +35,7 @@ const maxLeadMirrorPath = '/.netlify/functions/max-lead-mirror';
   action="/spasibo/"
   data-netlify="true"
   netlify-honeypot="bot-field"
+  data-contact-form
   class="relative space-y-6"
 >
   <!-- Honeypot Netlify: не заполнять (боты часто заполняют скрытые поля) -->
@@ -213,8 +214,8 @@ const maxLeadMirrorPath = '/.netlify/functions/max-lead-mirror';
       });
     }
 
-    // Обработчик для всех форм с data-netlify (после View Transitions — новый DOM)
-    const forms = document.querySelectorAll('form[data-netlify="true"]');
+    // Netlify удаляет data-netlify из HTML при обработке; ищем по data-contact-form
+    const forms = document.querySelectorAll('form[data-contact-form]');
 
     forms.forEach((form) => {
       if (form.dataset.vtFormBound === '1') return;

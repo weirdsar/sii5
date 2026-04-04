@@ -500,3 +500,9 @@
 - **`ContactForm.astro`**, **`BriefForm.astro`**: при ответе зеркала **≠ OK** показывается скрытый блок **`[data-max-warning]`** (жёлтый текст + Telegram).
 - **`netlify/functions/max-lead-mirror.mjs`**: в теле к MAX добавлено **`format: 'markdown'`** (как в PHP Gidra / доках).
 - **`MAX_LEADS_SETUP.md`**: §**12.1** — чеклист «Netlify есть, MAX нет» (env, логи Functions, отправка без JS).
+
+## 2026-04-04 — ContactForm: JS не перехватывал submit (data-netlify удалён Netlify)
+
+- **Проблема**: форма уходила **нативным POST** → редирект на `/spasibo/`, вызов `max-lead-mirror` **не происходил**.
+- **Причина**: JS искал формы по **`form[data-netlify="true"]`**, но **Netlify при деплое удаляет** атрибут `data-netlify` из HTML (он «потребляется» для регистрации формы). Селектор находил **0 форм**, обработчик submit не привязывался.
+- **`ContactForm.astro`**: добавлен кастомный атрибут **`data-contact-form`** на `<form>`, JS ищет по **`form[data-contact-form]`** — Netlify его не трогает.
