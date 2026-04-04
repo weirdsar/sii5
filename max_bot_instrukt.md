@@ -154,4 +154,35 @@ TTL transient заявки: **45 суток** (`RAZOKNA_MAX_GB_TTL`). Ожида
 
 ---
 
+## Сайт-портфолио sii5 (Astro, Netlify)
+
+Здесь **нет PHP в репозитории**: заявки с **`ContactForm`** / **`BriefForm`** уходят в **Netlify Forms** и **параллельно** в MAX через Netlify Function **`/.netlify/functions/max-lead-mirror`** (серверный `fetch` — **без CORS** в браузере).
+
+### Чеклист развёртывания (вручную в Netlify)
+
+**Рекомендуется: заявки сразу в чат MAX** (без своего сервера). Функция вызывает **`POST https://platform-api.max.ru/messages`** ([документация](https://dev.max.ru/docs-api/methods/POST/messages)).
+
+1. **Environment variables** (все нужные контексты: Production и при необходимости Deploy Previews):
+   - **`MAX_BOT_TOKEN`** — токен из [business.max.ru](https://business.max.ru/self) → **Чат-боты** → **Интеграция** (в **`Authorization`**, как в доке MAX).
+   - **`MAX_USER_ID`** или **`MAX_NOTIFY_USER_ID`** — личные уведомления (имя **`MAX_NOTIFY_USER_ID`** совпадает с **`Gidra/.deploy/.max.env`** — можно **скопировать те же значения** в Netlify).
+   - **или** **`MAX_CHAT_ID`** / **`MAX_NOTIFY_CHAT_ID`** — группа (id может быть отрицательным). Если заданы **и** user, **и** chat, используется **user** (как в **`Gidra/public/api/submit-lead.php`**). Значение **`0`** в env не считается заданным.
+2. Бот должен быть **участником** этой группы; по правилам MAX пользователю иногда нужно написать боту **`/start`** до того, как бот сможет писать в личку (см. раздел **A3** выше).
+3. **Deploy** → при первом включении функции желательно **Clear cache and deploy site**.
+4. **Проверка**: DevTools → **Network** → отправка формы → **`max-lead-mirror`** ответ **200**. **503** — не заданы **`MAX_BOT_TOKEN`** и пара **chat/user id**, и не настроен вебхук (см. ниже). Ошибки **401/403** от MAX — проверить токен и права бота в чате.
+
+**Альтернатива — свой HTTPS-вебхук** (если нужен PHP/CRM): **`MAX_LEAD_WEBHOOK_URL`** или **`PUBLIC_MAX_BOT_URL`**; опционально **`MAX_LEAD_WEBHOOK_BODY_FORMAT=form`** для **`application/x-www-form-urlencoded`**. Если заданы **и** токен MAX, **и** вебхук, используется **прямой MAX** (приоритет).
+
+### CLI (`netlify link` выполнен)
+
+```bash
+# Скопируйте значения из Gidra/.deploy/.max.env (не публикуйте в git):
+npx netlify env:set MAX_BOT_TOKEN "<из_MAX_BOT_TOKEN>"
+npx netlify env:set MAX_NOTIFY_USER_ID "<из_MAX_NOTIFY_USER_ID>"
+npx netlify deploy --prod --build
+```
+
+Локально **`astro dev`**: функция **`max-lead-mirror`** не поднимается — тест прямого MAX через **`netlify dev`** или только после деплоя на Netlify.
+
+---
+
 *Документ согласован с репозиторием vpn / Razokna; при изменении кода сверяйте константы и имена функций в указанных файлах.*

@@ -2,7 +2,7 @@
 import { getPublicMaxBotUrl } from '../data/env-public';
 
 /**
- * Форма заявки: Netlify Forms + опционально дублирование в MAX (`PUBLIC_MAX_BOT_URL`).
+ * Форма заявки: Netlify Forms + MAX через Netlify Function `max-lead-mirror` (прод) или прямой `PUBLIC_MAX_BOT_URL` (localhost).
  */
 interface Props {
   /** Атрибут `name` формы и значение скрытого `form-name` для Netlify. */
@@ -23,6 +23,8 @@ const {
 } = Astro.props;
 
 const maxBotUrl = getPublicMaxBotUrl();
+/** Same-origin на проде Netlify — обход CORS к вебхуку MAX */
+const maxLeadMirrorPath = '/.netlify/functions/max-lead-mirror';
 ---
 
 <!-- Форма -->
@@ -179,7 +181,17 @@ const maxBotUrl = getPublicMaxBotUrl();
   </p>
 </div>
 
-<script is:inline define:vars={{ maxBotUrl }}>
+<script is:inline define:vars={{ maxBotUrl, maxLeadMirrorPath }}>
+  function resolveMaxLeadUrl() {
+    var h = '';
+    try {
+      h = window.location.hostname || '';
+    } catch (e) {}
+    var local = h === 'localhost' || h === '127.0.0.1' || h === '[::1]';
+    if (local) return maxBotUrl || '';
+    return maxLeadMirrorPath;
+  }
+
   function initNetlifyContactForms() {
     // Предвыбор услуги из ?service= в URL (SSG не видит query при сборке)
     const params = new URLSearchParams(window.location.search);
@@ -269,20 +281,21 @@ const maxBotUrl = getPublicMaxBotUrl();
           maxPayload.source = sourceField.value;
         }
 
-        // Зеркало в MAX — опционально; ошибки не блокируют отправку в Netlify
-        if (maxBotUrl) {
-          void fetch(maxBotUrl, {
+        // MAX: на проде — Netlify Function (нет CORS); локально — прямой URL из PUBLIC_MAX_BOT_URL
+        var maxUrl = resolveMaxLeadUrl();
+        if (maxUrl) {
+          void fetch(maxUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(maxPayload),
           })
             .then((res) => {
               if (!res.ok) {
-                console.warn('[ContactForm] MAX bot mirror HTTP', res.status);
+                console.warn('[ContactForm] MAX mirror HTTP', res.status, maxUrl);
               }
             })
             .catch((maxErr) => {
-              console.warn('[ContactForm] MAX bot mirror failed:', maxErr);
+              console.warn('[ContactForm] MAX mirror failed:', maxErr);
             });
         }
 

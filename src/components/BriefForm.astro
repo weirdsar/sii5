@@ -1,8 +1,9 @@
 ---
 import { getPublicMaxBotUrl } from '../data/env-public';
 
-/** Форма брифа: Netlify `project-brief` + опционально MAX (`getPublicMaxBotUrl()`). */
+/** Форма брифа: Netlify `project-brief` + MAX через зеркало (как в ContactForm). */
 const maxBotUrl = getPublicMaxBotUrl();
+const maxLeadMirrorPath = '/.netlify/functions/max-lead-mirror';
 ---
 
 <form
@@ -155,7 +156,17 @@ const maxBotUrl = getPublicMaxBotUrl();
   <p>Не удалось отправить. Напишите в <a href="https://t.me/weirdsar" class="underline font-semibold">Telegram</a>.</p>
 </div>
 
-<script is:inline define:vars={{ maxBotUrl }}>
+<script is:inline define:vars={{ maxBotUrl, maxLeadMirrorPath }}>
+  function resolveMaxLeadUrl() {
+    var h = '';
+    try {
+      h = window.location.hostname || '';
+    } catch (e) {}
+    var local = h === 'localhost' || h === '127.0.0.1' || h === '[::1]';
+    if (local) return maxBotUrl || '';
+    return maxLeadMirrorPath;
+  }
+
   function initBriefForm() {
     var form = document.getElementById('brief-form-project-brief');
     if (!form || form.dataset.vtBound === '1') return;
@@ -208,8 +219,9 @@ const maxBotUrl = getPublicMaxBotUrl();
       ];
       var messageBody = lines.join('\n');
 
-      if (maxBotUrl) {
-        void fetch(maxBotUrl, {
+      var maxUrl = resolveMaxLeadUrl();
+      if (maxUrl) {
+        void fetch(maxUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -219,7 +231,13 @@ const maxBotUrl = getPublicMaxBotUrl();
             service: 'project-brief',
             source: 'Страница /brief',
           }),
-        }).catch(function () {});
+        })
+          .then(function (res) {
+            if (!res.ok) console.warn('[BriefForm] MAX mirror HTTP', res.status, maxUrl);
+          })
+          .catch(function (err) {
+            console.warn('[BriefForm] MAX mirror failed:', err);
+          });
       }
 
       try {

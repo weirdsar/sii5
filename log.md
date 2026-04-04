@@ -428,6 +428,31 @@
 - Убран эмодзи в строке города; остаётся текст **`{city}, Россия`**.
 - Канонический домен в коде по-прежнему **`https://sii5.ru`** (**`astro.config.mjs`**, **`siteConfig.url`**); редирект **www → apex** настраивается в **Netlify → Domain management** (primary domain), дублирующий **`netlify.toml`** не добавлялся.
 
+## 2026-04-04 — MAX: совместимость с Gidra (`.deploy/.max.env`)
+
+- **`netlify/functions/max-lead-mirror.mjs`**: читаются **`MAX_NOTIFY_USER_ID`** и **`MAX_NOTIFY_CHAT_ID`** (как в **Gidra**); приоритет **`user_id`** над **`chat_id`**, как в **`Gidra/public/api/submit-lead.php`**; **`0`** в env трактуется как «не задано».
+- **`MAX_LEADS_SETUP.md`**: §12 — перенос переменных из **`Gidra/.deploy/.max.env`** в Netlify без коммита секретов.
+- **`max_bot_instrukt.md`**, **`.env.example`**: те же имена и отсылка к Gidra.
+
+## 2026-04-04 — MAX: прямой Platform API из Netlify Function (без своего вебхука)
+
+- **`netlify/functions/max-lead-mirror.mjs`**: при **`MAX_BOT_TOKEN`** (или **`MAX_PLATFORM_ACCESS_TOKEN`**) и **`MAX_CHAT_ID`** или **`MAX_USER_ID`** — **`POST https://platform-api.max.ru/messages`** с **`Authorization: <токен>`** и текстом заявки (до ~3800 символов). Иначе — прежний прокси на **`MAX_LEAD_WEBHOOK_URL`** / **`PUBLIC_MAX_BOT_URL`**; при конфигурации обоих приоритет у прямого MAX.
+- **`.env.example`**, **`max_bot_instrukt.md`** (раздел sii5), **`summary.md`**: инструкции под токен + **chat_id** / **user_id**, **`GET /chats`** для поиска id группы.
+
+## 2026-04-03 — MAX: чеклист Netlify в max_bot_instrukt, форма для PHP
+
+- **`max_bot_instrukt.md`**: раздел **sii5** расширен пошаговым чеклистом (env, Clear cache deploy, JSON-тело, проверка Network, 503/502, опционально **CLI** `netlify env:set` / `deploy --prod --build`).
+- **`netlify/functions/max-lead-mirror.mjs`**: при **`MAX_LEAD_WEBHOOK_BODY_FORMAT=form`** (или **`urlencoded`**) тело из JSON клиента перекодируется в **`application/x-www-form-urlencoded`** (поля **`name`**, **`contact`**, **`message`**, **`service`**, **`source`**).
+- **`.env.example`**: комментарий про **`MAX_LEAD_WEBHOOK_BODY_FORMAT`**.
+
+## 2026-04-03 — MAX: зеркало заявок через Netlify Function (CORS)
+
+- **Проблема**: прямой `fetch` из браузера на внешний вебхук часто блокируется **CORS**; плюс без **`PUBLIC_MAX_BOT_URL`** в env при сборке клиент вообще не вызывал MAX.
+- **`netlify/functions/max-lead-mirror.mjs`**: **`export const handler`** — POST тело JSON пересылается на **`process.env.MAX_LEAD_WEBHOOK_URL || process.env.PUBLIC_MAX_BOT_URL`**; OPTIONS для совместимости.
+- **`ContactForm.astro`**, **`BriefForm.astro`**: на **проде** запрос на **`/.netlify/functions/max-lead-mirror`**; на **localhost / 127.0.0.1 / ::1** — прямой **`PUBLIC_MAX_BOT_URL`** при наличии.
+- **`netlify.toml`**: **`[functions] directory = "netlify/functions"`**; **`.env.example`** — описание **`MAX_LEAD_WEBHOOK_URL`** и **`PUBLIC_MAX_BOT_URL`**.
+- **`max_bot_instrukt.md`**, **`summary.md`**: раздел/строки про схему sii5 + Netlify.
+
 ## 2026-04-03 — Favicon и превью кейсов (валидный SVG)
 
 - **`public/favicon.svg`**: был **два корневых `<svg>`** в одном файле (невалидный документ) + второй фрагмент от шаблона Astro — браузеры могли **не показывать иконку вкладки**. Оставлен **один** значок SII5 (**SI** на синем круге), шрифт **`system-ui`**.

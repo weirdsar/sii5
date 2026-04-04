@@ -209,8 +209,8 @@ sii5/
 | `ArticleCard.astro` | Превью статьи → `/articles/[slug]`; `OptimizedMedia` + заглушка |
 | `ArticlesPreview.astro` | Две последние статьи по `date` из коллекции **`articles`** |
 | `CTA.astro` | Градиентный блок призыва; опциональная вторая ссылка (бриф) |
-| `ContactForm.astro` | Заявка: Netlify + опционально MAX (`getPublicMaxBotUrl()`) |
-| `BriefForm.astro` | Бриф: отдельное имя формы Netlify + тот же MAX URL |
+| `ContactForm.astro` | Заявка: Netlify + MAX через `/.netlify/functions/max-lead-mirror` (прод) или `PUBLIC_MAX_BOT_URL` (localhost) |
+| `BriefForm.astro` | Бриф: Netlify `project-brief` + то же зеркало MAX |
 | `JsonLd.astro` | Один тип схемы за вызов: `website` \| `localBusiness` \| `article` \| `breadcrumb`; экспорт **`BreadcrumbSchemaItem`** |
 
 **`MobileMenu.astro`** в проекте нет — меню в `Header.astro`.
@@ -231,7 +231,7 @@ sii5/
 
 - **`getPublicMetrikaId(pageProp?)`** — Яндекс.Метрика: проп страницы → `PUBLIC_METRIKA_ID` → **`PUBLIC_METRIKA_ID_DEV_PLACEHOLDER`**.
 - **`YANDEX_METRIKA_TAG_SCRIPT_URL`**, **`yandexMetrikaWatchPixelUrl(id)`** — URL скрипта и noscript-пикселя.
-- **`getPublicMaxBotUrl()`** — `PUBLIC_MAX_BOT_URL` для дублирования заявок в MAX (пусто = только Netlify).
+- **`getPublicMaxBotUrl()`** — `PUBLIC_MAX_BOT_URL` только для **localhost** (прямой POST). На проде MAX — через **`max-lead-mirror`**: **`MAX_BOT_TOKEN`** + **`MAX_CHAT_ID`** / **`MAX_USER_ID`** (прямой API) или вебхук **`MAX_LEAD_WEBHOOK_URL`**.
 
 ### Content Collections (`src/content.config.ts`)
 
@@ -314,7 +314,7 @@ sii5/
 
 ### MAX / внешние API
 
-Дублирование заявок в **MAX**: клиентский `fetch` на URL из **`getPublicMaxBotUrl()`** (`PUBLIC_MAX_BOT_URL`). Подробности — `max_bot_instrukt.md`.
+Дублирование в **MAX**: **`/.netlify/functions/max-lead-mirror`** — по умолчанию **прямо в Platform API** (**`MAX_BOT_TOKEN`** + **`MAX_CHAT_ID`** или **`MAX_USER_ID`**); иначе прокси на **`MAX_LEAD_WEBHOOK_URL`** / **`PUBLIC_MAX_BOT_URL`**. Чеклист — `max_bot_instrukt.md` (sii5).
 
 ---
 
@@ -368,7 +368,7 @@ sii5/
 | `Header.astro` | Мобильное меню, бургер, resize; `astro:page-load` |
 | `BaseLayout.astro` | Тема (в `<head>`, FOUC), `IntersectionObserver` для `[data-reveal]`, `astro:page-load` |
 | `ThemeSwitcher.astro` | Смена темы, `storage`, `matchMedia`, `astro:page-load` |
-| `ContactForm.astro` / `BriefForm.astro` | Submit, валидация, Netlify + условный fetch MAX |
+| `ContactForm.astro` / `BriefForm.astro` | Submit, валидация, Netlify + зеркало MAX (Netlify Function) |
 
 **View Transitions:** `ClientRouter` в layout. Нет `client:*` островков — только inline-скрипты и Partytown для Метрики.
 

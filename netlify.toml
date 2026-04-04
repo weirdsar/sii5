@@ -2,6 +2,10 @@
   command = "npm run build"
   publish = "dist"
 
+# Прокси заявок в MAX: POST /.netlify/functions/max-lead-mirror (см. .env.example)
+[functions]
+  directory = "netlify/functions"
+
 [[headers]]
   for = "/*"
   [headers.values]
