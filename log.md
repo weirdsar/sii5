@@ -466,3 +466,10 @@
 - **`src/utils/imageAssets.ts`**: импорты переведены с **`.svg`** на растр; **`OptimizedMedia`** отдаёт **`<Picture />`** (AVIF/WebP).
 - Удалены неиспользуемые **`*-preview.svg`** из **`src/assets/images/cases/`** и дубликаты в **`public/images/cases/`**.
 - Проверка: **`npm run build:only`** проходит успешно, этап **generating optimized images** для превью кейсов без ошибок.
+
+## 2026-04-04 — Превью кейсов: замена битых GIF (thum.io) на JPEG с сайтов
+
+- **Проблема**: часть карточек показывала пустое превью или заглушку **thum.io**; GIF с сервиса скриншотов плохо конвертировались / содержали не кадр сайта.
+- **Решение**: **`razumnyeokna`** — **`preview.jpg`** с живого домена (og); **`uzelok64`** — реальный **`user-content/*.jpg`** с главной (старый **`hero-bg.jpg`** на сервере **404**); **`volgawhisper`** — **`/media/gallery/.../volgawhisper-001.jpg`** (маршрут **`/og-image.jpg`** отдаёт HTML SPA).
+- **`src/utils/imageAssets.ts`**: импорты **`.jpg`** вместо **`.gif`** для трёх кейсов; **`gidravlika64-preview.png`** без изменений.
+- Удалены проблемные **`*-preview.gif`**; добавлены/оставлены **`razumnyeokna-preview.jpg`**, **`uzelok64-preview.jpg`**, **`volgawhisper-preview.jpg`**.
