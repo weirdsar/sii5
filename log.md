@@ -473,3 +473,10 @@
 - **Решение**: **`razumnyeokna`** — **`preview.jpg`** с живого домена (og); **`uzelok64`** — реальный **`user-content/*.jpg`** с главной (старый **`hero-bg.jpg`** на сервере **404**); **`volgawhisper`** — **`/media/gallery/.../volgawhisper-001.jpg`** (маршрут **`/og-image.jpg`** отдаёт HTML SPA).
 - **`src/utils/imageAssets.ts`**: импорты **`.jpg`** вместо **`.gif`** для трёх кейсов; **`gidravlika64-preview.png`** без изменений.
 - Удалены проблемные **`*-preview.gif`**; добавлены/оставлены **`razumnyeokna-preview.jpg`**, **`uzelok64-preview.jpg`**, **`volgawhisper-preview.jpg`**.
+
+## 2026-04-04 — Кейс VolgaWhisper: исправление тематики (глэмпинг, не экскурсии)
+
+- **Было по ошибке**: экскурсионное бюро по Саратову.
+- **Факт**: **VolgaWhisper.ru** — **аренда домиков/куполов для глэмпинга**, отдых на природе.
+- **`src/content/cases/volgawhisper.md`**: заголовок, описание, категория, клиент, задача/решение/результат, теги (**Глэмпинг** вместо **Туризм**), **metaTitle** / **metaDescription**.
+- **`roadmap.md`**: синхронизирован пример блока для slug **volgawhisper** (в т.ч. путь превью **`.jpg`**).
