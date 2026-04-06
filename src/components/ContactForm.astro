@@ -1,5 +1,5 @@
 ---
-import { getPublicMaxBotUrl } from '../data/env-public';
+import { getMaxLeadMirrorPath, getPublicMaxBotUrl } from '../data/env-public';
 
 /**
  * Форма заявки: Netlify Forms + MAX через Netlify Function `max-lead-mirror` (прод) или прямой `PUBLIC_MAX_BOT_URL` (localhost).
@@ -23,8 +23,8 @@ const {
 } = Astro.props;
 
 const maxBotUrl = getPublicMaxBotUrl();
-/** Same-origin на проде Netlify — обход CORS к вебхуку MAX */
-const maxLeadMirrorPath = '/.netlify/functions/max-lead-mirror';
+/** Same-origin на проде — Netlify Function или Cloudflare Pages Function */
+const maxLeadMirrorPath = getMaxLeadMirrorPath();
 ---
 
 <!-- Форма -->
@@ -323,7 +323,11 @@ const maxLeadMirrorPath = '/.netlify/functions/max-lead-mirror';
           var maxResult = results[0];
           var response = results[1];
 
-          if (response.ok) {
+          /* Netlify Forms на CF нет: успех при доставке в MAX; skipped без URL — только если Netlify ok */
+          var netlifyOk = response.ok;
+          var mirrorDelivered =
+            maxResult && maxResult.ok === true && maxResult.skipped !== true;
+          if (netlifyOk || mirrorDelivered) {
             form.classList.add('hidden');
             if (successEl) {
               successEl.classList.remove('hidden');

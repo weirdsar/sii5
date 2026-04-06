@@ -1,9 +1,9 @@
 ---
-import { getPublicMaxBotUrl } from '../data/env-public';
+import { getMaxLeadMirrorPath, getPublicMaxBotUrl } from '../data/env-public';
 
 /** Форма брифа: Netlify `project-brief` + MAX через зеркало (как в ContactForm). */
 const maxBotUrl = getPublicMaxBotUrl();
-const maxLeadMirrorPath = '/.netlify/functions/max-lead-mirror';
+const maxLeadMirrorPath = getMaxLeadMirrorPath();
 ---
 
 <form
@@ -260,7 +260,10 @@ const maxLeadMirrorPath = '/.netlify/functions/max-lead-mirror';
         var pair = await Promise.all([maxP, netlifyP]);
         var maxResult = pair[0];
         var res = pair[1];
-        if (res.ok) {
+        var netlifyOk = res.ok;
+        var mirrorDelivered =
+          maxResult && maxResult.ok === true && maxResult.skipped !== true;
+        if (netlifyOk || mirrorDelivered) {
           form.classList.add('hidden');
           if (successEl) {
             successEl.classList.remove('hidden');

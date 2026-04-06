@@ -17,6 +17,9 @@ pnpm-debug.log*
 .env
 .env.production
 .yandex.metrika.env
+/.cloudflare.env
+# Cloudflare (секреты только локально; см. docs/cloudflare-env.example)
+docs/.cloudflare.env
 
 # macOS-specific files
 .DS_Store

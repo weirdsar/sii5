@@ -34,3 +34,14 @@ export function getPublicMetrikaId(pageProp?: string | undefined): string {
 export function getPublicMaxBotUrl(): string {
   return String(import.meta.env.PUBLIC_MAX_BOT_URL ?? '').trim();
 }
+
+/**
+ * Путь POST для зеркала заявок в MAX (same-origin на проде).
+ * Netlify: `/.netlify/functions/max-lead-mirror`
+ * Cloudflare Pages: задайте в билде `PUBLIC_MAX_LEAD_MIRROR_PATH=/api/max-lead-mirror`
+ */
+export function getMaxLeadMirrorPath(): string {
+  const fromEnv = String(import.meta.env.PUBLIC_MAX_LEAD_MIRROR_PATH ?? '').trim();
+  if (fromEnv) return fromEnv;
+  return '/.netlify/functions/max-lead-mirror';
+}

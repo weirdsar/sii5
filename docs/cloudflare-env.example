@@ -1,0 +1,13 @@
+# Скопируйте в docs/.cloudflare.env и заполните (docs/.cloudflare.env в .gitignore).
+
+# CLOUDFLARE_API_TOKEN — для whoami достаточно Read; для `wrangler pages project create`
+# и смены настроек через API нужен минимум Account → Cloudflare Pages → Edit.
+# См. docs/CLOUDFLARE_PAGES.md → «API Token: какие права нужны».
+# CLOUDFLARE_API_TOKEN=
+
+# Legacy HTTP API (нужны оба; лучше заменить на CLOUDFLARE_API_TOKEN):
+# CF_ACCOUNT_EMAIL=you@example.com
+# CF_GLOBAL_API_KEY=
+
+# Origin CA — только для выпуска origin-сертификата на своём сервере (не для Pages):
+# CF_ORIGIN_CA_KEY=

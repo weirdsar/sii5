@@ -595,9 +595,58 @@
 - **`src/utils/articles-pagination.ts`**: комментарий о неиспользовании пагинации.
 - Проверка: `npm run build`, `check-internal-links` OK.
 
+## 2026-04-04 — Документ: посев статей (VC.ru, Habr)
+
+- **`CONTENT_SEEDING.md`**: стратегия переупаковки (не копипаст), ссылки на оригиналы **скорость** и **техническое SEO**, углы для VC vs Habr, черновики лидов, чеклист, опциональные UTM.
+- Дополнение: раздел **«Пошагово: VC.ru»** (10 шагов: аккаунт, тема, уникальный текст, ссылка, оформление, публикация, модерация, после выхода).
+- Сборка кода не менялась.
+
+## 2026-04-04 — Cloudflare: чеклист настроек и права API Token
+
+- Проверка API: список Pages-проектов пуст; **`wrangler pages project create sii5`** — **Authentication error 10000** при текущем токене (нужно **Pages → Edit**).
+- **`docs/CLOUDFLARE_PAGES.md`**: таблица **полного чеклиста** настроек в Dashboard; раздел **API Token: какие права нужны**.
+- **`docs/cloudflare-env.example`**: ссылка на права токена.
+
+## 2026-04-04 — Cloudflare: секреты вне репозитория
+
+- Утечка: ключи из **`docs/.cloudflare.env`** попали в чат — **сменить Global API Key и Origin CA key** в панели Cloudflare.
+- **`.gitignore`**: **`docs/.cloudflare.env`**; файл очищен от секретов, добавлен коммитимый шаблон **`docs/cloudflare-env.example`**.
+- **`docs/CLOUDFLARE_PAGES.md`**: раздел про **`CLOUDFLARE_API_TOKEN`**, `source docs/.cloudflare.env`, `wrangler whoami`.
+
+## 2026-04-04 — Cloudflare Pages: Deploy command обязателен → `true`
+
+- **`docs/CLOUDFLARE_PAGES.md`**: если пустое значение недопустимо — **`true`** или **`exit 0`** как no-op; уточнено отличие **`wrangler deploy`** (Worker, ломает SSG) от **`wrangler pages deploy dist`** (избыточно при Git Pages).
+
+## 2026-04-04 — Cloudflare Pages: предупреждение про `wrangler deploy`
+
+- **`docs/CLOUDFLARE_PAGES.md`**: не использовать **`npx wrangler deploy`** (авто-`astro add cloudflare`, падение OG); при обязательном поле деплоя — **`true`**; откат репо при случайной модификации Wrangler.
+- Сборка кода не менялась; проверка: **`npm run build`** OK.
+
+## 2026-04-04 — Cloudflare Pages: зеркало MAX, путь из env, формы без Netlify
+
+- **`functions/api/max-lead-mirror.js`**: Pages Function **POST `/api/max-lead-mirror`**, логика как у **`netlify/functions/max-lead-mirror.mjs`** (MAX API или прокси-вебхук), секреты из **`context.env`**.
+- **`src/data/env-public.ts`**: **`getMaxLeadMirrorPath()`** — **`PUBLIC_MAX_LEAD_MIRROR_PATH`** или дефолт Netlify.
+- **`src/components/ContactForm.astro`**, **`src/components/BriefForm.astro`**: путь зеркала из **`getMaxLeadMirrorPath()`**; успех при **`netlifyOk || mirrorDelivered`** (учёт **`skipped`** без URL).
+- **`public/_redirects`**, **`public/_headers`**: редирект пагинации статей и заголовки безопасности для CF (дубль **`netlify.toml`**).
+- **`docs/CLOUDFLARE_PAGES.md`**: пошаговая настройка Pages, env, домен; **`.env.example`**: **`PUBLIC_MAX_LEAD_MIRROR_PATH`**.
+- Проверка: **`npm run build`** — успешно, **`check-internal-links`** OK.
+
 ## 2026-04-04 — Статья CRM: контекстный CTA (аудит заявок) + стили inline-блока
 
 - **`src/content/articles/sajt-kak-chast-crm-2026.md`**: перед «В итоге» — HTML-блок **article-inline-cta** (бесплатный аудит процесса заявок, кнопки на **`/contact/?service=vip`** и **`/brief/`**); финальный абзац переписан под тот же оффер.
 - **`src/pages/articles/[slug].astro`**: для **`sajt-kak-chast-crm-2026`** нижний **`<CTA>`** с тем же смыслом + вторичная кнопка на PDF-бриф.
 - **`src/styles/globals.css`**: стили **`.article-inline-cta`** внутри **`.article-prose`**.
 - Проверка: `npm run build`, `check-internal-links` OK.
+
+## 2026-04-07 — Cursor: валидный `hooks.json` (п.5 логов DevTools)
+
+- В корне не было **`.cursor/hooks.json`**, из‑за этого в Cursor 3.x в консоли появлялось **`[HOOKS] Failed to parse project hooks configuration undefined`**.
+- Добавлен **`.cursor/hooks.json`**: **`version: 1`**, пустой объект **`hooks`** (хуков нет — только валидная схема).
+
+## 2026-04-06 — Cloudflare Pages: создание проекта и обязательные параметры
+
+- **`.gitignore`**: добавлен **`/.cloudflare.env`** (локальный токен Cloudflare больше не попадет в git).
+- Cloudflare API: создан Pages-проект **`sii5`** с production branch **`main`**.
+- Cloudflare API: для `preview` и `production` заданы env vars **`NODE_VERSION=22`** и **`PUBLIC_MAX_LEAD_MIRROR_PATH=/api/max-lead-mirror`**.
+- Cloudflare API: задан build config проекта (`build_command`: `npm run build`, `destination_dir`: `dist`, `root_dir`: `/`).
+- Попытка первого деплоя через `wrangler pages deploy dist` из этой среды несколько раз падала с сетевой ошибкой **`fetch failed (EPIPE)`** на этапе `pages/assets/upload`; требуется повторить деплой из локального терминала пользователя или через Dashboard/Git-триггер.
