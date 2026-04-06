@@ -2,6 +2,11 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
+## 2026-04-07 — Cloudflare Pages: зеркало MAX, push в main
+
+- Закоммичены и отправлены в `origin/main` (commit `ea168e1`): Pages Function `functions/api/max-lead-mirror.js`, `PUBLIC_MAX_LEAD_MIRROR_PATH` и правки форм, `public/_headers`, `public/_redirects`, `docs/CLOUDFLARE_PAGES.md` (в т.ч. раздел про подключение GitHub и перенос с Direct Upload), `docs/cloudflare-env.example`, `.env.example`, `.gitignore` (локальный `.cloudflare.env`), `CONTENT_SEEDING.md`, `.cursor/hooks.json`.
+- Дальнейшие шаги только в UI: **GitHub** — доступ приложению Cloudflare к репо `weirdsar/sii5`; **Cloudflare** — Create/Connect Git, build `npm run build`, output `dist`, переменные `NODE_VERSION`, `PUBLIC_*`, секреты MAX для Functions; при необходимости перенести custom domain с проекта только с Upload assets.
+
 ## 2026-04-02 — Инициализация Astro и базовой структуры
 
 - Прочитан и учтен файл `.cursorrules`.
