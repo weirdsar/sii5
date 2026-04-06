@@ -7,6 +7,12 @@
 - Закоммичены и отправлены в `origin/main` (commit `ea168e1`): Pages Function `functions/api/max-lead-mirror.js`, `PUBLIC_MAX_LEAD_MIRROR_PATH` и правки форм, `public/_headers`, `public/_redirects`, `docs/CLOUDFLARE_PAGES.md` (в т.ч. раздел про подключение GitHub и перенос с Direct Upload), `docs/cloudflare-env.example`, `.env.example`, `.gitignore` (локальный `.cloudflare.env`), `CONTENT_SEEDING.md`, `.cursor/hooks.json`.
 - Дальнейшие шаги только в UI: **GitHub** — доступ приложению Cloudflare к репо `weirdsar/sii5`; **Cloudflare** — Create/Connect Git, build `npm run build`, output `dist`, переменные `NODE_VERSION`, `PUBLIC_*`, секреты MAX для Functions; при необходимости перенести custom domain с проекта только с Upload assets.
 
+## 2026-04-07 — Пустой коммит для триггера Pages
+
+- Выполнен пустой коммит и push в `main`: `af5aea0` (`chore: trigger Cloudflare Pages rebuild`), чтобы инициировать сборку на стороне Cloudflare при подключённом Git.
+- Проверка Cloudflare API из среды агента: в корневом `/.cloudflare.env` не задан `CLOUDFLARE_API_TOKEN` (или файл пустой) — запрос списка деплоев через API не выполнен; для проверки локально задать токен по `docs/cloudflare-env.example` и вызвать `GET .../accounts/{id}/pages/projects/sii5/deployments`.
+- Проверка `https://sii5.pages.dev` из среды агента: ошибка резолва DNS (`Could not resolve host`) — не подтверждает доступность продакшена; проверить в браузере или с своей машины.
+
 ## 2026-04-02 — Инициализация Astro и базовой структуры
 
 - Прочитан и учтен файл `.cursorrules`.
