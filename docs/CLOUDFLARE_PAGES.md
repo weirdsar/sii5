@@ -53,6 +53,16 @@
 
 Если Wrangler уже изменил файлы в репозитории (появились `@astrojs/cloudflare`, `wrangler.toml`, правки `astro.config`), откатите эти изменения к варианту из `main` с **`output: 'static'`** и без адаптера Cloudflare.
 
+### Ошибка в логе: после `Success: Build command completed` идёт `npx wrangler deploy`
+
+Типичная последовательность:
+
+1. Первый **`npm run build`** завершается успешно (статический вывод в `dist/`).
+2. В логе появляется **`Executing user deploy command: npx wrangler deploy`**.
+3. Wrangler запускает автонастройку и снова вызывает **`npm run build`** уже с **`@astrojs/cloudflare`** → сборка падает с **`No such module "node:path"`** в Miniflare при prerender OG.
+
+**Что сделать:** в **Workers & Pages** → ваш проект → **Settings** → **Build** (или **Builds & deployments**) поле **Deploy command** очистить или заменить на **`true`**. Сохранить и запустить **Retry deployment** / новый push. В репозитории менять ничего не нужно, если `astro.config` по-прежнему **`output: 'static'`** без адаптера Cloudflare.
+
 ## Что меняется относительно Netlify
 
 - **Сборка:** `npm run build`, каталог вывода **`dist`** (как сейчас).

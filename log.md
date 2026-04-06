@@ -13,6 +13,11 @@
 - Проверка Cloudflare API из среды агента: в корневом `/.cloudflare.env` не задан `CLOUDFLARE_API_TOKEN` (или файл пустой) — запрос списка деплоев через API не выполнен; для проверки локально задать токен по `docs/cloudflare-env.example` и вызвать `GET .../accounts/{id}/pages/projects/sii5/deployments`.
 - Проверка `https://sii5.pages.dev` из среды агента: ошибка резолва DNS (`Could not resolve host`) — не подтверждает доступность продакшена; проверить в браузере или с своей машины.
 
+## 2026-04-07 — Лог CI Cloudflare: `npx wrangler deploy` ломает сборку
+
+- В логе Pages после успешного `npm run build` выполнялась команда **`npx wrangler deploy`** → Wrangler вызывал **`astro add cloudflare`**, второй билд шёл в режиме Worker/Miniflare и падал с **`No such module "node:path"`** (как в `docs/CLOUDFLARE_PAGES.md`, раздел «Критично»).
+- Исправление: в настройках **Cloudflare Pages** убрать **Deploy command** или указать **`true`**, не **`wrangler deploy`**. В `docs/CLOUDFLARE_PAGES.md` добавлен подраздел с типичной последовательностью лога.
+
 ## 2026-04-07 — Диагностика API: проект Pages отсутствует
 
 - По `CLOUDFLARE_API_TOKEN` (файлы `/.cloudflare.env` и `docs/.cloudflare.env`): токен валиден, аккаунт `88d686b610f5fb3d09f7b4552fb3d4ff`.
