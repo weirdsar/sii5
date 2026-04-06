@@ -13,6 +13,13 @@
 - Проверка Cloudflare API из среды агента: в корневом `/.cloudflare.env` не задан `CLOUDFLARE_API_TOKEN` (или файл пустой) — запрос списка деплоев через API не выполнен; для проверки локально задать токен по `docs/cloudflare-env.example` и вызвать `GET .../accounts/{id}/pages/projects/sii5/deployments`.
 - Проверка `https://sii5.pages.dev` из среды агента: ошибка резолва DNS (`Could not resolve host`) — не подтверждает доступность продакшена; проверить в браузере или с своей машины.
 
+## 2026-04-07 — Диагностика API: проект Pages отсутствует
+
+- По `CLOUDFLARE_API_TOKEN` (файлы `/.cloudflare.env` и `docs/.cloudflare.env`): токен валиден, аккаунт `88d686b610f5fb3d09f7b4552fb3d4ff`.
+- `GET /accounts/{id}/pages/projects`: **total_count: 0** — **нет ни одного Cloudflare Pages-проекта**; `GET .../pages/projects/sii5` → **404**.
+- `GET /accounts/{id}/workers/scripts`: есть скрипт **`sii5`** (Worker), не Pages.
+- Вывод: поддомен **`*.pages.dev` для сайта не существует**, пока не создан заново **Pages**-проект; ошибка браузера и отсутствие DNS для `sii5.pages.dev` согласуются с удалением/отсутствием Pages. Дальше — создать Pages из GitHub `weirdsar/sii5` (при конфликте имени с Worker — переименовать или удалить Worker `sii5`), настроить build `npm run build` / `dist` и переменные по `docs/CLOUDFLARE_PAGES.md`.
+
 ## 2026-04-02 — Инициализация Astro и базовой структуры
 
 - Прочитан и учтен файл `.cursorrules`.
