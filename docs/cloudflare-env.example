@@ -7,6 +7,9 @@
 # Проверка токена: GET /client/v4/user/tokens/verify с заголовком Authorization: Bearer …
 # CLOUDFLARE_API_TOKEN=
 # Второй токен (если задан): обычно с Zone → DNS → Edit — для правок DNS по API (`CLOUDFLARE_API_TOKEN3`).
+#
+# GitHub Actions (деплой в Cloudflare Pages из CI) — секреты в репозитории, не в этом файле:
+#   CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID — см. docs/CLOUDFLARE_PAGES.md → «Деплой через GitHub Actions».
 
 # Legacy HTTP API (нужны оба; лучше заменить на CLOUDFLARE_API_TOKEN):
 # CF_ACCOUNT_EMAIL=you@example.com

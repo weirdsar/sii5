@@ -1,0 +1,44 @@
+# Деплой статики в Cloudflare Pages через Wrangler (обход «build token» встроенной связки CF↔Git).
+# Секреты: GitHub → Settings → Secrets and variables → Actions.
+name: Deploy Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: cloudflare-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # PUBLIC_* вшиваются на этапе `astro build` — для CF задайте зеркало в MAX (как в Netlify/Pages).
+      - name: Build
+        run: npm run build
+        env:
+          PUBLIC_MAX_LEAD_MIRROR_PATH: /api/max-lead-mirror
+          PUBLIC_METRIKA_ID: ${{ vars.PUBLIC_METRIKA_ID }}
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        # Имя проекта в Pages (как в дашборде). При другом имени — поменяйте здесь.
+        run: npx wrangler@4 pages deploy dist --project-name=sii5

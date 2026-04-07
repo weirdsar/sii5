@@ -13,6 +13,11 @@
 - Проверка Cloudflare API из среды агента: в корневом `/.cloudflare.env` не задан `CLOUDFLARE_API_TOKEN` (или файл пустой) — запрос списка деплоев через API не выполнен; для проверки локально задать токен по `docs/cloudflare-env.example` и вызвать `GET .../accounts/{id}/pages/projects/sii5/deployments`.
 - Проверка `https://sii5.pages.dev` из среды агента: ошибка резолва DNS (`Could not resolve host`) — не подтверждает доступность продакшена; проверить в браузере или с своей машины.
 
+## 2026-04-07 — Деплой Cloudflare: GitHub Actions + разделение ключей
+
+- Добавлен workflow **`.github/workflows/cloudflare-pages.yml`**: `npm run build` + `wrangler pages deploy dist` с секретами **`CLOUDFLARE_API_TOKEN`** и **`CLOUDFLARE_ACCOUNT_ID`** в GitHub (альтернатива встроенной связке CF↔Git при ошибке «build token deleted»). Опционально variable **`PUBLIC_METRIKA_ID`**.
+- В **`docs/CLOUDFLARE_PAGES.md`**: пояснено, что локальные **`docs/.cloudflare.env`** не влияют на сборку в Cloudflare; **`docs/cloudflare-env.example`**: ссылка на секреты Actions.
+
 ## 2026-04-07 — DNS sii5.ru → Cloudflare Pages (API)
 
 - Через `CLOUDFLARE_API_TOKEN3` (Zone DNS Edit): удалены **MX** для **`www.sii5.ru`** (две записи на Beget) — иначе **CNAME** на `www` несовместим с MX на том же имени; почта на **`@sii5.ru`** по **MX** на apex сохранена.

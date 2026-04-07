@@ -133,6 +133,21 @@ npx wrangler whoami
 
 Для полного E2E удобен `wrangler pages dev` (отдельно от Astro dev) или деплой в preview-ветку. В `astro dev` функция Cloudflare не поднимается — для локального теста MAX по-прежнему можно использовать `PUBLIC_MAX_BOT_URL` (прямой вебхук) или `netlify dev` со старым зеркалом.
 
+## Деплой через GitHub Actions (если «build token» в Cloudflare отозван)
+
+Сообщение *«The build token selected for this build has been deleted or rolled»* относится к **встроенной** связке **Cloudflare ↔ GitHub** в настройках Worker/Pages (отдельный токен в панели). Файлы **`docs/.cloudflare.env`** и **`/.cloudflare.env`** на вашем ПК **не участвуют** в этой сборке и их правки **не могут** вызвать эту ошибку — нужно **переподключить GitHub** в **Workers & Pages → Settings → Builds** или перейти на деплой из **GitHub Actions**.
+
+В репозитории есть workflow **`.github/workflows/cloudflare-pages.yml`**:
+
+1. **GitHub** → репозиторий **`weirdsar/sii5`** → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**:
+   - **`CLOUDFLARE_API_TOKEN`** — API Token с правами **Account → Cloudflare Pages → Edit** (и при необходимости **Workers** для того же аккаунта).
+   - **`CLOUDFLARE_ACCOUNT_ID`** — ID аккаунта (строка из URL дашборда `dash.cloudflare.com/<ACCOUNT_ID>/...`).
+2. Опционально: **Variables** → **`PUBLIC_METRIKA_ID`** — ID Яндекс.Метрики (как в `.env`), иначе при сборке в Actions может подставиться запасной плейсхолдер из кода.
+3. В **Cloudflare Pages** должен существовать проект с именем **`sii5`** (или измените `--project-name` в workflow).
+4. Чтобы **не было двойных деплоев**, отключите автосборку из **встроенного Git** в Cloudflare для этого проекта **или** не включайте этот workflow — выберите **один** канал.
+
+Локальные ключи в **`docs/.cloudflare.env`** по-прежнему нужны только для **Wrangler / API с вашего компьютера**, не для Actions.
+
 ## Netlify
 
 Файл `netlify.toml` и `netlify/functions/` можно оставить для резервного деплоя или удалить позже, когда миграция закреплена.
