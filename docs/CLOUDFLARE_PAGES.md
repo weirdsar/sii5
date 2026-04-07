@@ -139,9 +139,10 @@ npx wrangler whoami
 
 В репозитории есть workflow **`.github/workflows/cloudflare-pages.yml`**:
 
-1. **GitHub** → репозиторий **`weirdsar/sii5`** → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**:
-   - **`CLOUDFLARE_API_TOKEN`** — API Token с правами **Account → Cloudflare Pages → Edit** (и при необходимости **Workers** для того же аккаунта).
+1. **GitHub** → репозиторий **`weirdsar/sii5`** → **Settings** → **Secrets and variables** → **Actions** → вкладка **Secrets** (не Variables) → **New repository secret**:
+   - **`CLOUDFLARE_API_TOKEN`** — API Token с правами **Account → Cloudflare Pages → Edit** (и при необходимости **Workers** для того же аккаунта). Имя секрета должно совпадать **буква в букву**; иначе Wrangler в CI выдаст: *«set a CLOUDFLARE_API_TOKEN environment variable»*.
    - **`CLOUDFLARE_ACCOUNT_ID`** — ID аккаунта (строка из URL дашборда `dash.cloudflare.com/<ACCOUNT_ID>/...`).
+   - Секреты нужно добавлять как **Repository secrets**. Если создать только **Environment** secrets без указания `environment:` в workflow, переменные в job **не попадут**.
 2. Опционально: **Variables** → **`PUBLIC_METRIKA_ID`** — ID Яндекс.Метрики (как в `.env`), иначе при сборке в Actions может подставиться запасной плейсхолдер из кода.
 3. В **Cloudflare Pages** должен существовать проект с именем **`sii5`** (или измените `--project-name` в workflow).
 4. Чтобы **не было двойных деплоев**, отключите автосборку из **встроенного Git** в Cloudflare для этого проекта **или** не включайте этот workflow — выберите **один** канал.
