@@ -6,7 +6,7 @@
 # См. docs/CLOUDFLARE_PAGES.md → «API Token: какие права нужны».
 # Проверка токена: GET /client/v4/user/tokens/verify с заголовком Authorization: Bearer …
 # CLOUDFLARE_API_TOKEN=
-# Опционально второй рабочий токен (резерв): CLOUDFLARE_API_TOKEN3=
+# Второй токен (если задан): обычно с Zone → DNS → Edit — для правок DNS по API (`CLOUDFLARE_API_TOKEN3`).
 
 # Legacy HTTP API (нужны оба; лучше заменить на CLOUDFLARE_API_TOKEN):
 # CF_ACCOUNT_EMAIL=you@example.com

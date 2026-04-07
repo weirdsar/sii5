@@ -13,6 +13,13 @@
 - Проверка Cloudflare API из среды агента: в корневом `/.cloudflare.env` не задан `CLOUDFLARE_API_TOKEN` (или файл пустой) — запрос списка деплоев через API не выполнен; для проверки локально задать токен по `docs/cloudflare-env.example` и вызвать `GET .../accounts/{id}/pages/projects/sii5/deployments`.
 - Проверка `https://sii5.pages.dev` из среды агента: ошибка резолва DNS (`Could not resolve host`) — не подтверждает доступность продакшена; проверить в браузере или с своей машины.
 
+## 2026-04-07 — DNS sii5.ru → Cloudflare Pages (API)
+
+- Через `CLOUDFLARE_API_TOKEN3` (Zone DNS Edit): удалены **MX** для **`www.sii5.ru`** (две записи на Beget) — иначе **CNAME** на `www` несовместим с MX на том же имени; почта на **`@sii5.ru`** по **MX** на apex сохранена.
+- Добавлено: **CNAME** `www` → **`sii5.pages.dev`**, Proxied; **A** `sii5.ru` → **`192.0.2.1`**, Proxied (заглушка под прокси для корня; сайт на Pages — через **www**).
+- **`CLOUDFLARE_API_TOKEN`** по-прежнему без прав на DNS (403); правки зоны — токеном с **DNS Edit** (сейчас **TOKEN3**).
+- Редирект **`https://sii5.ru/*` → `https://www.sii5.ru/$1`** в API не создавался (403 на rulesets); при необходимости — вручную: **Rules → Redirect Rules** в панели Cloudflare. В **Pages → Custom domains** должны быть **`www.sii5.ru`** (и при необходимости apex).
+
 ## 2026-04-07 — Проверка API-токенов Cloudflare
 
 - Через `GET /user/tokens/verify`: **рабочие** — `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_API_TOKEN3`; **невалидные** — `CLOUDFLARE_API_TOKEN2`, `CLOUDFLARE_API_TOKEN4` (Invalid API Token), корневой `Edit_zone_DNS_API_token`.
