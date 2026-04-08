@@ -13,6 +13,12 @@
 - Проверка Cloudflare API из среды агента: в корневом `/.cloudflare.env` не задан `CLOUDFLARE_API_TOKEN` (или файл пустой) — запрос списка деплоев через API не выполнен; для проверки локально задать токен по `docs/cloudflare-env.example` и вызвать `GET .../accounts/{id}/pages/projects/sii5/deployments`.
 - Проверка `https://sii5.pages.dev` из среды агента: ошибка резолва DNS (`Could not resolve host`) — не подтверждает доступность продакшена; проверить в браузере или с своей машины.
 
+## 2026-04-08 — OG-превью в MAX: дефолтный `og:image` переведён на PNG
+
+- В `src/layouts/BaseLayout.astro` для дефолтного `og:image` (главная/страницы без явного `ogImage`) заменён SVG на PNG: `/open-graph/articles/dizajn-sajta-2026.png?v=20260408`.
+- Причина: в MAX при шаринге `sii5.ru` отображалась некорректная старая карточка; PNG-изображения для OG обычно распознаются стабильнее, чем SVG.
+- Проверка: `npm run build` — успешно.
+
 ## 2026-04-07 — GitHub Actions: проверка секретов в workflow
 
 - В **`.github/workflows/cloudflare-pages.yml`** добавлен шаг «Секреты Cloudflare (проверка)» до `wrangler pages deploy`: явная ошибка, если не заданы **`CLOUDFLARE_API_TOKEN`** или **`CLOUDFLARE_ACCOUNT_ID`** (частая причина — секрет только на вкладке Variables, в Environment без `environment:` в job, или другое имя секрета).
