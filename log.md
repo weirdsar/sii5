@@ -2,6 +2,13 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
+## 2026-04-12 — Метрика 108384118: дефолт в коде, init как в конструкторе, деплой
+
+- **`src/data/env-public.ts`**: запасной ID Метрики заменён с плейсхолдера на **108384118** (как в `.yandex.metrika.env`), чтобы прод-сборка без `PUBLIC_METRIKA_ID` в панели хостинга всё равно отдавала рабочий счётчик.
+- **`src/layouts/BaseLayout.astro`**: перед Partytown — `window.dataLayer`; в `ym(..., 'init', …)` добавлены **`ssr`**, **`ecommerce: 'dataLayer'`**, **`referrer`**, **`url`** по вставке из конструктора; порядок опций выровнен с `.yandex.metrika.env`.
+- Проверка: **`npm run build`** — успешно; в `dist/index.html` — `metrikaId "108384118"`, `watch/108384118`.
+- Деплой: push в **`origin/main`** (после коммита проверить в браузере `view-source:https://sii5.ru/` на наличие `108384118` и онлайн-отчёт Метрики).
+
 ## 2026-04-07 — Cloudflare Pages: зеркало MAX, push в main
 
 - Закоммичены и отправлены в `origin/main` (commit `ea168e1`): Pages Function `functions/api/max-lead-mirror.js`, `PUBLIC_MAX_LEAD_MIRROR_PATH` и правки форм, `public/_headers`, `public/_redirects`, `docs/CLOUDFLARE_PAGES.md` (в т.ч. раздел про подключение GitHub и перенос с Direct Upload), `docs/cloudflare-env.example`, `.env.example`, `.gitignore` (локальный `.cloudflare.env`), `CONTENT_SEEDING.md`, `.cursor/hooks.json`.
@@ -18,6 +25,20 @@
 - В `src/layouts/BaseLayout.astro` для дефолтного `og:image` (главная/страницы без явного `ogImage`) заменён SVG на PNG: `/open-graph/articles/dizajn-sajta-2026.png?v=20260408`.
 - Причина: в MAX при шаринге `sii5.ru` отображалась некорректная старая карточка; PNG-изображения для OG обычно распознаются стабильнее, чем SVG.
 - Проверка: `npm run build` — успешно.
+
+## 2026-04-08 — Python окружение для Yandex Metrica
+
+- Добавлены файлы: `/.env` (переменные `YANDEX_CLIENT_ID`, `YANDEX_CLIENT_SECRET`, `YANDEX_ACCESS_TOKEN`, `YANDEX_COUNTER_ID`), `/requirements.txt`, `/auth_setup.py`, `/metrica_client.py`.
+- `auth_setup.py`: генерация OAuth URL, обмен `verification_code` на `access_token`, автоматическая запись токена в `.env`.
+- `metrica_client.py`: класс `MetricaClient` для теста подключения (список счетчиков) и выгрузки дневных метрик (`visits`, `users`, `pageviews`) по `YANDEX_COUNTER_ID`; при успешном тесте выводит `SYSTEM READY FOR ANALYTICS`.
+- Проверка: `python3 -m py_compile auth_setup.py metrica_client.py` — успешно.
+- Повторная проверка: `python3 metrica_client.py` — `Connection OK`, доступно 6 счётчиков, превью дневного трафика, `SYSTEM READY FOR ANALYTICS`; предупреждение urllib3 про LibreSSL на системном Python — ожидаемо, на работу API не влияет.
+
+## 2026-04-08 — Перенос Яндекс.Метрики API в проект Analitika
+
+- Код и секреты OAuth/API вынесены из `sii5` в **`Analitika/metrica-yandex/`** (абсолютный путь рядом с репо: `../Analitika/metrica-yandex/`): `auth_setup.py`, `metrica_client.py`, `requirements.txt`, `.env.example`, `.gitignore`, `README.md`, локальный `.env` с `YANDEX_*`, при необходимости `.oauth.yandex.env`.
+- Из корня `sii5` удалены `auth_setup.py`, `metrica_client.py`, `requirements.txt`; в **`sii5/.env`** — комментарий: публичные переменные для Astro из **`.env.example`**, секреты API Метрики — только в `Analitika/metrica-yandex/.env`.
+- Проверка: `python3 -m py_compile` в `metrica-yandex` — успешно.
 
 ## 2026-04-07 — GitHub Actions: проверка секретов в workflow
 

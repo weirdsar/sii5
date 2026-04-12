@@ -12,10 +12,10 @@ export function yandexMetrikaWatchPixelUrl(counterId: string): string {
 }
 
 /**
- * Запасной ID Метрики, если не заданы проп страницы и `PUBLIC_METRIKA_ID`
- * (локальная разработка без `.env`). В продакшене задайте реальный ID в Netlify.
+ * ID счётчика по умолчанию (см. `.yandex.metrika.env` / конструктор Метрики).
+ * Проп страницы и `PUBLIC_METRIKA_ID` в окружении билда переопределяют это значение.
  */
-export const PUBLIC_METRIKA_ID_DEV_PLACEHOLDER = '99999999';
+export const PUBLIC_METRIKA_ID_DEV_PLACEHOLDER = '108384118';
 
 /**
  * Эффективный ID Яндекс.Метрики: проп страницы → `PUBLIC_METRIKA_ID` → запасной плейсхолдер.

@@ -106,6 +106,10 @@ const absoluteOgImage = new URL(ogImage, siteOrigin).href;
     <JsonLd type="website" />
     <JsonLd type="localBusiness" />
 
+    <!-- dataLayer для параметра ecommerce в ym init (как в конструкторе Метрики) -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+    </script>
     <!-- Yandex.Metrika: Partytown (web worker) — снижает блокировку основного потока -->
     <script is:inline type="text/partytown" define:vars={{ metrikaId, metrikaTagUrl }}>
       (function (m, e, t, r, i, k, a) {
@@ -128,10 +132,14 @@ const absoluteOgImage = new URL(ogImage, siteOrigin).href;
       })(window, document, 'script', metrikaTagUrl, 'ym');
 
       ym(metrikaId, 'init', {
-        clickmap: true,
-        trackLinks: true,
-        accurateTrackBounce: true,
+        ssr: true,
         webvisor: true,
+        clickmap: true,
+        ecommerce: 'dataLayer',
+        referrer: document.referrer,
+        url: location.href,
+        accurateTrackBounce: true,
+        trackLinks: true,
       });
     </script>
     <noscript>
