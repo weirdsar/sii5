@@ -7,7 +7,7 @@
 - **`src/data/env-public.ts`**: запасной ID Метрики заменён с плейсхолдера на **108384118** (как в `.yandex.metrika.env`), чтобы прод-сборка без `PUBLIC_METRIKA_ID` в панели хостинга всё равно отдавала рабочий счётчик.
 - **`src/layouts/BaseLayout.astro`**: перед Partytown — `window.dataLayer`; в `ym(..., 'init', …)` добавлены **`ssr`**, **`ecommerce: 'dataLayer'`**, **`referrer`**, **`url`** по вставке из конструктора; порядок опций выровнен с `.yandex.metrika.env`.
 - Проверка: **`npm run build`** — успешно; в `dist/index.html` — `metrikaId "108384118"`, `watch/108384118`.
-- Деплой: push в **`origin/main`** (после коммита проверить в браузере `view-source:https://sii5.ru/` на наличие `108384118` и онлайн-отчёт Метрики).
+- Деплой: push в **`origin/main`**, commit **`b22e56b`**. Проверка с сервера: через ~40 с после деплоя в HTML главной **`108384118`**, плейсхолдер **`99999999`** исчез.
 
 ## 2026-04-07 — Cloudflare Pages: зеркало MAX, push в main
 
