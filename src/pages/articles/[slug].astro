@@ -1,6 +1,7 @@
 ---
 import { getCollection, getEntry, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import CTA from '../../components/CTA.astro';
 import { siteConfig } from '../../data/site';
@@ -66,20 +67,15 @@ const canonicalUrl = new URL(`/articles/${entry.id}/`, base).href;
   />
   <article class="py-16 md:py-24" data-article-reading>
     <div class="container-custom max-w-3xl">
-      <!-- Хлебные крошки -->
-      <nav class="mb-8 text-sm" aria-label="Breadcrumb">
-        <ol class="flex items-center gap-2 text-text-muted">
-          <li>
-            <a href="/" class="hover:text-primary transition-colors">Главная</a>
-          </li>
-          <li>/</li>
-          <li>
-            <a href="/articles" class="hover:text-primary transition-colors">Статьи</a>
-          </li>
-          <li>/</li>
-          <li class="text-text-main">{article.title}</li>
-        </ol>
-      </nav>
+      <Breadcrumb
+        variant="default"
+        class="mb-8"
+        items={[
+          { name: 'Главная', href: '/' },
+          { name: 'Статьи', href: '/articles/' },
+          { name: article.title },
+        ]}
+      />
 
       <!-- Метаданные -->
       <div class="flex items-center gap-4 text-sm text-text-muted mb-6">

@@ -2,6 +2,17 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
+## 2026-04-13 — Рефакторинг по плану: формы, стили, типы, тесты
+
+- **Удалён** неиспользуемый `src/styles/global.css`; **`package.json`**: поле `name` → **`sii5`**; **`tsconfig.json`**: убраны неиспользуемые `paths`/`baseUrl`.
+- **Формы**: общая логика в **`src/scripts/lead-forms.ts`** (Netlify + MAX, honeypot, `?service=`), инициализация из **`BaseLayout.astro`** на `astro:page-load`; из **`ContactForm.astro`** / **`BriefForm.astro`** удалены большие inline-скрипты.
+- **Анимация reveal**: **`src/scripts/reveal-on-view.ts`**, подключение из **`BaseLayout.astro`** (инлайн FOUC-темы и Метрика без изменений).
+- **Хлебные крошки**: компонент **`src/components/Breadcrumb.astro`**, страницы **`src/pages/cases/[slug].astro`**, **`src/pages/articles/[slug].astro`**.
+- **Контент**: в **`src/content.config.ts`** вынесены схемы Zod + экспорт **`z.infer`**; **`ServiceCardProps`** в **`src/types/index.ts`** согласован с **`ServiceEntryData`**.
+- **Удалён** **`src/utils/articles-pagination.ts`** (пагинация статей не используется; редиректы в **`netlify.toml`** сохранены).
+- **Тесты**: **`src/utils/article-hubs.test.ts`**, **`ogImagePaths.test.ts`**, **`imageAssets.test.ts`**.
+- Проверки: **`npm test`** — ок; **`npx astro check`** — 0 ошибок; **`npm run build`** — ок, **`check-internal-links`** — ок.
+
 ## 2026-04-12 — Метрика 108384118: комплексная настройка через Management API
 
 - Выполнено из проекта **`Analitika/metrica-yandex/`** (OAuth-токен с `metrika:write`): часовой пояс **`Europe/Saratov`**, счётчик в **избранном**, **`ecommerce_deduplicator_enabled`**, **8 фильтров исключения** (localhost, preview-хостинги, `.local`, шумовые URL), **3 URL-цели** — благодарность `/spasibo`, интерес `/contact`, `/brief`; ранее на счётчике уже были автоцели телефон/форма и фильтр only_mirrors.

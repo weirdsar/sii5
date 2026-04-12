@@ -2,6 +2,7 @@
 import { getCollection, getEntry } from 'astro:content';
 import OptimizedMedia from '../../components/OptimizedMedia.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import ContactForm from '../../components/ContactForm.astro';
 import { siteConfig } from '../../data/site';
@@ -52,20 +53,15 @@ const canonicalUrl = new URL(`/cases/${entry.id}`, base).href;
   <!-- Шапка с названием проекта -->
   <section class="bg-surface-dark py-16 md:py-20">
     <div class="container-custom">
-      <!-- Хлебные крошки -->
-      <nav class="mb-6 text-sm" aria-label="Breadcrumb">
-        <ol class="flex items-center gap-2">
-          <li>
-            <a href="/" class="text-gray-400 hover:text-white transition-colors">Главная</a>
-          </li>
-          <li class="text-gray-600">/</li>
-          <li>
-            <a href="/cases" class="text-gray-400 hover:text-white transition-colors">Кейсы</a>
-          </li>
-          <li class="text-gray-600">/</li>
-          <li class="text-gray-300">{data.title}</li>
-        </ol>
-      </nav>
+      <Breadcrumb
+        variant="onDark"
+        class="mb-6"
+        items={[
+          { name: 'Главная', href: '/' },
+          { name: 'Кейсы', href: '/cases/' },
+          { name: data.title },
+        ]}
+      />
 
       <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
         <div>

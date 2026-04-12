@@ -1,0 +1,47 @@
+---
+/**
+ * Хлебные крошки: последний элемент без `href` — текущая страница.
+ */
+export interface BreadcrumbItem {
+  name: string;
+  /** Если не задан — пункт текущей страницы (не ссылка) */
+  href?: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+  /** `onDark` — тёмная шапка кейса; `default` — светлая зона статьи */
+  variant?: 'onDark' | 'default';
+  class?: string;
+}
+
+const { items, variant = 'default', class: className = '' } = Astro.props;
+
+const linkClass =
+  variant === 'onDark'
+    ? 'text-gray-400 hover:text-white transition-colors'
+    : 'text-text-muted hover:text-primary transition-colors';
+const sepClass = variant === 'onDark' ? 'text-gray-600' : 'text-text-muted';
+const currentClass = variant === 'onDark' ? 'text-gray-300' : 'text-text-main';
+---
+
+<nav class:list={['text-sm', className]} aria-label="Breadcrumb">
+  <ol class="flex items-center gap-2 flex-wrap">
+    {
+      items.map((item, i) => (
+        <>
+          {i > 0 && <li class={sepClass}>/</li>}
+          <li>
+            {item.href ? (
+              <a href={item.href} class={linkClass}>
+                {item.name}
+              </a>
+            ) : (
+              <span class={currentClass}>{item.name}</span>
+            )}
+          </li>
+        </>
+      ))
+    }
+  </ol>
+</nav>

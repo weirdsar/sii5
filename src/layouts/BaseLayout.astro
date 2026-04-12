@@ -174,48 +174,17 @@ const absoluteOgImage = new URL(ogImage, siteOrigin).href;
 
     <Footer />
 
-    <!-- Появление секций: IntersectionObserver + классы Tailwind (astro:page-load — после View Transitions) -->
-    <script is:inline>
-      function initRevealAnimations() {
-        var hidden = ['opacity-0', 'translate-y-4'];
-        var shown = ['opacity-100', 'translate-y-0'];
-        var revealElements = document.querySelectorAll('[data-reveal]');
+    <!-- Формы Netlify + MAX, reveal-секции: бандлится, срабатывает на astro:page-load (View Transitions) -->
+    <script>
+      import { initLeadForms } from '../scripts/lead-forms';
+      import { initRevealAnimations } from '../scripts/reveal-on-view';
 
-        if (!revealElements.length) return;
-
-        revealElements.forEach(function (el) {
-          el.classList.add.apply(el.classList, hidden);
-          el.classList.add('transition-all', 'duration-500', 'ease-out');
-        });
-
-        var observer = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (!entry.isIntersecting) return;
-              var el = entry.target;
-              var delay = el.getAttribute('data-reveal-delay') || '0';
-              el.style.transitionDelay = delay + 'ms';
-              hidden.forEach(function (c) {
-                el.classList.remove(c);
-              });
-              shown.forEach(function (c) {
-                el.classList.add(c);
-              });
-              observer.unobserve(el);
-            });
-          },
-          {
-            threshold: window.innerWidth < 768 ? 0.05 : 0.15,
-            rootMargin: '0px 0px -50px 0px',
-          }
-        );
-
-        revealElements.forEach(function (el) {
-          observer.observe(el);
-        });
+      function onPageLoad() {
+        initLeadForms();
+        initRevealAnimations();
       }
 
-      document.addEventListener('astro:page-load', initRevealAnimations);
+      document.addEventListener('astro:page-load', onPageLoad);
     </script>
   </body>
 </html>
