@@ -824,7 +824,12 @@ function initParallaxStarfield(): void {
 }
 
 function initReveal(): void {
-  const els = document.querySelectorAll<HTMLElement>('.reveal');
+  /* Hero: без отложенного появления — на мобильных WebKit IO внутри overflow:hidden
+   * часто не даёт isIntersecting, блоки остаются opacity:0 («чёрный экран»). */
+  document.querySelectorAll<HTMLElement>('#hero .reveal').forEach((el) => {
+    el.classList.add('is-visible');
+  });
+
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
@@ -836,7 +841,9 @@ function initReveal(): void {
     },
     { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
   );
-  els.forEach((el) => io.observe(el));
+  document.querySelectorAll<HTMLElement>('.reveal:not(.is-visible)').forEach((el) => {
+    io.observe(el);
+  });
 }
 
 function renderGallery(): void {
