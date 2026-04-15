@@ -1,0 +1,462 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Orbitron", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Montserrat Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-space-void: #030308;
+  --color-space-deep: #0a0612;
+  --color-space-surface: #120a1c;
+  --color-space-card: #160f22;
+  --color-accent-cyan: #22d3ee;
+  --color-accent-neon: #38bdf8;
+  --color-accent-violet: #a78bfa;
+  --color-accent-magenta: #c084fc;
+  --color-text-main: #e8e6f0;
+  --color-text-muted: #9ca3af;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[#030308] text-[var(--color-text-main)] antialiased;
+    font-family: var(--font-body);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+}
+
+/* Hero: фоновый цикл видео */
+.hero-bg-videos {
+  @apply absolute inset-0 overflow-hidden;
+}
+
+.hero-bg-layer {
+  @apply pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-[600ms] ease-in-out;
+  z-index: 1;
+}
+
+.hero-bg-layer.hero-bg-layer--top {
+  @apply opacity-100;
+  z-index: 2;
+}
+
+.hero-text-band {
+  @apply rounded-xl px-2 py-1;
+}
+
+/* Звёздный слой + лёгкий параллакс через transform в JS */
+.starfield {
+  background: radial-gradient(ellipse 100% 80% at 50% -30%, #1e1035 0%, transparent 55%),
+    radial-gradient(ellipse 80% 50% at 100% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 45%),
+    linear-gradient(180deg, var(--color-space-void) 0%, var(--color-space-deep) 45%, #030308 100%);
+}
+
+/* Фон: пульсация по басу (canvas, z ниже контента) */
+.atmosphere-visualizer {
+  @apply pointer-events-none absolute inset-0 z-[1] mix-blend-screen opacity-90;
+}
+
+/* Плавающая кнопка атмосферы: поверх контента, дрейф задаётся transform из JS */
+.atmosphere-toggle-root {
+  position: fixed;
+  z-index: 60;
+  right: max(0.75rem, env(safe-area-inset-right, 0px));
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  max-width: min(92vw, 18rem);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.atmosphere-toggle-root .atmosphere-toggle {
+  pointer-events: auto;
+  width: 100%;
+}
+
+.atmosphere-toggle {
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.atmosphere-toggle--floating {
+  box-shadow: 0 0 40px rgba(88, 28, 135, 0.35), 0 12px 40px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.atmosphere-toggle--on {
+  @apply border-cyan-400/55 bg-cyan-950/25;
+  box-shadow: 0 0 32px rgba(34, 211, 238, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.atmosphere-toggle--on .atmosphere-toggle__label {
+  @apply text-cyan-100;
+}
+
+.atmosphere-toggle__wave {
+  transform-origin: 50% 50%;
+}
+
+.atmosphere-toggle--on .atmosphere-toggle__wave--1 {
+  animation: atmosphere-wave-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes atmosphere-wave-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scaleY(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atmosphere-toggle--on .atmosphere-toggle__wave--1 {
+    animation: none;
+    opacity: 1;
+  }
+
+  .atmosphere-toggle-root {
+    will-change: auto;
+  }
+}
+
+.starfield__dots {
+  background-image: radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1px 1px at 40px 70px, rgba(167, 139, 250, 0.4), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(56, 189, 248, 0.35), transparent),
+    radial-gradient(1.5px 1.5px at 130px 80px, rgba(255, 255, 255, 0.25), transparent),
+    radial-gradient(1px 1px at 160px 30px, rgba(192, 132, 252, 0.3), transparent);
+  background-size: 200px 200px, 220px 220px, 180px 180px, 250px 250px, 190px 190px;
+  opacity: 0.55;
+}
+
+/* Таймер: неон */
+.timer-digit {
+  text-shadow: 0 0 12px rgba(34, 211, 238, 0.55), 0 0 28px rgba(167, 139, 250, 0.35);
+}
+
+/* Карточка пары */
+.pair-card {
+  @apply relative overflow-hidden rounded-2xl border border-white/10 bg-[var(--color-space-card)]/90 p-4 text-left transition-all duration-300;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.pair-card:hover {
+  @apply border-cyan-400/35 -translate-y-0.5;
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.12), 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.pair-card.is-active {
+  @apply border-cyan-400/60 ring-2 ring-cyan-400/25;
+}
+
+/* Полноширинный горизонтальный ряд под витриной */
+.video-showcase-bleed {
+  width: 100%;
+}
+
+/* Видео-рамка */
+.video-frame {
+  @apply relative overflow-hidden rounded-2xl border border-cyan-500/20 bg-black/50;
+  box-shadow: 0 0 40px rgba(34, 211, 238, 0.08), inset 0 0 60px rgba(88, 28, 135, 0.15);
+}
+
+/* Киноформат на всю ширину секции (без боковых скруглений у краёв экрана) */
+.video-frame--full {
+  @apply rounded-none border-x-0 sm:rounded-2xl sm:border-x;
+}
+
+/* Два слоя MP4: кроссфейд без смены src (нет белой вспышки) */
+.video-stack-inner {
+  @apply relative h-full min-h-full w-full bg-black;
+}
+
+.video-stack__track {
+  @apply pointer-events-none absolute inset-0 h-full w-full bg-black object-contain opacity-0 transition-opacity duration-[450ms] ease-in-out;
+  z-index: 1;
+}
+
+.video-stack__track.video-stack--top {
+  @apply pointer-events-auto opacity-100;
+  z-index: 2;
+}
+
+.video-frame::after {
+  content: "";
+  @apply pointer-events-none absolute inset-0 rounded-2xl;
+  z-index: 3;
+  box-shadow: inset 0 0 30px rgba(167, 139, 250, 0.12);
+}
+
+/* Видео без нативных controls: скрыть остаточную оболочку WebKit/Chromium */
+video.video-chromeless::-webkit-media-controls,
+video.video-chromeless::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+.video-chromeless-frame {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.showcase-audio-consent::backdrop {
+  background: rgba(0, 0, 0, 0.78);
+}
+
+/* Текст описания под роликом: крупно, тот же «огонь», без наслоения на кадр */
+.video-story-below {
+  @apply mt-3 w-full rounded-none border border-orange-400/25 bg-gradient-to-b from-[#140a18]/95 to-[#030308] px-3 py-4 sm:rounded-2xl sm:px-5 sm:py-5;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  min-height: 7.25rem;
+}
+
+@media (max-width: 639px) {
+  .video-story-below {
+    border-left: 0;
+    border-right: 0;
+  }
+}
+
+.video-story-below__text {
+  margin: 0 auto;
+  max-width: 44rem;
+  text-align: center;
+  white-space: pre-line;
+  font-size: clamp(1.05rem, 4.2vw, 1.45rem);
+  line-height: 1.4;
+  letter-spacing: 0.03em;
+}
+
+/* Общий «огненный» градиент + мерцание (под видео и при необходимости ещё где-то) */
+.video-story-fire-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  background: linear-gradient(
+    92deg,
+    #fff7ed 0%,
+    #fde047 18%,
+    #fb923c 42%,
+    #f87171 58%,
+    #fdba74 78%,
+    #fef3c7 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 1px rgba(254, 243, 199, 0.95)) drop-shadow(0 0 10px rgba(251, 146, 60, 0.88))
+    drop-shadow(0 0 22px rgba(220, 38, 38, 0.5));
+  animation: video-story-flicker 1.35s ease-in-out infinite alternate,
+    video-story-shimmer 2.8s linear infinite;
+  transition: opacity 0.48s ease, transform 0.48s ease;
+}
+
+.video-story-fire-text.video-story-fire-text--out {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+@keyframes video-story-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes video-story-flicker {
+  0% {
+    filter: drop-shadow(0 0 1px rgba(254, 243, 199, 0.9)) drop-shadow(0 0 8px rgba(251, 146, 60, 0.78))
+      drop-shadow(0 0 18px rgba(220, 38, 38, 0.38));
+  }
+  100% {
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.55)) drop-shadow(0 0 14px rgba(251, 146, 60, 0.95))
+      drop-shadow(0 0 28px rgba(185, 28, 28, 0.58));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video-story-fire-text {
+    animation: none;
+    filter: drop-shadow(0 0 4px rgba(251, 146, 60, 0.75)) drop-shadow(0 0 14px rgba(220, 38, 38, 0.45));
+  }
+}
+
+/* Регламент марафона: огненные заголовки + карточка текста */
+.rules-marathon__fire-hero {
+  font-size: clamp(1.35rem, 5.2vw, 2.15rem);
+  line-height: 1.12;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0 auto 2rem;
+  max-width: 58rem;
+  padding: 0 0.25rem;
+}
+
+.rules-marathon__fire-section {
+  font-size: clamp(1rem, 3.4vw, 1.38rem);
+  line-height: 1.22;
+  letter-spacing: 0.04em;
+  margin-top: 1.85rem;
+  margin-bottom: 0.65rem;
+  text-transform: uppercase;
+}
+
+.rules-marathon__block:first-child .rules-marathon__fire-section {
+  margin-top: 0;
+}
+
+.rules-marathon__card {
+  @apply rounded-2xl border border-orange-400/25 bg-gradient-to-b from-[#140a18]/95 to-[#030308]/98 p-6 md:p-9;
+  box-shadow: 0 0 48px rgba(251, 146, 60, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.rules-marathon__prose {
+  @apply text-[15px] leading-relaxed text-slate-200/95 md:text-base md:leading-relaxed;
+}
+
+.rules-marathon__prose p + p {
+  margin-top: 0.65rem;
+}
+
+.rules-marathon__table-wrap {
+  @apply mt-4 overflow-x-auto rounded-xl border border-white/10 bg-black/25;
+}
+
+.rules-marathon__table {
+  @apply w-full min-w-[260px] border-collapse text-left;
+}
+
+.rules-marathon__table th,
+.rules-marathon__table td {
+  @apply border-b border-white/10 px-4 py-3 align-top;
+}
+
+.rules-marathon__table th {
+  @apply font-display text-xs font-bold uppercase tracking-wider text-orange-200/95;
+}
+
+.rules-marathon__table td {
+  @apply text-slate-100;
+}
+
+.rules-marathon__table tbody tr:last-child td {
+  border-bottom-width: 0;
+}
+
+/* Появление секций */
+.reveal {
+  @apply translate-y-6 opacity-0 transition-all duration-700 ease-out;
+}
+
+.reveal.is-visible {
+  @apply translate-y-0 opacity-100;
+}
+
+/* Описания пар: аккордеон */
+.pair-story-details {
+  @apply rounded-xl border border-white/10 bg-[var(--color-space-card)]/70 backdrop-blur-sm;
+  box-shadow: 0 0 0 1px rgba(167, 139, 250, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.pair-story-summary {
+  @apply cursor-pointer list-none px-4 py-3.5 outline-none transition-colors hover:text-cyan-200 md:px-5 md:py-4;
+}
+
+.pair-story-summary::-webkit-details-marker {
+  display: none;
+}
+
+.pair-story-summary__inner {
+  @apply flex flex-col gap-0.5 pr-8 md:flex-row md:items-baseline md:justify-between md:gap-4;
+}
+
+.pair-story-summary__n {
+  @apply font-display text-xs font-bold tracking-[0.2em] text-cyan-400/90;
+}
+
+.pair-story-summary__names {
+  @apply text-left text-sm font-medium text-[var(--color-text-main)] md:text-base;
+}
+
+.pair-story-summary::after {
+  content: "+";
+  @apply float-right -mt-0.5 text-lg font-light text-violet-300/90;
+}
+
+.pair-story-details[open] .pair-story-summary::after {
+  content: "−";
+}
+
+.pair-story-body {
+  @apply space-y-4 border-t border-white/5 px-4 pb-4 pt-3 md:px-5 md:pb-5 md:pt-4;
+}
+
+.pair-story-char__title {
+  @apply mb-1.5 text-sm font-semibold text-cyan-100/95 md:text-[15px];
+}
+
+.pair-story-char__text {
+  @apply text-[13px] leading-relaxed text-[var(--color-text-muted)] md:text-sm md:leading-relaxed;
+}
+
+.pair-story-synergy {
+  @apply rounded-lg border border-violet-400/20 bg-violet-950/25 px-3 py-3 md:px-4 md:py-3.5;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.pair-story-synergy__label {
+  @apply mb-1.5 text-xs font-bold uppercase tracking-widest text-violet-200/95;
+}
+
+.pair-story-synergy__text {
+  @apply text-[13px] leading-relaxed text-slate-200/95 md:text-sm md:leading-relaxed;
+}
+
+/* Фотогалерея */
+.gallery-empty {
+  @apply rounded-2xl border border-dashed border-white/15 bg-[var(--color-space-card)]/40 px-6 py-14 text-center;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .gallery-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .gallery-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.gallery-tile {
+  @apply relative block overflow-hidden rounded-xl border border-white/10 bg-black/50 p-0 text-left transition hover:border-cyan-400/30 hover:shadow-lg hover:shadow-cyan-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/45;
+}
+
+.gallery-tile__img {
+  @apply aspect-square w-full object-cover;
+}
+
+.gallery-tile__cap {
+  @apply absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-2 py-2 text-xs text-white/95;
+}
+
+#gallery-lightbox::backdrop {
+  background: rgba(0, 0, 0, 0.82);
+}

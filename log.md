@@ -2,6 +2,126 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
+## 2026-04-16 — mafia.sii5.ru: звук только у трибунала; кнопка атмосферы плавающая
+
+- **`mafia_sii5_ru/src/main.ts`**: витрины/пары — принудительно без звука (`enforceShowcaseClipSilent`); судьи — звук только при `judgesTribunalInView` и выборе «Звук у Трибунала»; `initJudgesTribunalViewport()`.
+- **`mafia_sii5_ru/src/atmosphere.ts`**: `syncShowcaseVideoVolumesForAtmosphere` только для `.js-judges-video`; `initAtmosphereToggleParallax()` — плавный дрейф кнопки при скролле.
+- **`mafia_sii5_ru/index.html`**: кнопка атмосферы в `#atmosphere-toggle-root` (fixed); текст диалога про звук трибунала.
+- **`mafia_sii5_ru/src/styles.css`**: `.atmosphere-toggle-root`, крупнее тень у плавающей кнопки.
+
+## 2026-04-16 — mafia.sii5.ru: hero без звука; атмосфера с окна «со звуком»
+
+- **`mafia_sii5_ru/src/main.ts`**: фон hero — `volume = 0`, `muted`/`defaultMuted`, фиксация на `volumechange`/`playing`/`loadeddata`; перед `play()` в цикле — повторная фиксация; по кнопке «Смотреть со звуком» в диалоге — `startAtmosphereFromUserGesture()` + `setAtmosphereToggleUi`.
+- **`mafia_sii5_ru/src/atmosphere.ts`**: экспорт `setAtmosphereToggleUi`, колбэк с панели инициализации кнопки.
+
+## 2026-04-16 — mafia.sii5.ru: фоновая музыка «атмосфера», визуализатор, low-pass при чтении
+
+- **`mafia_sii5_ru/public/content/broken-king.mp3`**: трек Broken King (копия из загрузок пользователя) для фоновой музыки.
+- **`mafia_sii5_ru/src/atmosphere.ts`**: Web Audio — кроссфейд-петля (~0,45 с), `AnalyserNode` → canvas-пульсация в `.starfield`; low-pass при зоне чтения (`#rules`, `#pair-marathon-intro`, открытый `details.pair-story-details`); при совместном воспроизведении с роликами со звуком — `video.volume = 0.5`, музыка не останавливается; старт только по клику, `AudioContext.close()` при выключении.
+- **`mafia_sii5_ru/src/audioConstants.ts`**: ключ `mafiaShowcaseAudio` для sessionStorage (общий с витриной).
+- **`mafia_sii5_ru/src/main.ts`**: импорт константы; после синка mute — `syncShowcaseVideoVolumesForAtmosphere`; `initAtmosphereUi()` в `boot`.
+- **`mafia_sii5_ru/index.html`**: кнопка «Включить атмосферу» / «Атмосфера» с SVG-волной рядом с таймером.
+- **`mafia_sii5_ru/src/styles.css`**: `.atmosphere-visualizer`, `.atmosphere-toggle*`.
+- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
+
+## 2026-04-15 — mafia.sii5.ru: регламент — полный текст после трибунала
+
+- **`mafia_sii5_ru/index.html`**: секция `#rules` после «Трибунал» — шесть разделов (общие положения, формат, судейство, призы таблицей, участие/отдых, этика); ссылка на VolgaWhisper.ru; типографика и правки («звёздных», «партнёры», «ФСМ», тире).
+- **`mafia_sii5_ru/src/styles.css`**: классы `rules-marathon__*` — крупный огненный главный заголовок и подзаголовки разделов (`video-story-fire-text` + размеры), карточка текста, таблица призов.
+- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
+
+## 2026-04-15 — mafia.sii5.ru: звук — диалог; видео без controls, play по клику
+
+- **`mafia_sii5_ru/index.html`**: `<dialog id="showcase-audio-consent">` (выбор «со звуком» / «только без звука»); трибунал — обёртка `js-judges-video-frame`, видео без `controls`, старт с `muted`.
+- **`mafia_sii5_ru/src/main.ts`**: `sessionStorage` ключ `mafiaShowcaseAudio`; при первом заходе во вкладке — `showModal`; синхронизация `muted` для `.js-video-block video` и `.js-judges-video`; ролики пар без `controls`, `disablePictureInPicture`, клик/Enter/пробел по `.video-frame` — play/pause верхнего трека или single; `initJudgesChromelessVideo` — то же по кадру трибунала; после закрытия диалога — `retryShowcasePlaybackForVisible`.
+- **`mafia_sii5_ru/src/styles.css`**: скрытие webkit-оболочки у `video.video-chromeless`; стили `::backdrop` для диалога.
+- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
+
+## 2026-04-15 — mafia.sii5.ru: описание пары — панель под видео (огонь, слайды)
+
+- **`mafia_sii5_ru/src/main.ts`**: текст из `pairStoryByNumber` вынесен **под** ролик (без оверлея на кадре); `appendVideoStoryBelow` + `initVideoStoryBelowPanels`; слайды ~106 символов, смена ~4,2 с, `aria-live`; таймер только в viewport.
+- **`mafia_sii5_ru/src/styles.css`**: `.video-story-below` + крупный шрифт; общий класс `.video-story-fire-text` (градиент, shimmer, flicker); `prefers-reduced-motion`.
+- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
+
+## 2026-04-15 — mafia.sii5.ru: описание пары — оверлей на видео
+
+- Устарело: оверлей на кадре заменён панелью под видео (см. запись выше).
+
+## 2026-04-15 — mafia.sii5.ru: тексты про дуэты (вступление + 10 пар)
+
+- **`mafia_sii5_ru/src/pairStories.ts`**: общий абзац про марафон из 18 игр и один представитель пары за столом; для пар 1–10 — роли A/B и блок «Симбиоз (Итог)».
+- **`mafia_sii5_ru/index.html`**: секция «О дуэтах марафона» (`#pair-intro-root`); под сетками пар — заголовки и контейнеры `#pair-stories-1` / `#pair-stories-2`.
+- **`mafia_sii5_ru/src/main.ts`**: `renderMarathonIntro()`, `renderPairStoriesList()` (аккордеон `<details>` на пару).
+- **`mafia_sii5_ru/src/styles.css`**: стили `.pair-story-*` (карточка, summary, тела, выделение симбиоза).
+- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
+
+## 2026-04-15 — mafia.sii5.ru: hero — фон из 4 роликов, текст сверху/снизу
+
+- **`mafia_sii5_ru/index.html`**: секция `#hero` на всю ширину, слой `#hero-bg-cycler` с двумя `<video>` (кроссфейд), градиенты; текст разнесён: **верх** — бейдж, заголовок, подзаголовок; **центр** — пустой `hero-spacer` (виден кадр); **низ** — таймер, даты/место, CTA.
+- **`mafia_sii5_ru/src/main.ts`**: `initHeroBackgroundCycler()` — цикл **`1-5-part1` → `6-10-part1` → `1-5-part2` → `6-10-part2`**, `muted`, **`playbackRate = 0.8`**, пауза вне viewport (IntersectionObserver на `#hero`).
+- **`src/styles.css`**: `.hero-bg-layer`, кроссфейд ~600 ms.
+- Проверка: **`npm run build`** — ок.
+
+## 2026-04-15 — mafia.sii5.ru: hero фон — playbackRate 0.8
+
+- **`mafia_sii5_ru/src/main.ts`**: у фонового цикла hero **`HERO_PLAYBACK_RATE = 0.8`** вместо `1/2.5`, чтобы не было ощущения «тормозящего» видео.
+
+## 2026-04-15 — mafia.sii5.ru: пара 1 — звук как у остальных роликов
+
+- **`mafia_sii5_ru/src/main.ts`**: у двухслойного видео пары 1 снят `muted`, добавлены **`controls`**; **`src/styles.css`**: у верхнего слоя стека **`pointer-events-auto`**, чтобы панель плеера нажималась.
+- Проверка: **`npm run build`** — ок.
+
+## 2026-04-15 — mafia.sii5.ru: трибунал — видео Judes.mp4
+
+- **`mafia_sii5_ru/index.html`**: блок «Трибунал» — ролик **`/content/Judes.mp4`** (имя файла в репо с заглавной **J**), подписи сеткой: слева Белый Эльф, центр Морфейка (главный судья), справа ASPID; убраны стили карточек судей из **`src/styles.css`**.
+- Проверка: **`npm run build`** — ок.
+
+## 2026-04-15 — mafia.sii5.ru: видео Para2–Para10, звук на парах 2–10
+
+- **`mafia_sii5_ru/src/pairs.ts`**: пути к файлам в `public/content/` приведены к реальным именам (`Para2-…` … `Para9-…`, `para10-Darksider-Gold.mp4`).
+- **`mafia_sii5_ru/src/main.ts`**: одиночные ролики пар 2–10 без `muted`, с **`controls`** (громкость / Play при политике автозапуска браузера). Пара 1 (двухчастное видео) без изменений по звуку.
+- Проверка: **`npm run build`** — ок.
+
+## 2026-04-15 — mafia.sii5.ru: фотогалерея (пополняется по ходу турнира)
+
+- **`mafia_sii5_ru/src/gallery.ts`**: массив `galleryItems` (пока пустой) + комментарий, как добавлять файлы в `public/content/gallery/`.
+- **`mafia_sii5_ru/public/content/gallery/.gitkeep`**: каталог для снимков.
+- **`mafia_sii5_ru/index.html`**: секция `#gallery`, диалог лайтбокса; **`src/main.ts`** + **`src/styles.css`**: сетка 2/3/4 колонки, пустое состояние, клик → `<dialog>` с крупным фото, закрытие по кнопке/клику по фону/Escape.
+- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
+
+## 2026-04-15 — mafia.sii5.ru: видео по парам (1 — два файла, 2–10 — по одному)
+
+- **`mafia_sii5_ru/src/pairs.ts`**: пара 1 — `para1-Adelaida-Grace.mp4` + `para1-Adelaida-Grace-part2.mp4`; пары 2–10 — поле `videoSrc` с именами вида `para2-…` … `para10-…` (файлы кладутся в `public/content/`).
+- **`mafia_sii5_ru/src/main.ts`**, **`index.html`**: слоты `#videos-showcase-1` / `#videos-showcase-2` заполняются из данных — для пары 1 двухслойный плеер, для остальных один `<video loop>`.
+- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
+
+## 2026-04-15 — mafia.sii5.ru: тексты витрин, плавная смена part1/part2
+
+- **`mafia_sii5_ru/index.html`**, **`src/main.ts`**, **`src/styles.css`**: убраны подписи под «Созвездие I/II»; вместо одного плеера со сменой `src` — **два** `<video>` (фиксированные part1/part2), переключение слоя после **`playing`** + кроссфейд **opacity** (~450 ms), фон **#000** — без белой вспышки при цикле.
+- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
+
+## 2026-04-15 — mafia.sii5.ru: видео по очереди, без кнопки регистрации
+
+- **`mafia_sii5_ru/index.html`**, **`src/main.ts`**, **`src/styles.css`**: убрана кнопка «Зарегистрироваться» и подпись-заглушка; витрины **Созвездие I / II** — одно горизонтальное **16:9** на всю ширину, воспроизведение **part1 → part2** по событию `ended` (цикл); пауза вне viewport сохранена.
+- Проверка: **`cd mafia_sii5_ru && npm run build`** — ок.
+
+## 2026-04-15 — mafia.sii5.ru: лендинг «Созвездие аргументов» (Vite)
+
+- Подпроект **`mafia_sii5_ru/`**: Vite 6 + TypeScript + Tailwind CSS v4 (`@tailwindcss/vite`), шрифты Montserrat Variable + Orbitron; одна страница — hero с таймером до `2026-04-25T12:00:00+04:00`, две витрины (видео `1-5-part1/2` и `6-10-part1/2` + сетки из 5 пар), блок судей, аккордеон регламента; пауза видео вне viewport (Intersection Observer), параллакс звёзд, появление секций.
+- Ассеты: **`public/content/`** (перенесены бывшие `content/*.mp4`, PNG), **`public/_headers`**, **`public/robots.txt`**, **`public/favicon.svg`**.
+- Документация: **`docs/CLOUDFLARE_PAGES.md`** — для Pages: root `mafia_sii5_ru`, build `npm ci && npm run build`, output **`dist`**, `NODE_VERSION=22`.
+- Проверка: **`cd mafia_sii5_ru && npm run build`** — успешно.
+
+## 2026-04-15 — mafia.sii5.ru: проверка в проде
+
+- Подтверждено: заглушка из папки **`mafia_sii5_ru/`** выкладывается и открывается на **https://mafia.sii5.ru/** (полная папка загружена на хостинг).
+
+## 2026-04-15 — Поддомен mafia.sii5.ru: заглушка под Cloudflare Pages
+
+- Статическая заглушка в **`mafia_sii5_ru/`**: **`index.html`**, **`robots.txt`**, **`_headers`** (Cloudflare Pages). Удалён **`mafia_sii5_ru/netlify.toml`** — прод-деплой на **Cloudflare**, не Netlify.
+- Инструкция по второму Pages-проекту (root `mafia_sii5_ru`, домен **mafia.sii5.ru**) — в **`docs/CLOUDFLARE_PAGES.md`**. Основной сайт **sii5.ru** и корневые конфиги не затрагивались.
+- **`.cursorrules`**: строка про деплой приведена к **Cloudflare Pages** (с ссылкой на `docs/CLOUDFLARE_PAGES.md`).
+
 ## 2026-04-14 — Подвал: убран юридический адрес
 
 - **`src/components/Footer.astro`**: из блока «Реквизиты» удалена строка «Юридический адрес: г. Саратов, ул. Покровская, д. 47» (ИНН/КПП/ОГРН и название ООО сохранены).

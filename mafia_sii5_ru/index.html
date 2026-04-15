@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Марафон по спортивной мафии «Созвездие аргументов» — клуб «Аргумент», Саратов. 25–26 апреля 2026."
+    />
+    <title>Марафон «Созвездие аргументов» — клуб «Аргумент» | Саратов</title>
+    <meta property="og:title" content="Марафон «Созвездие аргументов» — спортивная мафия" />
+    <meta
+      property="og:description"
+      content="25–26 апреля 2026. Саратов, Усовка, VolgaWhisper. Клуб «Аргумент»."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:url" content="https://mafia.sii5.ru/" />
+    <meta property="og:image" content="https://mafia.sii5.ru/content/1-5.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="min-h-screen overflow-x-hidden">
+    <div class="pointer-events-none fixed inset-0 z-0 starfield">
+      <div
+        id="starfield-parallax"
+        class="starfield__dots absolute inset-0 will-change-transform"
+        aria-hidden="true"
+      ></div>
+    </div>
+
+    <header class="relative z-10 border-b border-white/5 bg-black/30 backdrop-blur-md">
+      <div
+        class="mx-auto flex max-w-6xl flex-nowrap items-center gap-2 px-3 py-2 sm:gap-3 sm:px-4 md:px-6"
+      >
+        <span class="font-display shrink-0 text-[11px] font-bold tracking-[0.14em] text-cyan-300/95 sm:text-xs md:text-sm">
+          АРГУМЕНТ
+        </span>
+        <span class="shrink-0 text-[10px] text-white/25 sm:text-xs" aria-hidden="true">·</span>
+        <span
+          class="min-w-0 flex-1 truncate text-[11px] leading-tight text-slate-300/95 sm:text-xs md:text-sm"
+          title="Клуб «Аргумент» приглашает на главное событие сезона."
+          >Клуб «Аргумент» приглашает на главное событие сезона.</span>
+        <span class="shrink-0 text-[10px] text-white/25 sm:text-xs" aria-hidden="true">·</span>
+        <span class="shrink-0 whitespace-nowrap text-right text-[10px] leading-tight text-[var(--color-text-muted)] sm:text-xs md:text-sm">Спортивная мафия · Саратов</span>
+      </div>
+    </header>
+
+    <main class="relative z-10">
+      <!-- Hero: фон — цикл из 4 роликов (без звука, 0.8×); текст сверху и снизу -->
+      <section
+        id="hero"
+        class="relative isolate flex min-h-[min(100dvh,920px)] w-full flex-col overflow-hidden pb-10 pt-6 md:min-h-[min(100dvh,960px)] md:pb-16 md:pt-8"
+        aria-labelledby="hero-title"
+      >
+        <div
+          id="hero-bg-cycler"
+          class="pointer-events-none absolute inset-0 -z-10"
+          aria-hidden="true"
+        >
+          <div class="absolute inset-0 bg-black/35"></div>
+          <div class="hero-bg-videos absolute inset-0">
+            <video
+              class="js-hero-bg-0 hero-bg-layer hero-bg-layer--top"
+              muted
+              playsinline
+              preload="auto"
+            ></video>
+            <video
+              class="js-hero-bg-1 hero-bg-layer"
+              muted
+              playsinline
+              preload="auto"
+            ></video>
+          </div>
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-black/90 via-black/25 to-black/90"
+          ></div>
+        </div>
+
+        <div class="relative z-10 flex min-h-0 flex-1 flex-col">
+          <!-- Верхняя строка: счётчик слева, «Когда и где» справа -->
+          <div
+            class="hero-top-bar reveal pointer-events-auto mx-auto mb-4 flex w-full max-w-6xl flex-col items-stretch gap-4 px-4 sm:mb-5 sm:flex-row sm:items-start sm:justify-between md:px-6"
+          >
+            <div class="hero-top-bar__countdown flex min-w-0 flex-col items-start gap-2 self-start text-left">
+              <div
+                id="countdown"
+                class="flex flex-wrap items-stretch justify-start gap-2 md:gap-3"
+                role="timer"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                <div
+                  class="timer-digit font-display flex min-w-[3.5rem] flex-col rounded-2xl border border-cyan-500/35 bg-black/55 px-2.5 py-2 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] md:min-w-[5.5rem] md:py-3.5"
+                >
+                  <span id="cd-days" class="text-xl font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-300/90 sm:text-[10px]"
+                    >дней</span
+                  >
+                </div>
+                <div
+                  class="timer-digit font-display flex min-w-[3.5rem] flex-col rounded-2xl border border-cyan-500/35 bg-black/55 px-2.5 py-2 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] md:min-w-[5.5rem] md:py-3.5"
+                >
+                  <span id="cd-hours" class="text-xl font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-300/90 sm:text-[10px]"
+                    >часов</span
+                  >
+                </div>
+                <div
+                  class="timer-digit font-display flex min-w-[3.5rem] flex-col rounded-2xl border border-cyan-500/35 bg-black/55 px-2.5 py-2 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] md:min-w-[5.5rem] md:py-3.5"
+                >
+                  <span id="cd-mins" class="text-xl font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-300/90 sm:text-[10px]"
+                    >мин</span
+                  >
+                </div>
+                <div
+                  class="timer-digit font-display flex min-w-[3.5rem] flex-col rounded-2xl border border-cyan-500/35 bg-black/55 px-2.5 py-2 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] md:min-w-[5.5rem] md:py-3.5"
+                >
+                  <span id="cd-secs" class="text-xl font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-300/90 sm:text-[10px]"
+                    >сек</span
+                  >
+                </div>
+              </div>
+              <p
+                class="max-w-[16rem] text-xs text-slate-200/95 drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)] sm:text-sm"
+              >
+                До старта:
+                <time datetime="2026-04-25T12:00:00+04:00">25 апреля 2026, 12:00</time> (Саратов)
+              </p>
+            </div>
+
+            <div
+              class="hero-top-bar__where w-full max-w-xl shrink-0 self-end sm:max-w-sm sm:self-start md:max-w-md"
+            >
+              <div
+                class="rounded-2xl border border-white/15 bg-black/55 p-4 text-left shadow-xl backdrop-blur-md sm:p-5 md:p-6"
+              >
+                <h2
+                  class="font-display mb-2 text-xs font-bold uppercase tracking-widest text-violet-200/95 md:text-sm"
+                >
+                  Когда и где
+                </h2>
+                <ul class="space-y-2 text-sm text-slate-200/90 md:text-base">
+                  <li>
+                    <strong class="text-white">Даты:</strong> 25–26 апреля 2026
+                  </li>
+                  <li>
+                    <strong class="text-white">Место:</strong> г. Саратов, село Усовка, экопоселок
+                    <a
+                      class="text-cyan-300 underline decoration-cyan-500/50 underline-offset-2 hover:text-cyan-200"
+                      href="https://volgawhisper.ru/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >VolgaWhisper.ru</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="hero-text-band reveal mx-auto w-full max-w-4xl px-4 text-center md:px-6"
+          >
+            <h1
+              id="hero-title"
+              class="font-display mb-1 bg-gradient-to-br from-white via-cyan-100 to-violet-300 bg-clip-text text-2xl font-bold leading-tight text-transparent drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] md:mb-2 md:text-4xl lg:text-5xl"
+            >
+              Марафон по спортивной мафии:<br class="hidden sm:block" />
+              Созвездие аргументов
+            </h1>
+          </div>
+
+          <!-- Центральная зона без текста — видны персонажи на фоновом видео -->
+          <div
+            class="hero-spacer mx-auto min-h-[22vh] w-full max-w-5xl flex-1 md:min-h-[28vh] lg:min-h-[30vh]"
+            aria-hidden="true"
+          ></div>
+
+          <div
+            class="hero-text-band reveal mx-auto mt-auto w-full max-w-4xl px-4 pb-2 text-center md:px-6"
+          >
+            <div class="flex justify-center">
+              <a
+                class="font-display inline-flex min-h-[48px] min-w-[220px] items-center justify-center rounded-full border border-violet-300/50 bg-black/40 px-8 py-3 text-sm font-bold uppercase tracking-wide text-violet-100 shadow-lg backdrop-blur-sm transition hover:border-violet-200 hover:bg-violet-950/40"
+                href="#rules"
+                >Ознакомиться с регламентом</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Общее описание дуэтов марафона -->
+      <section
+        id="pair-marathon-intro"
+        class="reveal border-t border-white/5 bg-black/35 py-12 md:py-16"
+        aria-labelledby="pair-intro-heading"
+      >
+        <div class="mx-auto max-w-4xl px-4 md:px-6">
+          <h2
+            id="pair-intro-heading"
+            class="font-display mb-5 text-center text-lg font-bold tracking-wide text-cyan-200 md:text-xl"
+          >
+            О дуэтах марафона
+          </h2>
+          <p
+            id="pair-intro-root"
+            class="text-center text-[15px] leading-relaxed text-slate-300/95 md:text-lg md:leading-relaxed"
+          ></p>
+        </div>
+      </section>
+
+      <!-- Витрина 1–5 -->
+      <section
+        id="showcase-1"
+        class="reveal border-t border-white/5 bg-black/20 py-16 md:py-24"
+        aria-labelledby="showcase-1-title"
+      >
+        <div class="mx-auto max-w-6xl px-4 md:px-6">
+          <h2
+            id="showcase-1-title"
+            class="font-display mb-8 text-center text-2xl font-bold text-cyan-200 md:mb-10 md:text-3xl"
+          >
+            Созвездие I
+          </h2>
+        </div>
+
+        <div id="videos-showcase-1" class="w-full"></div>
+
+        <div class="mx-auto max-w-6xl px-4 md:px-6">
+          <div
+            id="pair-grid-1"
+            class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5"
+            role="list"
+          ></div>
+
+          <h3
+            class="font-display mt-14 text-center text-base font-bold uppercase tracking-[0.2em] text-violet-200/95 md:mt-16 md:text-lg"
+          >
+            Герои и симбиозы
+          </h3>
+          <p class="mb-6 text-center text-sm text-[var(--color-text-muted)] md:text-base">
+            Раскройте карточку пары, чтобы прочитать роли и итоговый симбиоз.
+          </p>
+          <div id="pair-stories-1" class="mx-auto mt-2 max-w-3xl space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- Витрина 6–10 -->
+      <section
+        id="showcase-2"
+        class="reveal border-t border-white/5 py-16 md:py-24"
+        aria-labelledby="showcase-2-title"
+      >
+        <div class="mx-auto max-w-6xl px-4 md:px-6">
+          <h2
+            id="showcase-2-title"
+            class="font-display mb-8 text-center text-2xl font-bold text-cyan-200 md:mb-10 md:text-3xl"
+          >
+            Созвездие II
+          </h2>
+        </div>
+
+        <div id="videos-showcase-2" class="w-full"></div>
+
+        <div class="mx-auto max-w-6xl px-4 md:px-6">
+          <div
+            id="pair-grid-2"
+            class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5"
+            role="list"
+          ></div>
+
+          <h3
+            class="font-display mt-14 text-center text-base font-bold uppercase tracking-[0.2em] text-violet-200/95 md:mt-16 md:text-lg"
+          >
+            Герои и симбиозы
+          </h3>
+          <p class="mb-6 text-center text-sm text-[var(--color-text-muted)] md:text-base">
+            Продолжение — пары 6–10. Раскройте карточку, чтобы прочитать описание.
+          </p>
+          <div id="pair-stories-2" class="mx-auto mt-2 max-w-3xl space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- Судьи: одно видео Judes.mp4 — слева / центр / справа на кадре -->
+      <section
+        id="judges"
+        class="reveal border-t border-white/5 bg-black/25 py-16 md:py-24"
+        aria-labelledby="judges-title"
+      >
+        <div class="mx-auto max-w-6xl px-4 md:px-6">
+          <h2
+            id="judges-title"
+            class="font-display mb-8 text-center text-2xl font-bold text-violet-200 md:mb-10 md:text-3xl"
+          >
+            Трибунал
+          </h2>
+          <div class="overflow-hidden rounded-2xl border border-cyan-500/20 bg-black shadow-[0_0_40px_rgba(34,211,238,0.08)]">
+            <div
+              class="js-judges-video-frame video-chromeless-frame aspect-video max-h-[min(75vh,90vw)] w-full cursor-pointer bg-black outline-none ring-cyan-400/0 transition-shadow focus-visible:ring-2 focus-visible:ring-cyan-400/50"
+              role="button"
+              tabindex="0"
+              aria-label="Воспроизвести или приостановить видео трибунала"
+            >
+              <video
+                class="js-judges-video video-chromeless h-full w-full object-contain"
+                src="/content/Judes.mp4"
+                muted
+                playsinline
+                preload="metadata"
+                aria-label="Видео: судьи трибуна — слева Белый Эльф, в центре Морфейка, справа ASPID"
+              >
+                Ваш браузер не поддерживает воспроизведение видео.
+              </video>
+            </div>
+          </div>
+          <div
+            class="mt-6 grid grid-cols-1 gap-6 border-t border-white/10 pt-6 sm:grid-cols-3 sm:items-start sm:gap-4"
+          >
+            <div class="text-center sm:text-left">
+              <p class="font-display text-sm font-bold uppercase tracking-wide text-cyan-200 md:text-base">
+                Белый Эльф
+              </p>
+              <p class="mt-1 text-xs text-[var(--color-text-muted)]">Судья</p>
+            </div>
+            <div class="text-center">
+              <p class="font-display text-base font-bold text-cyan-50 md:text-lg">Морфейка</p>
+              <p class="mt-1 text-xs font-medium text-violet-300">Главный судья</p>
+            </div>
+            <div class="text-center sm:text-right">
+              <p class="font-display text-sm font-bold uppercase tracking-wide text-cyan-200 md:text-base">
+                ASPID
+              </p>
+              <p class="mt-1 text-xs text-[var(--color-text-muted)]">Судья</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Регламент (после трибунала): полный текст, огненные заголовки -->
+      <section
+        id="rules"
+        class="reveal border-t border-white/5 bg-black/20 py-16 md:py-24"
+        aria-labelledby="rules-marathon-heading"
+      >
+        <div class="mx-auto max-w-4xl px-4 md:px-6">
+          <h2
+            id="rules-marathon-heading"
+            class="video-story-fire-text rules-marathon__fire-hero font-display font-extrabold"
+          >
+            Регламент марафона «Созвездие аргументов»
+          </h2>
+
+          <div class="rules-marathon__card space-y-10 md:space-y-12">
+            <article class="rules-marathon__block">
+              <h3 class="video-story-fire-text rules-marathon__fire-section font-display">
+                1. Общие положения
+              </h3>
+              <div class="rules-marathon__prose">
+                <p>
+                  «Созвездие аргументов» — это уникальный формат командного противостояния, где личный
+                  скилл переплетается с магией командного взаимодействия. 18 игр на выживание, где разум и
+                  интуиция работают на пределе.
+                </p>
+                <p><strong class="text-orange-100/95">Дата проведения:</strong> 25–26 апреля 2026 года.</p>
+                <p>
+                  <strong class="text-orange-100/95">Место:</strong> Саратовская обл., с.&nbsp;Усовка, ул.
+                  Нижняя, 56 (база отдыха <a
+                    class="text-cyan-300 underline decoration-cyan-400/50 underline-offset-2 hover:text-cyan-200"
+                    href="https://VolgaWhisper.ru/"
+                    rel="noopener noreferrer"
+                    >VolgaWhisper.ru</a
+                  >).
+                </p>
+                <p>
+                  <strong class="text-orange-100/95">Тайминг:</strong> старт первой игры в 12:00 (25.04).
+                  Финальная игра — утро 26.04.
+                </p>
+              </div>
+            </article>
+
+            <article class="rules-marathon__block">
+              <h3 class="video-story-fire-text rules-marathon__fire-section font-display">
+                2. Формат и участники
+              </h3>
+              <div class="rules-marathon__prose">
+                <p>В марафоне принимают участие 10 звёздных пар (команд).</p>
+                <p>
+                  <strong class="text-orange-100/95">Командный зачёт:</strong> очки, набранные игроками в
+                  каждой из 18 игр, суммируются в общий рейтинг пары.
+                </p>
+                <p>
+                  <strong class="text-orange-100/95">Система замен:</strong> внутри команды действует
+                  правило свободной замены. Партнёры сами решают, кто из них садится за стол в конкретной
+                  игровой сессии, исходя из тактики, усталости или состава оппонентов. Замена производится
+                  строго между играми.
+                </p>
+                <p>
+                  <strong class="text-orange-100/95">Количество игр:</strong> каждая команда обязана
+                  обеспечить участие одного своего представителя в каждой из 18 игр марафона.
+                </p>
+              </div>
+            </article>
+
+            <article class="rules-marathon__block">
+              <h3 class="video-story-fire-text rules-marathon__fire-section font-display">
+                3. Система оценки и судейство
+              </h3>
+              <div class="rules-marathon__prose">
+                <p>Игры проходят по классическим правилам спортивной мафии.</p>
+                <p>
+                  <strong class="text-orange-100/95">Система баллов:</strong> оценка результатов ведётся по
+                  системе ФСМ (Федерация спортивной мафии).
+                </p>
+                <p>
+                  <strong class="text-orange-100/95">Дополнительные баллы:</strong> судейская коллегия
+                  (Белый Эльф, ASPID и главный судья Морфейка) имеет право начислять дополнительные баллы за
+                  исключительную игру или штрафовать за нарушение этики и правил клуба.
+                </p>
+                <p>
+                  <strong class="text-orange-100/95">Решения:</strong> решение главного судьи является
+                  окончательным и обжалованию в ходе марафона не подлежит.
+                </p>
+              </div>
+            </article>
+
+            <article class="rules-marathon__block">
+              <h3 class="video-story-fire-text rules-marathon__fire-section font-display">
+                4. Призовой фонд и номинации
+              </h3>
+              <div class="rules-marathon__table-wrap">
+                <table class="rules-marathon__table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Место</th>
+                      <th scope="col">Награда</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>I место</td>
+                      <td>10&nbsp;000&nbsp;₽</td>
+                    </tr>
+                    <tr>
+                      <td>II место</td>
+                      <td>7&nbsp;000&nbsp;₽</td>
+                    </tr>
+                    <tr>
+                      <td>III место</td>
+                      <td>5&nbsp;000&nbsp;₽</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="rules-marathon__block">
+              <h3 class="video-story-fire-text rules-marathon__fire-section font-display">
+                5. Условия участия и отдых
+              </h3>
+              <div class="rules-marathon__prose">
+                <p>
+                  <strong class="text-orange-100/95">Взнос:</strong> 5&nbsp;000&nbsp;₽ с команды (за двоих
+                  участников).
+                </p>
+                <p>
+                  <strong class="text-orange-100/95">Локация:</strong> игры проводятся на свежем воздухе в
+                  живописном экопосёлке.
+                </p>
+                <p>
+                  <strong class="text-orange-100/95">Питание и досуг:</strong> для участников будет
+                  организован ароматный шашлык (оплачивается отдельно). По завершении игровых сессий для
+                  желающих доступна уютная баня (оплачивается отдельно).
+                </p>
+              </div>
+            </article>
+
+            <article class="rules-marathon__block">
+              <h3 class="video-story-fire-text rules-marathon__fire-section font-display">
+                6. Этика и атмосфера
+              </h3>
+              <div class="rules-marathon__prose">
+                <p>
+                  Марафон «Созвездие аргументов» — это территория высокого интеллекта и ярких эмоций. Мы
+                  приветствуем уважительное отношение к оппонентам.
+                </p>
+                <p>
+                  Помните: игры будут высокоинтеллектуальными… но это не точно! Главное — отличная компания и
+                  драйв.
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Фотогалерея (наполняется по мере турнира; список — src/gallery.ts) -->
+      <section
+        id="gallery"
+        class="reveal border-t border-white/5 bg-black/15 py-16 md:py-24"
+        aria-labelledby="gallery-title"
+      >
+        <div class="mx-auto max-w-6xl px-4 md:px-6">
+          <h2
+            id="gallery-title"
+            class="font-display mb-3 text-center text-2xl font-bold text-cyan-200 md:text-3xl"
+          >
+            Фотогалерея
+          </h2>
+          <p class="mx-auto mb-10 max-w-2xl text-center text-[var(--color-text-muted)]">
+            Снимки с марафона появятся здесь по ходу игры и после финала — заглядывайте позже.
+          </p>
+          <div id="gallery-root"></div>
+        </div>
+      </section>
+    </main>
+
+    <dialog
+      id="showcase-audio-consent"
+      class="showcase-audio-consent mx-auto w-[min(92vw,26rem)] rounded-2xl border border-orange-400/30 bg-[#0a0612] p-6 text-[var(--color-text-main)] shadow-[0_0_60px_rgba(251,146,60,0.15)] backdrop:bg-black/80"
+      aria-labelledby="showcase-audio-consent-title"
+    >
+      <h2 id="showcase-audio-consent-title" class="font-display text-lg font-bold text-cyan-100 md:text-xl">
+        Звук в блоке «Трибунал»
+      </h2>
+      <p class="mt-3 text-sm leading-relaxed text-[var(--color-text-muted)] md:text-[15px]">
+        Ролики пар и витрин идут без звука. Звук возможен только у видео судей в разделе «Трибунал», пока он
+        у вас на экране: нажмите по кадру, чтобы включить или поставить на паузу. Выберите, разрешить ли
+        такой звук в этой вкладке.
+      </p>
+      <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
+        <button
+          type="button"
+          id="showcase-audio-consent-muted"
+          class="rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-sm font-medium text-slate-200 transition hover:border-white/25 hover:bg-white/5"
+        >
+          Только без звука
+        </button>
+        <button
+          type="button"
+          id="showcase-audio-consent-agree"
+          class="font-display rounded-xl border border-orange-400/50 bg-gradient-to-r from-orange-600/90 to-amber-600/90 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition hover:brightness-110"
+        >
+          Звук у «Трибунала»
+        </button>
+      </div>
+    </dialog>
+
+    <div id="atmosphere-toggle-root" class="atmosphere-toggle-root">
+      <button
+        type="button"
+        id="atmosphere-toggle"
+        class="atmosphere-toggle atmosphere-toggle--floating group flex min-h-[3.5rem] items-center gap-3 rounded-2xl border-2 border-violet-400/45 bg-black/60 px-5 py-3.5 text-left shadow-xl backdrop-blur-md transition hover:border-cyan-400/55 hover:bg-violet-950/40 md:min-h-[4rem] md:min-w-[14rem] md:flex-col md:items-stretch md:gap-2 md:px-6 md:py-4"
+        aria-pressed="false"
+        aria-label="Включить атмосферу"
+      >
+        <span class="flex items-center gap-3 md:w-full md:justify-center">
+          <span class="atmosphere-toggle__icon shrink-0 text-cyan-300/95" aria-hidden="true">
+            <svg width="36" height="36" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                class="atmosphere-toggle__wave atmosphere-toggle__wave--1"
+                d="M4 10v8M7 7v14M10 5v18M13 8v12M16 5v18M19 8v12M22 10v8"
+                stroke="currentColor"
+                stroke-width="1.85"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+          <span
+            class="atmosphere-toggle__label font-display text-[13px] font-bold uppercase tracking-[0.1em] text-violet-100/95 md:text-sm"
+            >Включить атмосферу</span
+          >
+        </span>
+      </button>
+    </div>
+
+    <dialog
+      id="gallery-lightbox"
+      class="gallery-lightbox max-h-[95vh] max-w-[95vw] border-0 bg-transparent p-0 backdrop:bg-black/85"
+      aria-modal="true"
+      aria-label="Просмотр фото"
+    >
+      <div
+        class="gallery-lightbox__inner relative flex max-h-[95vh] max-w-[95vw] flex-col items-center gap-3 rounded-2xl border border-white/15 bg-[#0a0612] p-3 shadow-2xl md:p-4"
+      >
+        <button
+          type="button"
+          id="gallery-lightbox-close"
+          class="gallery-lightbox__close font-display absolute right-2 top-2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/60 text-lg text-cyan-200 transition hover:bg-white/10"
+          aria-label="Закрыть"
+        >
+          ×
+        </button>
+        <img
+          id="gallery-lightbox-img"
+          class="gallery-lightbox__img max-h-[min(85vh,90vw)] max-w-full rounded-lg object-contain"
+          alt=""
+        />
+        <p
+          id="gallery-lightbox-caption"
+          class="max-w-full px-2 text-center text-sm text-[var(--color-text-muted)]"
+          hidden
+        ></p>
+      </div>
+    </dialog>
+
+    <footer class="relative z-10 border-t border-white/10 py-10 text-center text-sm text-[var(--color-text-muted)]">
+      <p>Клуб «Аргумент» · Саратов</p>
+      <p class="mt-2 inline-flex flex-wrap items-center justify-center gap-1.5">
+        <span>Разработано с</span>
+        <svg
+          class="h-4 w-4 shrink-0 text-fuchsia-400 drop-shadow-[0_0_8px_rgba(232,121,249,0.45)]"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+          />
+        </svg>
+        <a class="text-cyan-500/90 hover:underline" href="https://sii5.ru/">студией sii5</a>
+      </p>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
