@@ -159,9 +159,29 @@
   opacity: 0.55;
 }
 
-/* Таймер: неон */
+/* Таймер: неон + стабильные цифры (tabular-nums в разметке) */
 .timer-digit {
   text-shadow: 0 0 12px rgba(34, 211, 238, 0.55), 0 0 28px rgba(167, 139, 250, 0.35);
+}
+
+/* Ячейки таймера hero: glass + лёгкое свечение (палитра cyan/violet) */
+.hero-timer-cell {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 0 22px rgba(34, 211, 238, 0.22),
+    0 0 48px rgba(34, 211, 238, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* CTA «Регламент»: glass + свечение без новых цветов */
+.hero-cta-regulations {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 0 24px rgba(167, 139, 250, 0.2),
+    0 0 40px rgba(34, 211, 238, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 /* Полноширинный горизонтальный ряд под витриной */
@@ -322,8 +342,13 @@ video.video-chromeless::-webkit-media-controls-enclosure {
 }
 
 .rules-marathon__card {
-  @apply rounded-2xl border border-orange-400/25 bg-gradient-to-b from-[#140a18]/95 to-[#030308]/98 p-6 md:p-9;
-  box-shadow: 0 0 48px rgba(251, 146, 60, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  @apply rounded-2xl border border-orange-400/25 bg-gradient-to-b from-[#140a18]/90 to-[#030308]/95 p-6 md:p-9;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 0 48px rgba(251, 146, 60, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .rules-marathon__prose {
