@@ -21,13 +21,6 @@
     scroll-behavior: smooth;
   }
 
-  @media (max-width: 639px) {
-    html {
-      /* плавный скролл тяжёлый на слабых телефонах */
-      scroll-behavior: auto;
-    }
-  }
-
   body {
     @apply bg-[#030308] text-[var(--color-text-main)] antialiased;
     font-family: var(--font-body);
@@ -53,14 +46,6 @@
   z-index: 2;
 }
 
-/* Мобильный hero: весь кадр видео в кадре (letterbox), без жёсткого crop object-cover */
-@media (max-width: 639px) {
-  .hero-bg-layer {
-    /* весь кадр в области hero (полосы по краю — тёмный фон под слоем) */
-    @apply object-contain object-[50%_42%];
-  }
-}
-
 .hero-text-band {
   @apply rounded-xl px-2 py-1;
 }
@@ -70,83 +55,6 @@
   background: radial-gradient(ellipse 100% 80% at 50% -30%, #1e1035 0%, transparent 55%),
     radial-gradient(ellipse 80% 50% at 100% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 45%),
     linear-gradient(180deg, var(--color-space-void) 0%, var(--color-space-deep) 45%, #030308 100%);
-}
-
-/* Фон: пульсация по басу (canvas, z ниже контента) */
-.atmosphere-visualizer {
-  @apply pointer-events-none absolute inset-0 z-[1] mix-blend-screen opacity-90;
-}
-
-/* Плавающая кнопка атмосферы: поверх контента, дрейф задаётся transform из JS */
-.atmosphere-toggle-root {
-  position: fixed;
-  z-index: 60;
-  right: max(0.75rem, env(safe-area-inset-right, 0px));
-  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-  max-width: min(92vw, 18rem);
-  pointer-events: none;
-  will-change: transform;
-}
-
-/* После базового блока: на узком экране кнопка выше — не перекрывает CTA в hero */
-@media (max-width: 639px) {
-  .atmosphere-toggle-root {
-    bottom: max(5.75rem, env(safe-area-inset-bottom, 0px));
-  }
-}
-
-.atmosphere-toggle-root .atmosphere-toggle {
-  pointer-events: auto;
-  width: 100%;
-}
-
-.atmosphere-toggle {
-  box-shadow: 0 0 24px rgba(139, 92, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-.atmosphere-toggle--floating {
-  box-shadow: 0 0 40px rgba(88, 28, 135, 0.35), 0 12px 40px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.atmosphere-toggle--on {
-  @apply border-cyan-400/55 bg-cyan-950/25;
-  box-shadow: 0 0 32px rgba(34, 211, 238, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.atmosphere-toggle--on .atmosphere-toggle__label {
-  @apply text-cyan-100;
-}
-
-.atmosphere-toggle__wave {
-  transform-origin: 50% 50%;
-}
-
-.atmosphere-toggle--on .atmosphere-toggle__wave--1 {
-  animation: atmosphere-wave-pulse 0.9s ease-in-out infinite;
-}
-
-@keyframes atmosphere-wave-pulse {
-  0%,
-  100% {
-    opacity: 0.55;
-    transform: scaleY(0.92);
-  }
-  50% {
-    opacity: 1;
-    transform: scaleY(1.08);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .atmosphere-toggle--on .atmosphere-toggle__wave--1 {
-    animation: none;
-    opacity: 1;
-  }
-
-  .atmosphere-toggle-root {
-    will-change: auto;
-  }
 }
 
 .starfield__dots {
@@ -162,21 +70,6 @@
 /* Таймер: неон */
 .timer-digit {
   text-shadow: 0 0 12px rgba(34, 211, 238, 0.55), 0 0 28px rgba(167, 139, 250, 0.35);
-}
-
-/* Карточка пары */
-.pair-card {
-  @apply relative overflow-hidden rounded-2xl border border-white/10 bg-[var(--color-space-card)]/90 p-4 text-left transition-all duration-300;
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.pair-card:hover {
-  @apply border-cyan-400/35 -translate-y-0.5;
-  box-shadow: 0 0 24px rgba(34, 211, 238, 0.12), 0 12px 40px rgba(0, 0, 0, 0.45);
-}
-
-.pair-card.is-active {
-  @apply border-cyan-400/60 ring-2 ring-cyan-400/25;
 }
 
 /* Полноширинный горизонтальный ряд под витриной */
@@ -231,31 +124,7 @@ video.video-chromeless::-webkit-media-controls-enclosure {
   background: rgba(0, 0, 0, 0.78);
 }
 
-/* Текст описания под роликом: крупно, тот же «огонь», без наслоения на кадр */
-.video-story-below {
-  @apply mt-3 w-full rounded-none border border-orange-400/25 bg-gradient-to-b from-[#140a18]/95 to-[#030308] px-3 py-4 sm:rounded-2xl sm:px-5 sm:py-5;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  min-height: 7.25rem;
-}
-
-@media (max-width: 639px) {
-  .video-story-below {
-    border-left: 0;
-    border-right: 0;
-  }
-}
-
-.video-story-below__text {
-  margin: 0 auto;
-  max-width: 44rem;
-  text-align: center;
-  white-space: pre-line;
-  font-size: clamp(1.05rem, 4.2vw, 1.45rem);
-  line-height: 1.4;
-  letter-spacing: 0.03em;
-}
-
-/* Общий «огненный» градиент + мерцание (под видео и при необходимости ещё где-то) */
+/* Общий «огненный» градиент + мерцание (регламент и др.) */
 .video-story-fire-text {
   font-family: var(--font-display);
   font-weight: 700;
@@ -343,19 +212,6 @@ video.video-chromeless::-webkit-media-controls-enclosure {
 
 .rules-marathon__prose {
   @apply text-[15px] leading-relaxed text-slate-200/95 md:text-base md:leading-relaxed;
-}
-
-/* Ниже первого экрана на мобильных — откладываем отрисовку длинных блоков */
-@media (max-width: 767px) {
-  #pair-marathon-intro,
-  #showcase-1,
-  #showcase-2,
-  #judges,
-  #rules,
-  #gallery {
-    content-visibility: auto;
-    contain-intrinsic-size: 1px 900px;
-  }
 }
 
 .rules-marathon__prose p + p {
