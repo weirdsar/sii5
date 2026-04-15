@@ -2,8 +2,16 @@ import '@fontsource-variable/montserrat/wght.css';
 import '@fontsource/orbitron/400.css';
 import '@fontsource/orbitron/700.css';
 
+import {
+  initAtmosphereUi,
+  setAtmosphereToggleUi,
+  startAtmosphereFromUserGesture,
+  syncShowcaseVideoVolumesForAtmosphere,
+  isAtmospherePlaying,
+} from './atmosphere';
+import { SHOWCASE_AUDIO_STORAGE_KEY } from './audioConstants';
 import { galleryItems, type GalleryItem } from './gallery';
-import { marathonPairIntro, pairStoryByNumber } from './pairStories';
+import { marathonPairIntro, pairStoryByNumber, type PairStoryContent } from './pairStories';
 import { pairsBlock1, pairsBlock2, type PairEntry } from './pairs';
 import './styles.css';
 
@@ -15,6 +23,42 @@ const viewportCtl = new WeakMap<
   { playVisible: () => void; pauseAll: () => void }
 >();
 
+/** Секция «Трибунал» в зоне видимости — можно включать звук у судей (если пользователь разрешил). */
+let judgesTribunalInView = false;
+
+const showcaseClipSilentLocked = new WeakSet<HTMLVideoElement>();
+
+/** Витрины и пары: только картинка, звук дорожки всегда выключен. */
+function enforceShowcaseClipSilent(v: HTMLVideoElement): void {
+  v.muted = true;
+  v.defaultMuted = true;
+  v.volume = 0;
+  v.setAttribute('muted', '');
+  if (showcaseClipSilentLocked.has(v)) return;
+  showcaseClipSilentLocked.add(v);
+  const lock = (): void => {
+    v.muted = true;
+    v.volume = 0;
+  };
+  v.addEventListener('volumechange', lock);
+  v.addEventListener('playing', lock);
+}
+
+function initJudgesTribunalViewport(): void {
+  const sec = document.getElementById('judges');
+  if (!sec) return;
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        judgesTribunalInView = e.isIntersecting && e.intersectionRatio > 0.12;
+      }
+      syncAllPageVideoMuteFromStorage();
+    },
+    { threshold: [0, 0.08, 0.12, 0.2, 0.35] },
+  );
+  io.observe(sec);
+}
+
 /** Фон hero: порядок роликов, без звука, слегка замедленное воспроизведение (0.8×). */
 const HERO_BG_SEQUENCE = [
   '/content/1-5-part1.mp4',
@@ -25,8 +69,14 @@ const HERO_BG_SEQUENCE = [
 
 const HERO_PLAYBACK_RATE = 0.8;
 
-/** Выбор звука для роликов пар и трибунала в рамках вкладки (sessionStorage). */
-const SHOWCASE_AUDIO_STORAGE_KEY = 'mafiaShowcaseAudio';
+/** Длина одного «кадра» текста под видео (~2–3 строки крупного шрифта). */
+const STORY_PANEL_SLIDE_CHAR = 106;
+
+/** Интервал смены слайдов под видео (мс). */
+const STORY_PANEL_ROTATE_MS = 6300;
+
+/** Задержка смены текста после fade-out (мс). */
+const STORY_PANEL_FADE_MS = 450;
 
 function getShowcaseAudioPreference(): 'sound' | 'muted' | 'unknown' {
   const v = sessionStorage.getItem(SHOWCASE_AUDIO_STORAGE_KEY);
@@ -35,14 +85,21 @@ function getShowcaseAudioPreference(): 'sound' | 'muted' | 'unknown' {
   return 'unknown';
 }
 
-/** Синхронизирует muted у всех роликов страницы (витрины + трибунал) с сохранённым выбором. */
+/** Витрины — всегда без звука; трибунал — звук только при видимой секции и согласии пользователя. */
 function syncAllPageVideoMuteFromStorage(): void {
-  const sound = sessionStorage.getItem(SHOWCASE_AUDIO_STORAGE_KEY) === 'sound';
   document.querySelectorAll<HTMLVideoElement>('.js-video-block video').forEach((v) => {
-    v.muted = !sound;
+    enforceShowcaseClipSilent(v);
   });
   const jv = document.querySelector<HTMLVideoElement>('.js-judges-video');
-  if (jv) jv.muted = !sound;
+  if (jv) {
+    const userWantsJudgesSound = sessionStorage.getItem(SHOWCASE_AUDIO_STORAGE_KEY) === 'sound';
+    const allowJudgesSound = userWantsJudgesSound && judgesTribunalInView;
+    jv.muted = !allowJudgesSound;
+    if (!allowJudgesSound) {
+      jv.volume = 0;
+    }
+  }
+  syncShowcaseVideoVolumesForAtmosphere(isAtmospherePlaying());
 }
 
 function retryShowcasePlaybackForVisible(): void {
@@ -114,6 +171,10 @@ function initShowcaseAudioConsentDialog(): void {
     sessionStorage.setItem(SHOWCASE_AUDIO_STORAGE_KEY, 'sound');
     syncAllPageVideoMuteFromStorage();
     dlg.close();
+    /** Тот же пользовательский жест — сразу запускаем фоновый трек; кнопка остаётся выключателем. */
+    void startAtmosphereFromUserGesture().then((started) => {
+      setAtmosphereToggleUi(started);
+    });
   });
 
   mutedBtn.addEventListener('click', () => {
@@ -135,6 +196,122 @@ function initShowcaseAudioConsentDialog(): void {
   }
 }
 
+function splitIntoSentences(text: string): string[] {
+  const t = text.replace(/\s+/g, ' ').trim();
+  if (!t) return [];
+  return t
+    .split(/(?<=[.!?…])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function packSentencesIntoSlides(sentences: string[], maxLen: number): string[] {
+  const slides: string[] = [];
+  let buf = '';
+  for (const sent of sentences) {
+    const piece = sent.trim();
+    if (!piece) continue;
+    const candidate = buf ? `${buf} ${piece}` : piece;
+    if (candidate.length <= maxLen) {
+      buf = candidate;
+    } else {
+      if (buf) slides.push(buf);
+      if (piece.length <= maxLen) {
+        buf = piece;
+      } else {
+        buf = '';
+        let rest = piece;
+        while (rest.length > maxLen) {
+          const space = rest.lastIndexOf(' ', maxLen);
+          const at = space > Math.floor(maxLen * 0.55) ? space : maxLen;
+          slides.push(rest.slice(0, at).trim());
+          rest = rest.slice(at).trim();
+        }
+        buf = rest;
+      }
+    }
+  }
+  if (buf) slides.push(buf);
+  return slides;
+}
+
+function buildSectionSlides(title: string, body: string, maxLen: number): string[] {
+  const packed = packSentencesIntoSlides(splitIntoSentences(body), maxLen);
+  if (packed.length === 0) {
+    return title ? [`${title}`] : [];
+  }
+  return packed.map((chunk, i) => (i === 0 ? `${title}\n${chunk}` : chunk));
+}
+
+function slidesForPairStory(story: PairStoryContent, maxLen: number = STORY_PANEL_SLIDE_CHAR): string[] {
+  const out: string[] = [];
+  out.push(...buildSectionSlides(story.charATitle, story.charAText, maxLen));
+  out.push(...buildSectionSlides(story.charBTitle, story.charBText, maxLen));
+  out.push(...buildSectionSlides('Симбиоз (Итог)', story.synergy, maxLen));
+  return out.length ? out : [''];
+}
+
+/** Панель с «огненным» текстом под роликом (читаемее, чем поверх кадра). */
+function appendVideoStoryBelow(wrap: HTMLElement): void {
+  const panel = document.createElement('div');
+  panel.className = 'video-story-below';
+  panel.setAttribute('aria-live', 'polite');
+  panel.setAttribute('aria-atomic', 'true');
+  const textEl = document.createElement('p');
+  textEl.className = 'video-story-below__text video-story-fire-text js-video-story-text';
+  panel.append(textEl);
+  wrap.append(panel);
+}
+
+/** Циклическая смена фрагментов в панели под видео; таймер только в зоне видимости блока. */
+function initVideoStoryBelowPanels(): void {
+  document.querySelectorAll<HTMLElement>('.js-video-block[data-pair-n]').forEach((block) => {
+    const n = Number(block.dataset.pairN);
+    const story = pairStoryByNumber[n];
+    const textEl = block.querySelector<HTMLElement>('.js-video-story-text');
+    if (!story || !textEl) return;
+
+    const slides = slidesForPairStory(story);
+    let idx = 0;
+    textEl.textContent = slides[0] ?? '';
+
+    let timerId: number | null = null;
+
+    const advance = (): void => {
+      if (slides.length < 2) return;
+      textEl.classList.add('video-story-fire-text--out');
+      window.setTimeout(() => {
+        idx = (idx + 1) % slides.length;
+        textEl.textContent = slides[idx] ?? '';
+        textEl.classList.remove('video-story-fire-text--out');
+      }, STORY_PANEL_FADE_MS);
+    };
+
+    const start = (): void => {
+      if (timerId != null || slides.length < 2) return;
+      timerId = window.setInterval(advance, STORY_PANEL_ROTATE_MS);
+    };
+
+    const stop = (): void => {
+      if (timerId != null) {
+        window.clearInterval(timerId);
+        timerId = null;
+      }
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) start();
+          else stop();
+        }
+      },
+      { threshold: 0.12 },
+    );
+    io.observe(block);
+  });
+}
+
 function enforceHeroPlaybackRate(v: HTMLVideoElement): void {
   try {
     if (Math.abs(v.playbackRate - HERO_PLAYBACK_RATE) > 0.02) {
@@ -145,6 +322,25 @@ function enforceHeroPlaybackRate(v: HTMLVideoElement): void {
   }
 }
 
+/** Фоновые ролики hero — только картинка: без звука даже после жеста «со звуком» на странице. */
+function enforceHeroVideosSilent(v: HTMLVideoElement): void {
+  v.muted = true;
+  v.defaultMuted = true;
+  v.volume = 0;
+  v.setAttribute('muted', '');
+}
+
+function lockHeroVideoSilent(v: HTMLVideoElement): void {
+  const fix = (): void => {
+    enforceHeroVideosSilent(v);
+    enforceHeroPlaybackRate(v);
+  };
+  v.addEventListener('volumechange', fix);
+  v.addEventListener('playing', fix);
+  v.addEventListener('loadeddata', fix);
+  fix();
+}
+
 /** Два слоя video: кроссфейд и цикл из четырёх клипов. */
 function initHeroBackgroundCycler(): void {
   const hero = document.getElementById('hero');
@@ -152,9 +348,11 @@ function initHeroBackgroundCycler(): void {
   const v1 = document.querySelector<HTMLVideoElement>('.js-hero-bg-1');
   if (!hero || !v0 || !v1) return;
 
+  const heroMobile = window.matchMedia('(max-width: 639px)').matches;
   for (const v of [v0, v1]) {
-    v.muted = true;
-    v.setAttribute('muted', '');
+    /* На мобильных не тянем сразу весь mp4 — меньше конкурирует с текстом и LCP. */
+    v.preload = heroMobile ? 'metadata' : 'auto';
+    lockHeroVideoSilent(v);
     v.defaultPlaybackRate = HERO_PLAYBACK_RATE;
     v.playbackRate = HERO_PLAYBACK_RATE;
     v.addEventListener('loadedmetadata', () => enforceHeroPlaybackRate(v));
@@ -182,6 +380,8 @@ function initHeroBackgroundCycler(): void {
     const top = topIs0 ? v0 : v1;
     const bottom = topIs0 ? v1 : v0;
     bottom.pause();
+    enforceHeroVideosSilent(top);
+    enforceHeroVideosSilent(bottom);
     enforceHeroPlaybackRate(top);
     void top.play().catch(() => {});
   };
@@ -316,6 +516,7 @@ function createDualVideoBlock(p: PairEntry): HTMLElement {
   inner.append(v0, v1);
   frame.append(inner);
   wrap.append(frame);
+  appendVideoStoryBelow(wrap);
   return wrap;
 }
 
@@ -340,6 +541,7 @@ function createSingleVideoBlock(p: PairEntry): HTMLElement {
 
   frame.append(video);
   wrap.append(frame);
+  appendVideoStoryBelow(wrap);
   return wrap;
 }
 
@@ -354,6 +556,55 @@ function renderVideoSlots(container: HTMLElement | null, pairs: PairEntry[]): vo
       container.append(createSingleVideoBlock(p));
     }
   }
+}
+
+function renderPairGrid(container: HTMLElement, pairs: PairEntry[], groupId: string): void {
+  container.replaceChildren();
+  for (const p of pairs) {
+    const article = document.createElement('article');
+    article.className = 'pair-card reveal';
+    article.setAttribute('data-pair', String(p.n));
+    article.setAttribute('tabindex', '0');
+    article.setAttribute('role', 'listitem');
+    article.setAttribute('aria-label', `Пара ${p.n}: ${p.a} и ${p.b}`);
+
+    const num = document.createElement('span');
+    num.className =
+      'font-display mb-2 inline-block text-xs font-bold tracking-widest text-cyan-400/90';
+    num.textContent = `ПАРА ${p.n}`;
+
+    const names = document.createElement('div');
+    names.className = 'space-y-1 text-sm font-medium text-[var(--color-text-main)] md:text-base';
+    const row1 = document.createElement('div');
+    row1.textContent = p.a;
+    const mid = document.createElement('div');
+    mid.className = 'text-[var(--color-text-muted)]';
+    mid.textContent = 'и';
+    const row2 = document.createElement('div');
+    row2.textContent = p.b;
+    names.append(row1, mid, row2);
+
+    article.append(num, names);
+    container.append(article);
+  }
+
+  const cards = container.querySelectorAll<HTMLElement>('.pair-card');
+  cards.forEach((card) => {
+    card.addEventListener('click', () => setActivePair(groupId, card));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setActivePair(groupId, card);
+      }
+    });
+  });
+}
+
+function setActivePair(groupId: string, el: HTMLElement): void {
+  const root = document.getElementById(groupId);
+  if (!root) return;
+  root.querySelectorAll('.pair-card').forEach((c) => c.classList.remove('is-active'));
+  el.classList.add('is-active');
 }
 
 function renderMarathonIntro(): void {
@@ -389,7 +640,7 @@ function appendPairStorySynergy(parent: HTMLElement, text: string): void {
   parent.append(wrap);
 }
 
-/** Аккордеон с ролями и симбиозом под витриной. */
+/** Аккордеон с ролями и симбиозом под сеткой пар. */
 function renderPairStoriesList(rootId: string, pairs: PairEntry[]): void {
   const root = document.getElementById(rootId);
   if (!root) return;
@@ -464,6 +715,8 @@ function initVideoStacks(): void {
       const top = topIs0 ? v0 : v1;
       const bottom = topIs0 ? v1 : v0;
       bottom.pause();
+      enforceShowcaseClipSilent(top);
+      enforceShowcaseClipSilent(bottom);
       void top.play().catch(() => {});
     };
 
@@ -520,6 +773,7 @@ function initSingleVideoPlayers(): void {
 
     viewportCtl.set(block, {
       playVisible: () => {
+        enforceShowcaseClipSilent(video);
         void video.play().catch(() => {});
       },
       pauseAll: () => {
@@ -570,7 +824,12 @@ function initParallaxStarfield(): void {
 }
 
 function initReveal(): void {
-  const els = document.querySelectorAll<HTMLElement>('.reveal');
+  /* Hero: без отложенного появления — на мобильных WebKit IO внутри overflow:hidden
+   * часто не даёт isIntersecting, блоки остаются opacity:0 («чёрный экран»). */
+  document.querySelectorAll<HTMLElement>('#hero .reveal').forEach((el) => {
+    el.classList.add('is-visible');
+  });
+
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
@@ -582,7 +841,9 @@ function initReveal(): void {
     },
     { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
   );
-  els.forEach((el) => io.observe(el));
+  document.querySelectorAll<HTMLElement>('.reveal:not(.is-visible)').forEach((el) => {
+    io.observe(el);
+  });
 }
 
 function renderGallery(): void {
@@ -695,6 +956,8 @@ function initSmoothAnchors(): void {
 }
 
 function boot(): void {
+  initAtmosphereUi();
+  initJudgesTribunalViewport();
   initCountdown();
   initParallaxStarfield();
   initHeroBackgroundCycler();
@@ -707,6 +970,7 @@ function boot(): void {
   syncAllPageVideoMuteFromStorage();
   initShowcaseTapPlayPause();
   initVideoViewport();
+  initVideoStoryBelowPanels();
   initJudgesChromelessVideo();
   initShowcaseAudioConsentDialog();
   initSmoothAnchors();
@@ -715,6 +979,11 @@ function boot(): void {
   initGalleryLightbox();
 
   renderMarathonIntro();
+
+  const g1 = document.getElementById('pair-grid-1');
+  const g2 = document.getElementById('pair-grid-2');
+  if (g1) renderPairGrid(g1, pairsBlock1, 'showcase-1');
+  if (g2) renderPairGrid(g2, pairsBlock2, 'showcase-2');
 
   renderPairStoriesList('pair-stories-1', pairsBlock1);
   renderPairStoriesList('pair-stories-2', pairsBlock2);

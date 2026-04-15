@@ -29,14 +29,35 @@
       ></div>
     </div>
 
-    <header class="relative z-10 border-b border-white/5 bg-black/20 backdrop-blur-md">
-      <div
-        class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 md:px-6"
-      >
-        <div class="font-display text-sm font-bold tracking-[0.2em] text-cyan-300/90 md:text-base">
-          АРГУМЕНТ
+    <header class="relative z-10 border-b border-white/5 bg-black/30 backdrop-blur-md">
+      <div class="mx-auto max-w-6xl px-3 py-2 sm:px-4 md:px-6">
+        <!-- Мобильная шапка: две строки, без обрезки одной линией -->
+        <div class="flex flex-col gap-1.5 sm:hidden">
+          <div class="flex items-start justify-between gap-3">
+            <span class="font-display text-[11px] font-bold tracking-[0.14em] text-cyan-300/95">АРГУМЕНТ</span>
+            <span class="max-w-[11rem] text-right text-[10px] leading-snug text-[var(--color-text-muted)]">
+              Спортивная мафия<br /><span class="text-slate-500">Саратов</span>
+            </span>
+          </div>
+          <p class="text-center text-[11px] leading-snug text-slate-300/95">
+            Клуб «Аргумент» приглашает на главное событие сезона.
+          </p>
         </div>
-        <p class="text-xs text-[var(--color-text-muted)] md:text-sm">Спортивная мафия · Саратов</p>
+        <div
+          class="hidden max-w-none flex-nowrap items-center gap-2 sm:flex sm:gap-3"
+        >
+          <span class="font-display shrink-0 text-xs font-bold tracking-[0.14em] text-cyan-300/95 md:text-sm">
+            АРГУМЕНТ
+          </span>
+          <span class="shrink-0 text-xs text-white/25" aria-hidden="true">·</span>
+          <span
+            class="min-w-0 flex-1 truncate text-xs leading-tight text-slate-300/95 md:text-sm"
+            title="Клуб «Аргумент» приглашает на главное событие сезона."
+            >Клуб «Аргумент» приглашает на главное событие сезона.</span>
+          <span class="shrink-0 text-xs text-white/25" aria-hidden="true">·</span>
+          <span class="shrink-0 whitespace-nowrap text-right text-xs leading-tight text-[var(--color-text-muted)] md:text-sm"
+            >Спортивная мафия · Саратов</span>
+        </div>
       </div>
     </header>
 
@@ -44,7 +65,7 @@
       <!-- Hero: фон — цикл из 4 роликов (без звука, 0.8×); текст сверху и снизу -->
       <section
         id="hero"
-        class="relative isolate flex min-h-[min(100dvh,920px)] w-full flex-col overflow-hidden pb-10 pt-6 md:min-h-[min(100dvh,960px)] md:pb-16 md:pt-8"
+        class="relative isolate flex min-h-[min(92dvh,820px)] w-full flex-col overflow-hidden pb-24 pt-4 max-sm:pb-28 sm:min-h-[min(100dvh,920px)] sm:pb-10 sm:pt-6 md:min-h-[min(100dvh,960px)] md:pb-16 md:pt-8"
         aria-labelledby="hero-title"
       >
         <div
@@ -68,115 +89,118 @@
             ></video>
           </div>
           <div
-            class="absolute inset-0 bg-gradient-to-b from-black/90 via-black/25 to-black/90"
+            class="absolute inset-0 bg-gradient-to-b from-black/90 via-black/25 to-black/90 max-sm:from-black/75 max-sm:via-black/35 max-sm:to-black/85"
           ></div>
         </div>
 
         <div class="relative z-10 flex min-h-0 flex-1 flex-col">
+          <!-- Верхняя строка: счётчик слева, «Когда и где» справа -->
           <div
-            class="hero-text-band reveal mx-auto w-full max-w-4xl px-4 text-center md:px-6"
+            class="hero-top-bar reveal pointer-events-auto mx-auto mb-3 flex w-full max-w-6xl flex-col items-stretch gap-3 px-4 max-sm:mb-4 sm:mb-5 sm:flex-row sm:items-start sm:justify-between sm:gap-4 md:px-6"
           >
-            <p
-              class="font-display mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-violet-200/95"
+            <div class="hero-top-bar__countdown flex min-w-0 flex-col items-stretch gap-2 self-center text-center sm:self-start sm:text-left">
+              <div
+                id="countdown"
+                class="grid w-full max-w-[16.5rem] grid-cols-2 justify-items-stretch gap-2 sm:flex sm:max-w-none sm:flex-wrap sm:justify-start md:gap-3"
+                role="timer"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                <div
+                  class="timer-digit font-display flex min-w-0 flex-col rounded-xl border border-cyan-500/35 bg-black/60 px-2 py-1.5 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] sm:rounded-2xl sm:px-2.5 sm:py-2 md:min-w-[5.5rem] md:py-3.5"
+                >
+                  <span id="cd-days" class="text-lg font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-300/90 sm:text-[10px]"
+                    >дней</span
+                  >
+                </div>
+                <div
+                  class="timer-digit font-display flex min-w-0 flex-col rounded-xl border border-cyan-500/35 bg-black/60 px-2 py-1.5 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] sm:rounded-2xl sm:px-2.5 sm:py-2 md:min-w-[5.5rem] md:py-3.5"
+                >
+                  <span id="cd-hours" class="text-lg font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-300/90 sm:text-[10px]"
+                    >часов</span
+                  >
+                </div>
+                <div
+                  class="timer-digit font-display flex min-w-0 flex-col rounded-xl border border-cyan-500/35 bg-black/60 px-2 py-1.5 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] sm:rounded-2xl sm:px-2.5 sm:py-2 md:min-w-[5.5rem] md:py-3.5"
+                >
+                  <span id="cd-mins" class="text-lg font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-300/90 sm:text-[10px]"
+                    >мин</span
+                  >
+                </div>
+                <div
+                  class="timer-digit font-display flex min-w-0 flex-col rounded-xl border border-cyan-500/35 bg-black/60 px-2 py-1.5 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] sm:rounded-2xl sm:px-2.5 sm:py-2 md:min-w-[5.5rem] md:py-3.5"
+                >
+                  <span id="cd-secs" class="text-lg font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-300/90 sm:text-[10px]"
+                    >сек</span
+                  >
+                </div>
+              </div>
+              <p
+                class="text-[11px] text-slate-200/95 drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)] sm:max-w-[16rem] sm:text-xs md:text-sm"
+              >
+                До старта:
+                <time datetime="2026-04-25T12:00:00+04:00">25 апреля 2026, 12:00</time> (Саратов)
+              </p>
+            </div>
+
+            <div
+              class="hero-top-bar__where w-full max-w-xl shrink-0 sm:max-w-sm sm:self-start md:max-w-md"
             >
-              Марафон
-            </p>
-            <h1
-              id="hero-title"
-              class="font-display mb-3 bg-gradient-to-br from-white via-cyan-100 to-violet-300 bg-clip-text text-2xl font-bold leading-tight text-transparent drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] md:mb-4 md:text-4xl lg:text-5xl"
-            >
-              Марафон по спортивной мафии:<br class="hidden sm:block" />
-              Созвездие аргументов
-            </h1>
-            <p
-              class="mx-auto max-w-2xl text-sm text-slate-200/95 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)] md:text-lg"
-            >
-              Клуб «Аргумент» приглашает на главное событие сезона.
-            </p>
+              <div
+                class="rounded-xl border border-white/15 bg-black/65 p-3 text-left shadow-lg backdrop-blur-md max-sm:text-[13px] sm:rounded-2xl sm:p-5 md:p-6 md:text-base"
+              >
+                <h2
+                  class="font-display mb-1.5 text-[10px] font-bold uppercase tracking-widest text-violet-200/95 sm:mb-2 sm:text-xs md:text-sm"
+                >
+                  Когда и где
+                </h2>
+                <ul class="space-y-1.5 text-[13px] leading-snug text-slate-200/90 sm:space-y-2 sm:text-sm md:text-base">
+                  <li>
+                    <strong class="text-white">Даты:</strong> 25–26 апреля 2026
+                  </li>
+                  <li>
+                    <strong class="text-white">Место:</strong> г. Саратов, село Усовка, экопоселок
+                    <a
+                      class="text-cyan-300 underline decoration-cyan-500/50 underline-offset-2 hover:text-cyan-200"
+                      href="https://volgawhisper.ru/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >VolgaWhisper.ru</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
 
-          <!-- Центральная зона без текста — видны персонажи на фоновом видео -->
           <div
-            class="hero-spacer mx-auto min-h-[22vh] w-full max-w-5xl flex-1 md:min-h-[28vh] lg:min-h-[30vh]"
+            class="hero-text-band reveal mx-auto w-full max-w-4xl px-4 pb-1 pt-1 text-center sm:pb-0 sm:pt-0 md:px-6"
+          >
+            <h1
+              id="hero-title"
+              class="font-display mb-0 bg-gradient-to-br from-white via-cyan-100 to-violet-300 bg-clip-text text-xl font-bold leading-snug text-transparent drop-shadow-[0_2px_14px_rgba(0,0,0,0.92)] sm:mb-1 sm:text-2xl sm:leading-tight md:mb-2 md:text-4xl lg:text-5xl"
+            >
+              <span class="block sm:inline">Марафон по спортивной мафии:</span>
+              <span class="block">Созвездие аргументов</span>
+            </h1>
+          </div>
+
+          <!-- Центральная зона — фоновое видео (на мобильных выше по min-height) -->
+          <div
+            class="hero-spacer mx-auto min-h-[min(34vh,16rem)] w-full max-w-5xl flex-1 sm:min-h-[22vh] md:min-h-[28vh] lg:min-h-[30vh]"
             aria-hidden="true"
           ></div>
 
           <div
-            class="hero-text-band reveal mx-auto mt-auto w-full max-w-4xl px-4 text-center md:px-6"
+            class="hero-text-band reveal mx-auto mt-auto w-full max-w-4xl px-4 pb-1 text-center max-sm:pt-1 md:px-6"
           >
-            <div
-              id="countdown"
-              class="mb-8 flex flex-wrap items-stretch justify-center gap-2 md:mb-10 md:gap-4"
-              role="timer"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              <div
-                class="timer-digit font-display flex min-w-[4rem] flex-col rounded-2xl border border-cyan-500/35 bg-black/55 px-3 py-2 text-center shadow-lg backdrop-blur-sm md:min-w-[5.5rem] md:py-4"
-              >
-                <span id="cd-days" class="text-2xl font-bold text-cyan-200 md:text-4xl">00</span>
-                <span class="text-[10px] uppercase tracking-wider text-slate-300/90"
-                  >дней</span
-                >
-              </div>
-              <div
-                class="timer-digit font-display flex min-w-[4rem] flex-col rounded-2xl border border-cyan-500/35 bg-black/55 px-3 py-2 text-center shadow-lg backdrop-blur-sm md:min-w-[5.5rem] md:py-4"
-              >
-                <span id="cd-hours" class="text-2xl font-bold text-cyan-200 md:text-4xl">00</span>
-                <span class="text-[10px] uppercase tracking-wider text-slate-300/90"
-                  >часов</span
-                >
-              </div>
-              <div
-                class="timer-digit font-display flex min-w-[4rem] flex-col rounded-2xl border border-cyan-500/35 bg-black/55 px-3 py-2 text-center shadow-lg backdrop-blur-sm md:min-w-[5.5rem] md:py-4"
-              >
-                <span id="cd-mins" class="text-2xl font-bold text-cyan-200 md:text-4xl">00</span>
-                <span class="text-[10px] uppercase tracking-wider text-slate-300/90"
-                  >мин</span
-                >
-              </div>
-              <div
-                class="timer-digit font-display flex min-w-[4rem] flex-col rounded-2xl border border-cyan-500/35 bg-black/55 px-3 py-2 text-center shadow-lg backdrop-blur-sm md:min-w-[5.5rem] md:py-4"
-              >
-                <span id="cd-secs" class="text-2xl font-bold text-cyan-200 md:text-4xl">00</span>
-                <span class="text-[10px] uppercase tracking-wider text-slate-300/90"
-                  >сек</span
-                >
-              </div>
-            </div>
-            <p class="mb-4 text-sm text-slate-200/95 drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)]">
-              До старта:
-              <time datetime="2026-04-25T12:00:00+04:00">25 апреля 2026, 12:00</time> (Саратов)
-            </p>
-
-            <div
-              class="mx-auto mb-6 max-w-xl rounded-2xl border border-white/15 bg-black/55 p-5 text-left shadow-xl backdrop-blur-md md:p-6"
-            >
-              <h2
-                class="font-display mb-2 text-xs font-bold uppercase tracking-widest text-violet-200/95 md:text-sm"
-              >
-                Когда и где
-              </h2>
-              <ul class="space-y-2 text-sm text-slate-200/90 md:text-base">
-                <li>
-                  <strong class="text-white">Даты:</strong> 25–26 апреля 2026
-                </li>
-                <li>
-                  <strong class="text-white">Место:</strong> г. Саратов, село Усовка, экопоселок
-                  <a
-                    class="text-cyan-300 underline decoration-cyan-500/50 underline-offset-2 hover:text-cyan-200"
-                    href="https://volgawhisper.ru/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    >VolgaWhisper.ru</a
-                  >
-                </li>
-              </ul>
-            </div>
-
-            <div class="flex justify-center pb-2">
+            <div class="flex justify-center max-sm:px-1">
               <a
-                class="font-display inline-flex min-h-[48px] min-w-[220px] items-center justify-center rounded-full border border-violet-300/50 bg-black/40 px-8 py-3 text-sm font-bold uppercase tracking-wide text-violet-100 shadow-lg backdrop-blur-sm transition hover:border-violet-200 hover:bg-violet-950/40"
+                class="font-display inline-flex min-h-[44px] w-full max-w-[min(100%,20rem)] items-center justify-center rounded-full border border-violet-300/50 bg-black/55 px-5 py-2.5 text-[11px] font-bold uppercase leading-tight tracking-wide text-violet-100 shadow-lg backdrop-blur-sm transition hover:border-violet-200 hover:bg-violet-950/40 sm:min-h-[48px] sm:w-auto sm:max-w-none sm:px-8 sm:py-3 sm:text-sm"
                 href="#rules"
                 >Ознакомиться с регламентом</a
               >
@@ -223,8 +247,14 @@
         <div id="videos-showcase-1" class="w-full"></div>
 
         <div class="mx-auto max-w-6xl px-4 md:px-6">
+          <div
+            id="pair-grid-1"
+            class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5"
+            role="list"
+          ></div>
+
           <h3
-            class="font-display mt-10 text-center text-base font-bold uppercase tracking-[0.2em] text-violet-200/95 md:mt-14 md:text-lg"
+            class="font-display mt-14 text-center text-base font-bold uppercase tracking-[0.2em] text-violet-200/95 md:mt-16 md:text-lg"
           >
             Герои и симбиозы
           </h3>
@@ -253,8 +283,14 @@
         <div id="videos-showcase-2" class="w-full"></div>
 
         <div class="mx-auto max-w-6xl px-4 md:px-6">
+          <div
+            id="pair-grid-2"
+            class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5"
+            role="list"
+          ></div>
+
           <h3
-            class="font-display mt-10 text-center text-base font-bold uppercase tracking-[0.2em] text-violet-200/95 md:mt-14 md:text-lg"
+            class="font-display mt-14 text-center text-base font-bold uppercase tracking-[0.2em] text-violet-200/95 md:mt-16 md:text-lg"
           >
             Герои и симбиозы
           </h3>
@@ -504,11 +540,12 @@
       aria-labelledby="showcase-audio-consent-title"
     >
       <h2 id="showcase-audio-consent-title" class="font-display text-lg font-bold text-cyan-100 md:text-xl">
-        Звук в роликах
+        Звук в блоке «Трибунал»
       </h2>
       <p class="mt-3 text-sm leading-relaxed text-[var(--color-text-muted)] md:text-[15px]">
-        Фрагменты игр могут содержать громкую речь и музыку. Элементы плеера скрыты: нажмите по видео, чтобы
-        включить или поставить на паузу. Выберите, разрешить ли звук на этой странице в текущей вкладке.
+        Ролики пар и витрин идут без звука. Звук возможен только у видео судей в разделе «Трибунал», пока он
+        у вас на экране: нажмите по кадру, чтобы включить или поставить на паузу. Выберите, разрешить ли
+        такой звук в этой вкладке.
       </p>
       <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
         <button
@@ -523,10 +560,38 @@
           id="showcase-audio-consent-agree"
           class="font-display rounded-xl border border-orange-400/50 bg-gradient-to-r from-orange-600/90 to-amber-600/90 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition hover:brightness-110"
         >
-          Смотреть со звуком
+          Звук у «Трибунала»
         </button>
       </div>
     </dialog>
+
+    <div id="atmosphere-toggle-root" class="atmosphere-toggle-root">
+      <button
+        type="button"
+        id="atmosphere-toggle"
+        class="atmosphere-toggle atmosphere-toggle--floating group flex min-h-[3.5rem] items-center gap-3 rounded-2xl border-2 border-violet-400/45 bg-black/60 px-5 py-3.5 text-left shadow-xl backdrop-blur-md transition hover:border-cyan-400/55 hover:bg-violet-950/40 md:min-h-[4rem] md:min-w-[14rem] md:flex-col md:items-stretch md:gap-2 md:px-6 md:py-4"
+        aria-pressed="false"
+        aria-label="Включить атмосферу"
+      >
+        <span class="flex items-center gap-3 md:w-full md:justify-center">
+          <span class="atmosphere-toggle__icon shrink-0 text-cyan-300/95" aria-hidden="true">
+            <svg width="36" height="36" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                class="atmosphere-toggle__wave atmosphere-toggle__wave--1"
+                d="M4 10v8M7 7v14M10 5v18M13 8v12M16 5v18M19 8v12M22 10v8"
+                stroke="currentColor"
+                stroke-width="1.85"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+          <span
+            class="atmosphere-toggle__label font-display text-[13px] font-bold uppercase tracking-[0.1em] text-violet-100/95 md:text-sm"
+            >Включить атмосферу</span
+          >
+        </span>
+      </button>
+    </div>
 
     <dialog
       id="gallery-lightbox"
@@ -560,9 +625,21 @@
 
     <footer class="relative z-10 border-t border-white/10 py-10 text-center text-sm text-[var(--color-text-muted)]">
       <p>Клуб «Аргумент» · Саратов</p>
-      <p class="mt-2">
-        <a class="text-cyan-500/90 hover:underline" href="https://sii5.ru/">sii5.ru</a>
-        — отдельный сайт портфолио, не связан с марафоном.
+      <p class="mt-2 inline-flex flex-wrap items-center justify-center gap-1.5">
+        <span>Разработано с</span>
+        <svg
+          class="h-4 w-4 shrink-0 text-fuchsia-400 drop-shadow-[0_0_8px_rgba(232,121,249,0.45)]"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+          />
+        </svg>
+        <a class="text-cyan-500/90 hover:underline" href="https://sii5.ru/">студией sii5</a>
       </p>
     </footer>
 
