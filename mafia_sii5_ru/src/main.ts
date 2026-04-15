@@ -44,15 +44,29 @@ function enforceShowcaseClipSilent(v: HTMLVideoElement): void {
   v.addEventListener('playing', lock);
 }
 
+/** Порог видимости секции «Трибунал» — звук и автозапуск ролика судей. */
+const JUDGES_VISIBLE_RATIO = 0.12;
+
 function initJudgesTribunalViewport(): void {
   const sec = document.getElementById('judges');
-  if (!sec) return;
+  const video = document.querySelector<HTMLVideoElement>('.js-judges-video');
+  if (!sec || !video) return;
+
   const io = new IntersectionObserver(
     (entries) => {
-      for (const e of entries) {
-        judgesTribunalInView = e.isIntersecting && e.intersectionRatio > 0.12;
-      }
+      const e = entries[entries.length - 1];
+      if (!e) return;
+
+      const visible = e.isIntersecting && e.intersectionRatio > JUDGES_VISIBLE_RATIO;
+      judgesTribunalInView = visible;
+
       syncAllPageVideoMuteFromStorage();
+
+      if (visible) {
+        void video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
     },
     { threshold: [0, 0.08, 0.12, 0.2, 0.35] },
   );
