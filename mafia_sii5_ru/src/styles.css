@@ -164,21 +164,6 @@
   text-shadow: 0 0 12px rgba(34, 211, 238, 0.55), 0 0 28px rgba(167, 139, 250, 0.35);
 }
 
-/* Карточка пары */
-.pair-card {
-  @apply relative overflow-hidden rounded-2xl border border-white/10 bg-[var(--color-space-card)]/90 p-4 text-left transition-all duration-300;
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.pair-card:hover {
-  @apply border-cyan-400/35 -translate-y-0.5;
-  box-shadow: 0 0 24px rgba(34, 211, 238, 0.12), 0 12px 40px rgba(0, 0, 0, 0.45);
-}
-
-.pair-card.is-active {
-  @apply border-cyan-400/60 ring-2 ring-cyan-400/25;
-}
-
 /* Полноширинный горизонтальный ряд под витриной */
 .video-showcase-bleed {
   width: 100%;

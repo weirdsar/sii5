@@ -558,55 +558,6 @@ function renderVideoSlots(container: HTMLElement | null, pairs: PairEntry[]): vo
   }
 }
 
-function renderPairGrid(container: HTMLElement, pairs: PairEntry[], groupId: string): void {
-  container.replaceChildren();
-  for (const p of pairs) {
-    const article = document.createElement('article');
-    article.className = 'pair-card reveal';
-    article.setAttribute('data-pair', String(p.n));
-    article.setAttribute('tabindex', '0');
-    article.setAttribute('role', 'listitem');
-    article.setAttribute('aria-label', `Пара ${p.n}: ${p.a} и ${p.b}`);
-
-    const num = document.createElement('span');
-    num.className =
-      'font-display mb-2 inline-block text-xs font-bold tracking-widest text-cyan-400/90';
-    num.textContent = `ПАРА ${p.n}`;
-
-    const names = document.createElement('div');
-    names.className = 'space-y-1 text-sm font-medium text-[var(--color-text-main)] md:text-base';
-    const row1 = document.createElement('div');
-    row1.textContent = p.a;
-    const mid = document.createElement('div');
-    mid.className = 'text-[var(--color-text-muted)]';
-    mid.textContent = 'и';
-    const row2 = document.createElement('div');
-    row2.textContent = p.b;
-    names.append(row1, mid, row2);
-
-    article.append(num, names);
-    container.append(article);
-  }
-
-  const cards = container.querySelectorAll<HTMLElement>('.pair-card');
-  cards.forEach((card) => {
-    card.addEventListener('click', () => setActivePair(groupId, card));
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        setActivePair(groupId, card);
-      }
-    });
-  });
-}
-
-function setActivePair(groupId: string, el: HTMLElement): void {
-  const root = document.getElementById(groupId);
-  if (!root) return;
-  root.querySelectorAll('.pair-card').forEach((c) => c.classList.remove('is-active'));
-  el.classList.add('is-active');
-}
-
 function renderMarathonIntro(): void {
   const el = document.getElementById('pair-intro-root');
   if (el) {
@@ -640,7 +591,7 @@ function appendPairStorySynergy(parent: HTMLElement, text: string): void {
   parent.append(wrap);
 }
 
-/** Аккордеон с ролями и симбиозом под сеткой пар. */
+/** Аккордеон с ролями и симбиозом под витриной (после роликов пар). */
 function renderPairStoriesList(rootId: string, pairs: PairEntry[]): void {
   const root = document.getElementById(rootId);
   if (!root) return;
@@ -956,12 +907,14 @@ function initSmoothAnchors(): void {
 }
 
 function boot(): void {
+  /* 1 — глобальные обработчики: атмосфера, hero, таймер, параллакс */
   initAtmosphereUi();
   initJudgesTribunalViewport();
   initCountdown();
   initParallaxStarfield();
   initHeroBackgroundCycler();
 
+  /* 2 — витрины: ролики пар + панели текста под роликом (отдельно от аккордеона «Герои и симбиозы») */
   renderVideoSlots(document.getElementById('videos-showcase-1'), pairsBlock1);
   renderVideoSlots(document.getElementById('videos-showcase-2'), pairsBlock2);
 
@@ -978,16 +931,13 @@ function boot(): void {
   renderGallery();
   initGalleryLightbox();
 
+  /* 3 — тексты: вступление о дуэтах + аккордеоны ролей/симбиоза */
   renderMarathonIntro();
-
-  const g1 = document.getElementById('pair-grid-1');
-  const g2 = document.getElementById('pair-grid-2');
-  if (g1) renderPairGrid(g1, pairsBlock1, 'showcase-1');
-  if (g2) renderPairGrid(g2, pairsBlock2, 'showcase-2');
 
   renderPairStoriesList('pair-stories-1', pairsBlock1);
   renderPairStoriesList('pair-stories-2', pairsBlock2);
 
+  /* 4 — появление секций при скролле */
   initReveal();
 }
 
