@@ -611,11 +611,12 @@ function renderPairStoriesList(rootId: string, pairs: PairEntry[]): void {
     inner.className = 'pair-story-summary__inner';
     const nEl = document.createElement('span');
     nEl.className = 'pair-story-summary__n';
-    nEl.textContent = `ПАРА ${p.n}`;
-    const namesEl = document.createElement('span');
-    namesEl.className = 'pair-story-summary__names';
-    namesEl.textContent = `${p.a} и ${p.b}`;
-    inner.append(nEl, namesEl);
+    /* Без второй строки с именами — они дублировали витрину и старые карточки «ПАРА N». */
+    nEl.textContent = `Пара ${p.n}`;
+    const a11y = document.createElement('span');
+    a11y.className = 'pair-story-summary__sr';
+    a11y.textContent = `${p.a} и ${p.b}`;
+    inner.append(nEl, a11y);
     summary.append(inner);
 
     const body = document.createElement('div');
