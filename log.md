@@ -2,52 +2,11 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
-## 2026-04-16 — mafia.sii5.ru: мобильный «чёрный экран» — reveal в hero
+## 2026-04-16 — mafia.sii5.ru: откат f79c0b8 (восстановление видео и атмосферы)
 
-- **`mafia_sii5_ru/src/main.ts`**: в `initReveal()` для всех `#hero .reveal` сразу добавляется `is-visible` (без IntersectionObserver). Причина: на мобильных WebKit наблюдатель с `threshold` / `rootMargin` внутри секции с `overflow-hidden` часто не выдаёт пересечение — таймер, заголовок и CTA оставались с `opacity:0`, на фоне казалось, что видна только кнопка «Включить атмосферу».
-- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
-
-## 2026-04-16 — mafia.sii5.ru: мобильная главная — таймер, градиент hero, кнопка «Атмосфера»
-
-- **`mafia_sii5_ru/index.html`**: убраны классы с несуществующим в теме брейкпоинтом `xs:` у сетки таймера; на узком экране остаётся сетка 2×2 до `sm:flex`; на hero-оверлее — чуть мягче градиент (`max-sm:from/via/to`).
-- **`mafia_sii5_ru/src/styles.css`**: подъём `.atmosphere-toggle-root` на ≤639px перенесён **после** базового блока (раньше базовый `bottom` перекрывал правило и кнопка оставалась у края).
-- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
-
-## 2026-04-16 — mafia.sii5.ru: hero на мобильных, скорость, low-pass на регламенте
-
-- **`mafia_sii5_ru/src/styles.css`**: hero ≤639px — `object-contain` + `object-position`; отключён `scroll-behavior: smooth` на мобильных; `content-visibility` на длинных секциях ≤767px.
-- **`mafia_sii5_ru/src/main.ts`**: фоновые hero-ролики на мобильных `preload="metadata"`.
-- **`mafia_sii5_ru/src/atmosphere.ts`**: для `#rules` — мягкий порог чтения (ratio / высота пересечения) + больше `threshold`, чтобы low-pass держался на всём блоке регламента.
-- **`mafia_sii5_ru/vite.config.ts`**: `build.target es2020`, `cssMinify`, без отчёта размеров в логе.
-- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
-
-## 2026-04-16 — mafia.sii5.ru: атмосфера — два трека по очереди
-
-- **`mafia_sii5_ru/public/content/broken-king-instrumental.mp3`**: второй трек (Broken King Instrumental).
-- **`mafia_sii5_ru/src/atmosphere.ts`**: декод двух URL; планировщик A→B→A… с кроссфейдом `overlapSec` между соседними буферами; `nextSegmentStartWall` вместо одного `loopAnchor`.
-- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
-
-## 2026-04-16 — mafia.sii5.ru: звук только у трибунала; кнопка атмосферы плавающая
-
-- **`mafia_sii5_ru/src/main.ts`**: витрины/пары — принудительно без звука (`enforceShowcaseClipSilent`); судьи — звук только при `judgesTribunalInView` и выборе «Звук у Трибунала»; `initJudgesTribunalViewport()`.
-- **`mafia_sii5_ru/src/atmosphere.ts`**: `syncShowcaseVideoVolumesForAtmosphere` только для `.js-judges-video`; `initAtmosphereToggleParallax()` — плавный дрейф кнопки при скролле.
-- **`mafia_sii5_ru/index.html`**: кнопка атмосферы в `#atmosphere-toggle-root` (fixed); текст диалога про звук трибунала.
-- **`mafia_sii5_ru/src/styles.css`**: `.atmosphere-toggle-root`, крупнее тень у плавающей кнопки.
-
-## 2026-04-16 — mafia.sii5.ru: hero без звука; атмосфера с окна «со звуком»
-
-- **`mafia_sii5_ru/src/main.ts`**: фон hero — `volume = 0`, `muted`/`defaultMuted`, фиксация на `volumechange`/`playing`/`loadeddata`; перед `play()` в цикле — повторная фиксация; по кнопке «Смотреть со звуком» в диалоге — `startAtmosphereFromUserGesture()` + `setAtmosphereToggleUi`.
-- **`mafia_sii5_ru/src/atmosphere.ts`**: экспорт `setAtmosphereToggleUi`, колбэк с панели инициализации кнопки.
-
-## 2026-04-16 — mafia.sii5.ru: фоновая музыка «атмосфера», визуализатор, low-pass при чтении
-
-- **`mafia_sii5_ru/public/content/broken-king.mp3`**: трек Broken King (копия из загрузок пользователя) для фоновой музыки.
-- **`mafia_sii5_ru/src/atmosphere.ts`**: Web Audio — кроссфейд-петля (~0,45 с), `AnalyserNode` → canvas-пульсация в `.starfield`; low-pass при зоне чтения (`#rules`, `#pair-marathon-intro`, открытый `details.pair-story-details`); при совместном воспроизведении с роликами со звуком — `video.volume = 0.5`, музыка не останавливается; старт только по клику, `AudioContext.close()` при выключении.
-- **`mafia_sii5_ru/src/audioConstants.ts`**: ключ `mafiaShowcaseAudio` для sessionStorage (общий с витриной).
-- **`mafia_sii5_ru/src/main.ts`**: импорт константы; после синка mute — `syncShowcaseVideoVolumesForAtmosphere`; `initAtmosphereUi()` в `boot`.
-- **`mafia_sii5_ru/index.html`**: кнопка «Включить атмосферу» / «Атмосфера» с SVG-волной рядом с таймером.
-- **`mafia_sii5_ru/src/styles.css`**: `.atmosphere-visualizer`, `.atmosphere-toggle*`.
-- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
+- Коммит **`f79c0b8`** откачен в **`main`** через **`git revert`** (новый коммит **`8e6b236`**): восстановлены **`atmosphere.ts`**, **`audioConstants.ts`**, полный **`main.ts`** с инициализацией витрин/атмосферы, **`index.html`**, **`styles.css`**, **`vite.config.ts`** как до проблемного пуша.
+- Запись «убраны сетки ПАРА / панели под роликами» от **2026-04-16** отменена этим откатом (сетки и панели снова в коде).
+- Проверка: **`npm run build`** в `mafia_sii5_ru` после revert — ок.
 
 ## 2026-04-15 — mafia.sii5.ru: регламент — полный текст после трибунала
 
