@@ -43,22 +43,15 @@
   @apply absolute inset-0 overflow-hidden;
 }
 
+/* Весь кадр в области hero на всех ширинах: object-cover на широких экранах часто даёт crop в «пустоту»/тень — ощущение чёрного экрана; letterbox по краям терпим. */
 .hero-bg-layer {
-  @apply pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-[600ms] ease-in-out;
+  @apply pointer-events-none absolute inset-0 h-full w-full object-contain object-[50%_42%] opacity-0 transition-opacity duration-[600ms] ease-in-out;
   z-index: 1;
 }
 
 .hero-bg-layer.hero-bg-layer--top {
   @apply opacity-100;
   z-index: 2;
-}
-
-/* Мобильный hero: весь кадр видео в кадре (letterbox), без жёсткого crop object-cover */
-@media (max-width: 639px) {
-  .hero-bg-layer {
-    /* весь кадр в области hero (полосы по краю — тёмный фон под слоем) */
-    @apply object-contain object-[50%_42%];
-  }
 }
 
 .hero-text-band {
