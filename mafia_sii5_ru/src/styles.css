@@ -21,6 +21,13 @@
     scroll-behavior: smooth;
   }
 
+  @media (max-width: 639px) {
+    html {
+      /* плавный скролл тяжёлый на слабых телефонах */
+      scroll-behavior: auto;
+    }
+  }
+
   body {
     @apply bg-[#030308] text-[var(--color-text-main)] antialiased;
     font-family: var(--font-body);
@@ -44,6 +51,14 @@
 .hero-bg-layer.hero-bg-layer--top {
   @apply opacity-100;
   z-index: 2;
+}
+
+/* Мобильный hero: весь кадр видео в кадре (letterbox), без жёсткого crop object-cover */
+@media (max-width: 639px) {
+  .hero-bg-layer {
+    /* весь кадр в области hero (полосы по краю — тёмный фон под слоем) */
+    @apply object-contain object-[50%_42%];
+  }
 }
 
 .hero-text-band {
@@ -321,6 +336,19 @@ video.video-chromeless::-webkit-media-controls-enclosure {
 
 .rules-marathon__prose {
   @apply text-[15px] leading-relaxed text-slate-200/95 md:text-base md:leading-relaxed;
+}
+
+/* Ниже первого экрана на мобильных — откладываем отрисовку длинных блоков */
+@media (max-width: 767px) {
+  #pair-marathon-intro,
+  #showcase-1,
+  #showcase-2,
+  #judges,
+  #rules,
+  #gallery {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 900px;
+  }
 }
 
 .rules-marathon__prose p + p {

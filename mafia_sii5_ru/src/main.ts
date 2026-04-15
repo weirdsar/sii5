@@ -348,7 +348,10 @@ function initHeroBackgroundCycler(): void {
   const v1 = document.querySelector<HTMLVideoElement>('.js-hero-bg-1');
   if (!hero || !v0 || !v1) return;
 
+  const heroMobile = window.matchMedia('(max-width: 639px)').matches;
   for (const v of [v0, v1]) {
+    /* На мобильных не тянем сразу весь mp4 — меньше конкурирует с текстом и LCP. */
+    v.preload = heroMobile ? 'metadata' : 'auto';
     lockHeroVideoSilent(v);
     v.defaultPlaybackRate = HERO_PLAYBACK_RATE;
     v.playbackRate = HERO_PLAYBACK_RATE;

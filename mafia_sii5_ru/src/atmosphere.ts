@@ -1,11 +1,11 @@
 /**
- * Фоновая атмосфера: Web Audio (кроссфейд-петля), бас → canvas-пульсация,
- * low-pass при чтении регламента/текстов; микширование с видео (50%).
+ * Фоновая атмосфера: Web Audio (два трека по очереди с кроссфейдом), бас → canvas,
+ * low-pass при чтении; микширование с видео (50%).
  */
 
 import { SHOWCASE_AUDIO_STORAGE_KEY } from './audioConstants';
 
-const TRACK_URL = '/content/broken-king.mp3';
+const TRACK_URLS = ['/content/broken-king.mp3', '/content/broken-king-instrumental.mp3'] as const;
 const LOOP_OVERLAP_SEC = 0.45;
 const SCHEDULE_LOOKAHEAD_SEC = 40;
 const RESCHEDULE_INTERVAL_MS = 6000;
@@ -13,8 +13,8 @@ const RESCHEDULE_INTERVAL_MS = 6000;
 const BASS_BIN_START = 1;
 const BASS_BIN_END = 10;
 
-/** Декодированный буфер переживает закрытие AudioContext (переиспользуем при повторном «вкл»). */
-let sharedBuffer: AudioBuffer | null = null;
+/** Два декодированных буфера (переиспользуются после закрытия AudioContext). */
+let sharedBuffers: [AudioBuffer | null, AudioBuffer | null] = [null, null];
 
 let ctx: AudioContext | null = null;
 let masterGain: GainNode | null = null;
@@ -23,9 +23,15 @@ let analyser: AnalyserNode | null = null;
 let fft: Uint8Array<ArrayBuffer> | null = null;
 
 let loopTimerId: number | null = null;
+/** Индекс сегмента в бесконечной цепочке A→B→A→… */
 let nextLoopIndex = 0;
-let loopAnchor = 0;
+/** Wall time старта следующего запланированного сегмента. */
+let nextSegmentStartWall = 0;
 let playing = false;
+
+function overlapSec(dA: number, dB: number): number {
+  return Math.min(LOOP_OVERLAP_SEC, Math.min(dA, dB) * 0.12);
+}
 
 let rafId = 0;
 
@@ -141,11 +147,17 @@ function initReadModeObservers(): void {
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
-        readZoneVisible.set(e.target, e.isIntersecting && e.intersectionRatio >= 0.32);
+        const t = e.target;
+        const isRules = t.id === 'rules';
+        /* Регламент — длинная секция: при чтении видна лишь полоска, ratio маленький — порог ниже, чем у «О дуэтах». */
+        const visible = e.isIntersecting && (isRules
+          ? e.intersectionRatio >= 0.02 || e.intersectionRect.height >= 72
+          : e.intersectionRatio >= 0.32);
+        readZoneVisible.set(t, visible);
       }
       if (playing) refreshReadingFilter();
     },
-    { threshold: [0, 0.15, 0.32, 0.5, 0.75] },
+    { threshold: [0, 0.02, 0.05, 0.1, 0.15, 0.2, 0.25, 0.32, 0.5, 0.75, 1] },
   );
   if (rules) io.observe(rules);
   if (intro) io.observe(intro);
@@ -162,32 +174,39 @@ function initReadModeObservers(): void {
 }
 
 function scheduleLoopLayers(): void {
-  if (!ctx || !sharedBuffer || !masterGain || !lowpass) return;
-  const D = sharedBuffer.duration;
-  if (!Number.isFinite(D) || D < LOOP_OVERLAP_SEC * 2) return;
+  const [b0, b1] = sharedBuffers;
+  if (!ctx || !b0 || !b1 || !masterGain || !lowpass) return;
 
-  const O = Math.min(LOOP_OVERLAP_SEC, D * 0.12);
   const end = ctx.currentTime + SCHEDULE_LOOKAHEAD_SEC;
 
   while (true) {
-    const tWall = loopAnchor + nextLoopIndex * (D - O);
+    const k = nextLoopIndex;
+    const buf = k % 2 === 0 ? b0 : b1;
+    const D = buf.duration;
+    if (!Number.isFinite(D) || D < LOOP_OVERLAP_SEC * 1.5) break;
+
+    const DNext = (k % 2 === 0 ? b1 : b0).duration;
+    const OOut = overlapSec(D, DNext);
+    const prevBuf = (k - 1) % 2 === 0 ? b0 : b1;
+    const OIn = k > 0 ? overlapSec(prevBuf.duration, D) : 0;
+
+    const tWall = nextSegmentStartWall;
     if (tWall > end) break;
 
     const src = ctx.createBufferSource();
-    src.buffer = sharedBuffer;
+    src.buffer = buf;
     const g = ctx.createGain();
     src.connect(g);
     g.connect(lowpass);
 
-    const isFirst = nextLoopIndex === 0;
-    if (isFirst) {
+    if (k === 0) {
       g.gain.setValueAtTime(1, tWall);
-      g.gain.setValueAtTime(1, tWall + Math.max(0.02, D - O));
+      g.gain.setValueAtTime(1, tWall + Math.max(0.02, D - OOut));
       g.gain.linearRampToValueAtTime(0, tWall + D);
     } else {
       g.gain.setValueAtTime(0, tWall);
-      g.gain.linearRampToValueAtTime(1, tWall + O);
-      g.gain.setValueAtTime(1, tWall + Math.max(O + 0.02, D - O));
+      g.gain.linearRampToValueAtTime(1, tWall + OIn);
+      g.gain.setValueAtTime(1, tWall + Math.max(OIn + 0.02, D - OOut));
       g.gain.linearRampToValueAtTime(0, tWall + D);
     }
 
@@ -198,6 +217,7 @@ function scheduleLoopLayers(): void {
     }
 
     nextLoopIndex += 1;
+    nextSegmentStartWall = tWall + D - OOut;
   }
 }
 
@@ -226,18 +246,32 @@ export function isAtmospherePlaying(): boolean {
   return playing;
 }
 
+async function decodeOne(tmp: AudioContext, url: string): Promise<AudioBuffer | null> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const arr = await res.arrayBuffer();
+    return await tmp.decodeAudioData(arr);
+  } catch {
+    return null;
+  }
+}
+
 async function decodeIfNeeded(): Promise<boolean> {
-  if (sharedBuffer) return true;
+  if (sharedBuffers[0] && sharedBuffers[1]) return true;
   const AC = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AC) return false;
   const tmp = new AC();
   try {
-    const res = await fetch(TRACK_URL);
-    if (!res.ok) return false;
-    const arr = await res.arrayBuffer();
-    sharedBuffer = await tmp.decodeAudioData(arr);
+    const [a, b] = await Promise.all([decodeOne(tmp, TRACK_URLS[0]), decodeOne(tmp, TRACK_URLS[1])]);
+    if (!a || !b) {
+      sharedBuffers = [null, null];
+      return false;
+    }
+    sharedBuffers = [a, b];
     return true;
   } catch {
+    sharedBuffers = [null, null];
     return false;
   } finally {
     try {
@@ -250,7 +284,7 @@ async function decodeIfNeeded(): Promise<boolean> {
 
 function buildGraph(): boolean {
   const AC = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  if (!AC || !sharedBuffer) return false;
+  if (!AC || !sharedBuffers[0] || !sharedBuffers[1]) return false;
 
   ctx = new AC();
   masterGain = ctx.createGain();
@@ -274,7 +308,7 @@ function buildGraph(): boolean {
 
 export async function startAtmosphereFromUserGesture(): Promise<boolean> {
   const decoded = await decodeIfNeeded();
-  if (!decoded || !sharedBuffer) return false;
+  if (!decoded || !sharedBuffers[0] || !sharedBuffers[1]) return false;
 
   if (!ctx || ctx.state === 'closed') {
     if (!buildGraph()) return false;
@@ -286,7 +320,7 @@ export async function startAtmosphereFromUserGesture(): Promise<boolean> {
 
   playing = true;
   nextLoopIndex = 0;
-  loopAnchor = ctx!.currentTime + 0.08;
+  nextSegmentStartWall = ctx!.currentTime + 0.08;
   startLoopScheduler();
   refreshReadingFilter();
 
@@ -305,6 +339,7 @@ export function stopAtmosphere(): void {
   playing = false;
   stopLoopScheduler();
   nextLoopIndex = 0;
+  nextSegmentStartWall = 0;
   cancelAnimationFrame(rafId);
   rafId = 0;
 

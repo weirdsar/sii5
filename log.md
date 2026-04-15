@@ -2,6 +2,20 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
+## 2026-04-16 — mafia.sii5.ru: hero на мобильных, скорость, low-pass на регламенте
+
+- **`mafia_sii5_ru/src/styles.css`**: hero ≤639px — `object-contain` + `object-position`; отключён `scroll-behavior: smooth` на мобильных; `content-visibility` на длинных секциях ≤767px.
+- **`mafia_sii5_ru/src/main.ts`**: фоновые hero-ролики на мобильных `preload="metadata"`.
+- **`mafia_sii5_ru/src/atmosphere.ts`**: для `#rules` — мягкий порог чтения (ratio / высота пересечения) + больше `threshold`, чтобы low-pass держался на всём блоке регламента.
+- **`mafia_sii5_ru/vite.config.ts`**: `build.target es2020`, `cssMinify`, без отчёта размеров в логе.
+- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
+
+## 2026-04-16 — mafia.sii5.ru: атмосфера — два трека по очереди
+
+- **`mafia_sii5_ru/public/content/broken-king-instrumental.mp3`**: второй трек (Broken King Instrumental).
+- **`mafia_sii5_ru/src/atmosphere.ts`**: декод двух URL; планировщик A→B→A… с кроссфейдом `overlapSec` между соседними буферами; `nextSegmentStartWall` вместо одного `loopAnchor`.
+- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
+
 ## 2026-04-16 — mafia.sii5.ru: звук только у трибунала; кнопка атмосферы плавающая
 
 - **`mafia_sii5_ru/src/main.ts`**: витрины/пары — принудительно без звука (`enforceShowcaseClipSilent`); судьи — звук только при `judgesTribunalInView` и выборе «Звук у Трибунала»; `initJudgesTribunalViewport()`.
