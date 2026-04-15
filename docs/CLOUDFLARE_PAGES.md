@@ -149,6 +149,22 @@ npx wrangler whoami
 
 Локальные ключи в **`docs/.cloudflare.env`** по-прежнему нужны только для **Wrangler / API с вашего компьютера**, не для Actions.
 
+## Поддомен `mafia.sii5.ru` (отдельный лендинг Vite)
+
+Каталог в репозитории: **`mafia_sii5_ru/`** — лендинг марафона «Созвездие аргументов» (Vite + TypeScript + Tailwind), не связан с основным Astro-сайтом **sii5.ru**. Деплой **вторым** проектом Cloudflare Pages из того же репо **`weirdsar/sii5`**.
+
+| Поле | Значение |
+|------|----------|
+| **Root directory** (Build → Root directory) | `mafia_sii5_ru` |
+| **Build command** | **`npm ci && npm run build`** |
+| **Build output directory** | **`dist`** |
+| **Deploy command** | пусто или **`true`** — не **`npx wrangler deploy`** |
+| **Environment variables** | **`NODE_VERSION`** = **`22`** (как в корневом `package.json`) |
+
+Переменные **`PUBLIC_*`** для Astro здесь не нужны. В **Custom domains** второго проекта — **`mafia.sii5.ru`**; DNS — по мастеру Cloudflare.
+
+Заголовки безопасности: **`mafia_sii5_ru/public/_headers`** (копируется в **`dist/_headers`** при сборке).
+
 ## Netlify
 
 Файл `netlify.toml` и `netlify/functions/` можно оставить для резервного деплоя или удалить позже, когда миграция закреплена.

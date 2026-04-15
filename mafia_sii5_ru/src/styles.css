@@ -88,6 +88,13 @@
   will-change: transform;
 }
 
+/* После базового блока: на узком экране кнопка выше — не перекрывает CTA в hero */
+@media (max-width: 639px) {
+  .atmosphere-toggle-root {
+    bottom: max(5.75rem, env(safe-area-inset-bottom, 0px));
+  }
+}
+
 .atmosphere-toggle-root .atmosphere-toggle {
   pointer-events: auto;
   width: 100%;

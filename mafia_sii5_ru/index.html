@@ -30,19 +30,34 @@
     </div>
 
     <header class="relative z-10 border-b border-white/5 bg-black/30 backdrop-blur-md">
-      <div
-        class="mx-auto flex max-w-6xl flex-nowrap items-center gap-2 px-3 py-2 sm:gap-3 sm:px-4 md:px-6"
-      >
-        <span class="font-display shrink-0 text-[11px] font-bold tracking-[0.14em] text-cyan-300/95 sm:text-xs md:text-sm">
-          АРГУМЕНТ
-        </span>
-        <span class="shrink-0 text-[10px] text-white/25 sm:text-xs" aria-hidden="true">·</span>
-        <span
-          class="min-w-0 flex-1 truncate text-[11px] leading-tight text-slate-300/95 sm:text-xs md:text-sm"
-          title="Клуб «Аргумент» приглашает на главное событие сезона."
-          >Клуб «Аргумент» приглашает на главное событие сезона.</span>
-        <span class="shrink-0 text-[10px] text-white/25 sm:text-xs" aria-hidden="true">·</span>
-        <span class="shrink-0 whitespace-nowrap text-right text-[10px] leading-tight text-[var(--color-text-muted)] sm:text-xs md:text-sm">Спортивная мафия · Саратов</span>
+      <div class="mx-auto max-w-6xl px-3 py-2 sm:px-4 md:px-6">
+        <!-- Мобильная шапка: две строки, без обрезки одной линией -->
+        <div class="flex flex-col gap-1.5 sm:hidden">
+          <div class="flex items-start justify-between gap-3">
+            <span class="font-display text-[11px] font-bold tracking-[0.14em] text-cyan-300/95">АРГУМЕНТ</span>
+            <span class="max-w-[11rem] text-right text-[10px] leading-snug text-[var(--color-text-muted)]">
+              Спортивная мафия<br /><span class="text-slate-500">Саратов</span>
+            </span>
+          </div>
+          <p class="text-center text-[11px] leading-snug text-slate-300/95">
+            Клуб «Аргумент» приглашает на главное событие сезона.
+          </p>
+        </div>
+        <div
+          class="hidden max-w-none flex-nowrap items-center gap-2 sm:flex sm:gap-3"
+        >
+          <span class="font-display shrink-0 text-xs font-bold tracking-[0.14em] text-cyan-300/95 md:text-sm">
+            АРГУМЕНТ
+          </span>
+          <span class="shrink-0 text-xs text-white/25" aria-hidden="true">·</span>
+          <span
+            class="min-w-0 flex-1 truncate text-xs leading-tight text-slate-300/95 md:text-sm"
+            title="Клуб «Аргумент» приглашает на главное событие сезона."
+            >Клуб «Аргумент» приглашает на главное событие сезона.</span>
+          <span class="shrink-0 text-xs text-white/25" aria-hidden="true">·</span>
+          <span class="shrink-0 whitespace-nowrap text-right text-xs leading-tight text-[var(--color-text-muted)] md:text-sm"
+            >Спортивная мафия · Саратов</span>
+        </div>
       </div>
     </header>
 
@@ -50,7 +65,7 @@
       <!-- Hero: фон — цикл из 4 роликов (без звука, 0.8×); текст сверху и снизу -->
       <section
         id="hero"
-        class="relative isolate flex min-h-[min(100dvh,920px)] w-full flex-col overflow-hidden pb-10 pt-6 md:min-h-[min(100dvh,960px)] md:pb-16 md:pt-8"
+        class="relative isolate flex min-h-[min(92dvh,820px)] w-full flex-col overflow-hidden pb-24 pt-4 max-sm:pb-28 sm:min-h-[min(100dvh,920px)] sm:pb-10 sm:pt-6 md:min-h-[min(100dvh,960px)] md:pb-16 md:pt-8"
         aria-labelledby="hero-title"
       >
         <div
@@ -74,58 +89,58 @@
             ></video>
           </div>
           <div
-            class="absolute inset-0 bg-gradient-to-b from-black/90 via-black/25 to-black/90"
+            class="absolute inset-0 bg-gradient-to-b from-black/90 via-black/25 to-black/90 max-sm:from-black/75 max-sm:via-black/35 max-sm:to-black/85"
           ></div>
         </div>
 
         <div class="relative z-10 flex min-h-0 flex-1 flex-col">
           <!-- Верхняя строка: счётчик слева, «Когда и где» справа -->
           <div
-            class="hero-top-bar reveal pointer-events-auto mx-auto mb-4 flex w-full max-w-6xl flex-col items-stretch gap-4 px-4 sm:mb-5 sm:flex-row sm:items-start sm:justify-between md:px-6"
+            class="hero-top-bar reveal pointer-events-auto mx-auto mb-3 flex w-full max-w-6xl flex-col items-stretch gap-3 px-4 max-sm:mb-4 sm:mb-5 sm:flex-row sm:items-start sm:justify-between sm:gap-4 md:px-6"
           >
-            <div class="hero-top-bar__countdown flex min-w-0 flex-col items-start gap-2 self-start text-left">
+            <div class="hero-top-bar__countdown flex min-w-0 flex-col items-stretch gap-2 self-center text-center sm:self-start sm:text-left">
               <div
                 id="countdown"
-                class="flex flex-wrap items-stretch justify-start gap-2 md:gap-3"
+                class="grid w-full max-w-[16.5rem] grid-cols-2 justify-items-stretch gap-2 sm:flex sm:max-w-none sm:flex-wrap sm:justify-start md:gap-3"
                 role="timer"
                 aria-live="polite"
                 aria-atomic="true"
               >
                 <div
-                  class="timer-digit font-display flex min-w-[3.5rem] flex-col rounded-2xl border border-cyan-500/35 bg-black/55 px-2.5 py-2 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] md:min-w-[5.5rem] md:py-3.5"
+                  class="timer-digit font-display flex min-w-0 flex-col rounded-xl border border-cyan-500/35 bg-black/60 px-2 py-1.5 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] sm:rounded-2xl sm:px-2.5 sm:py-2 md:min-w-[5.5rem] md:py-3.5"
                 >
-                  <span id="cd-days" class="text-xl font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
+                  <span id="cd-days" class="text-lg font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
                   <span class="text-[9px] uppercase tracking-wider text-slate-300/90 sm:text-[10px]"
                     >дней</span
                   >
                 </div>
                 <div
-                  class="timer-digit font-display flex min-w-[3.5rem] flex-col rounded-2xl border border-cyan-500/35 bg-black/55 px-2.5 py-2 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] md:min-w-[5.5rem] md:py-3.5"
+                  class="timer-digit font-display flex min-w-0 flex-col rounded-xl border border-cyan-500/35 bg-black/60 px-2 py-1.5 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] sm:rounded-2xl sm:px-2.5 sm:py-2 md:min-w-[5.5rem] md:py-3.5"
                 >
-                  <span id="cd-hours" class="text-xl font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
+                  <span id="cd-hours" class="text-lg font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
                   <span class="text-[9px] uppercase tracking-wider text-slate-300/90 sm:text-[10px]"
                     >часов</span
                   >
                 </div>
                 <div
-                  class="timer-digit font-display flex min-w-[3.5rem] flex-col rounded-2xl border border-cyan-500/35 bg-black/55 px-2.5 py-2 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] md:min-w-[5.5rem] md:py-3.5"
+                  class="timer-digit font-display flex min-w-0 flex-col rounded-xl border border-cyan-500/35 bg-black/60 px-2 py-1.5 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] sm:rounded-2xl sm:px-2.5 sm:py-2 md:min-w-[5.5rem] md:py-3.5"
                 >
-                  <span id="cd-mins" class="text-xl font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
+                  <span id="cd-mins" class="text-lg font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
                   <span class="text-[9px] uppercase tracking-wider text-slate-300/90 sm:text-[10px]"
                     >мин</span
                   >
                 </div>
                 <div
-                  class="timer-digit font-display flex min-w-[3.5rem] flex-col rounded-2xl border border-cyan-500/35 bg-black/55 px-2.5 py-2 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] md:min-w-[5.5rem] md:py-3.5"
+                  class="timer-digit font-display flex min-w-0 flex-col rounded-xl border border-cyan-500/35 bg-black/60 px-2 py-1.5 text-center shadow-lg backdrop-blur-sm sm:min-w-[4rem] sm:rounded-2xl sm:px-2.5 sm:py-2 md:min-w-[5.5rem] md:py-3.5"
                 >
-                  <span id="cd-secs" class="text-xl font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
+                  <span id="cd-secs" class="text-lg font-bold text-cyan-200 sm:text-2xl md:text-4xl">00</span>
                   <span class="text-[9px] uppercase tracking-wider text-slate-300/90 sm:text-[10px]"
                     >сек</span
                   >
                 </div>
               </div>
               <p
-                class="max-w-[16rem] text-xs text-slate-200/95 drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)] sm:text-sm"
+                class="text-[11px] text-slate-200/95 drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)] sm:max-w-[16rem] sm:text-xs md:text-sm"
               >
                 До старта:
                 <time datetime="2026-04-25T12:00:00+04:00">25 апреля 2026, 12:00</time> (Саратов)
@@ -133,17 +148,17 @@
             </div>
 
             <div
-              class="hero-top-bar__where w-full max-w-xl shrink-0 self-end sm:max-w-sm sm:self-start md:max-w-md"
+              class="hero-top-bar__where w-full max-w-xl shrink-0 sm:max-w-sm sm:self-start md:max-w-md"
             >
               <div
-                class="rounded-2xl border border-white/15 bg-black/55 p-4 text-left shadow-xl backdrop-blur-md sm:p-5 md:p-6"
+                class="rounded-xl border border-white/15 bg-black/65 p-3 text-left shadow-lg backdrop-blur-md max-sm:text-[13px] sm:rounded-2xl sm:p-5 md:p-6 md:text-base"
               >
                 <h2
-                  class="font-display mb-2 text-xs font-bold uppercase tracking-widest text-violet-200/95 md:text-sm"
+                  class="font-display mb-1.5 text-[10px] font-bold uppercase tracking-widest text-violet-200/95 sm:mb-2 sm:text-xs md:text-sm"
                 >
                   Когда и где
                 </h2>
-                <ul class="space-y-2 text-sm text-slate-200/90 md:text-base">
+                <ul class="space-y-1.5 text-[13px] leading-snug text-slate-200/90 sm:space-y-2 sm:text-sm md:text-base">
                   <li>
                     <strong class="text-white">Даты:</strong> 25–26 апреля 2026
                   </li>
@@ -163,29 +178,29 @@
           </div>
 
           <div
-            class="hero-text-band reveal mx-auto w-full max-w-4xl px-4 text-center md:px-6"
+            class="hero-text-band reveal mx-auto w-full max-w-4xl px-4 pb-1 pt-1 text-center sm:pb-0 sm:pt-0 md:px-6"
           >
             <h1
               id="hero-title"
-              class="font-display mb-1 bg-gradient-to-br from-white via-cyan-100 to-violet-300 bg-clip-text text-2xl font-bold leading-tight text-transparent drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] md:mb-2 md:text-4xl lg:text-5xl"
+              class="font-display mb-0 bg-gradient-to-br from-white via-cyan-100 to-violet-300 bg-clip-text text-xl font-bold leading-snug text-transparent drop-shadow-[0_2px_14px_rgba(0,0,0,0.92)] sm:mb-1 sm:text-2xl sm:leading-tight md:mb-2 md:text-4xl lg:text-5xl"
             >
-              Марафон по спортивной мафии:<br class="hidden sm:block" />
-              Созвездие аргументов
+              <span class="block sm:inline">Марафон по спортивной мафии:</span>
+              <span class="block">Созвездие аргументов</span>
             </h1>
           </div>
 
-          <!-- Центральная зона без текста — видны персонажи на фоновом видео -->
+          <!-- Центральная зона — фоновое видео (на мобильных выше по min-height) -->
           <div
-            class="hero-spacer mx-auto min-h-[22vh] w-full max-w-5xl flex-1 md:min-h-[28vh] lg:min-h-[30vh]"
+            class="hero-spacer mx-auto min-h-[min(34vh,16rem)] w-full max-w-5xl flex-1 sm:min-h-[22vh] md:min-h-[28vh] lg:min-h-[30vh]"
             aria-hidden="true"
           ></div>
 
           <div
-            class="hero-text-band reveal mx-auto mt-auto w-full max-w-4xl px-4 pb-2 text-center md:px-6"
+            class="hero-text-band reveal mx-auto mt-auto w-full max-w-4xl px-4 pb-1 text-center max-sm:pt-1 md:px-6"
           >
-            <div class="flex justify-center">
+            <div class="flex justify-center max-sm:px-1">
               <a
-                class="font-display inline-flex min-h-[48px] min-w-[220px] items-center justify-center rounded-full border border-violet-300/50 bg-black/40 px-8 py-3 text-sm font-bold uppercase tracking-wide text-violet-100 shadow-lg backdrop-blur-sm transition hover:border-violet-200 hover:bg-violet-950/40"
+                class="font-display inline-flex min-h-[44px] w-full max-w-[min(100%,20rem)] items-center justify-center rounded-full border border-violet-300/50 bg-black/55 px-5 py-2.5 text-[11px] font-bold uppercase leading-tight tracking-wide text-violet-100 shadow-lg backdrop-blur-sm transition hover:border-violet-200 hover:bg-violet-950/40 sm:min-h-[48px] sm:w-auto sm:max-w-none sm:px-8 sm:py-3 sm:text-sm"
                 href="#rules"
                 >Ознакомиться с регламентом</a
               >

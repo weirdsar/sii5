@@ -3,7 +3,7 @@
 ## Проект
 Одностраничный/многостраничный сайт-портфолио веб-разработчика.
 Репозиторий: https://github.com/weirdsar/sii5
-Деплой: Netlify (авто-деплой из main-ветки). https://app.netlify.com/start/repos/weirdsar
+Деплой: **Cloudflare Pages** (Git → `main`, см. `docs/CLOUDFLARE_PAGES.md`). Резерв/история: Netlify.
 
 ## Стек
 - Astro v4+ (SSG, output: "static")
