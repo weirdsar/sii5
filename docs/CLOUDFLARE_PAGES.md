@@ -165,6 +165,16 @@ npx wrangler whoami
 
 Заголовки безопасности: **`mafia_sii5_ru/public/_headers`** (копируется в **`dist/_headers`** при сборке).
 
+### Зеркало на GitHub Pages (бесплатно, не Cloudflare)
+
+Workflow: **`.github/workflows/github-pages-mafia.yml`**. Сборка задаёт **`VITE_BASE=/<имя-репо>/`**, чтобы статика работала по адресу вида **`https://<user>.github.io/<repo>/`** (для репозитория **`sii5`** — **`https://weirdsar.github.io/sii5/`**).
+
+1. **GitHub** → репозиторий **`weirdsar/sii5`** → **Settings** → **Pages** → **Build and deployment** → **Source: GitHub Actions** (один раз).
+2. Пуш в **`main`** с изменениями в **`mafia_sii5_ru/`** или вручную: **Actions** → **Deploy mafia to GitHub Pages** → **Run workflow**.
+3. После зелёного job — сайт по ссылке из вкладки **Pages** (или см. **deploy → page_url** в логе job **deploy**).
+
+Локально проверить подпуть: **`VITE_BASE=/sii5/ npm run build`** и **`npx vite preview`** (в `vite.config` уже подхвачен `base`).
+
 ## Netlify
 
 Файл `netlify.toml` и `netlify/functions/` можно оставить для резервного деплоя или удалить позже, когда миграция закреплена.

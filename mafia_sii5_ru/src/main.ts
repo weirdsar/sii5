@@ -13,6 +13,7 @@ import { SHOWCASE_AUDIO_STORAGE_KEY } from './audioConstants';
 import { galleryItems, type GalleryItem } from './gallery';
 import { marathonPairIntro, pairStoryByNumber, type PairStoryContent } from './pairStories';
 import { pairsBlock1, pairsBlock2, type PairEntry } from './pairs';
+import { assetUrl } from './baseUrl';
 import './styles.css';
 
 /** 25 апреля 2026, 12:00 по Europe/Saratov (UTC+4, без DST). */
@@ -75,10 +76,10 @@ function initJudgesTribunalViewport(): void {
 
 /** Фон hero: порядок роликов, без звука, слегка замедленное воспроизведение (0.8×). */
 const HERO_BG_SEQUENCE = [
-  '/content/1-5-part1.mp4',
-  '/content/6-10-part1.mp4',
-  '/content/1-5-part2.mp4',
-  '/content/6-10-part2.mp4',
+  assetUrl('content/1-5-part1.mp4'),
+  assetUrl('content/6-10-part1.mp4'),
+  assetUrl('content/1-5-part2.mp4'),
+  assetUrl('content/6-10-part2.mp4'),
 ] as const;
 
 const HERO_PLAYBACK_RATE = 0.8;

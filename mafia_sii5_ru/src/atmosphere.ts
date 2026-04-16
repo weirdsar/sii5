@@ -4,8 +4,9 @@
  */
 
 import { SHOWCASE_AUDIO_STORAGE_KEY } from './audioConstants';
+import { assetUrl } from './baseUrl';
 
-const TRACK_URLS = ['/content/broken-king.mp3', '/content/broken-king-instrumental.mp3'] as const;
+const TRACK_URLS = [assetUrl('content/broken-king.mp3'), assetUrl('content/broken-king-instrumental.mp3')] as const;
 const LOOP_OVERLAP_SEC = 0.45;
 const SCHEDULE_LOOKAHEAD_SEC = 40;
 const RESCHEDULE_INTERVAL_MS = 6000;

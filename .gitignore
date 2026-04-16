@@ -16,6 +16,8 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.gittoken.env
+**/.gittoken.env
 .yandex.metrika.env
 /.cloudflare.env
 # Cloudflare (секреты только локально; см. docs/cloudflare-env.example)
