@@ -8,6 +8,7 @@
 - **`mafia_sii5_ru/src/baseUrl.ts`**, правки **`main.ts`**, **`atmosphere.ts`**, **`pairs.ts`**, **`gallery.ts`**, **`index.html`**: публичные URL через **`assetUrl()`** / относительные пути — иначе на `github.io/<repo>/` не грузятся видео и ассеты.
 - **`.github/workflows/github-pages-mafia.yml`**: деплой **`mafia_sii5_ru/dist`** в GitHub Pages.
 - **`docs/CLOUDFLARE_PAGES.md`**: краткая инструкция по включению Pages.
+- **`.gitignore`**: **`/.gittoken.env`** — локальные токены не в git.
 - Проверка: **`npm run build`** в **`mafia_sii5_ru`** (с `VITE_BASE` и без) — ок.
 
 ## 2026-04-16 — mafia.sii5.ru: десктоп — не «чёрный экран» в hero
