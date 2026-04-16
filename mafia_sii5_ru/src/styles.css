@@ -390,6 +390,93 @@ video.video-chromeless::-webkit-media-controls-enclosure {
   border-bottom-width: 0;
 }
 
+/* Трибунал: композиция триумвирата (центр шире на 20%) + поэтапная анимация */
+.judges-triad-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .judges-triad-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+}
+
+.judges-triad-col {
+  @apply rounded-xl border border-white/15 bg-black/40 p-4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 26px rgba(34, 211, 238, 0.08);
+}
+
+.judges-triad-trigger {
+  @apply block w-full rounded-lg border border-cyan-500/25 bg-cyan-950/20 px-3 py-2 text-left transition;
+}
+
+.judges-triad-trigger:hover {
+  @apply border-cyan-300/55 bg-cyan-900/30;
+}
+
+.judges-triad-trigger:focus-visible {
+  @apply outline-none ring-2 ring-cyan-400/60;
+}
+
+.judges-triad-trigger--chief {
+  @apply border-violet-400/35 bg-violet-950/25;
+}
+
+.judges-triad-trigger--chief:hover {
+  @apply border-violet-300/60 bg-violet-900/30;
+}
+
+.judges-triad-trigger--chief:focus-visible {
+  @apply ring-violet-300/70;
+}
+
+.judges-triad-body {
+  @apply mt-3 space-y-2 text-sm leading-relaxed text-slate-300/95;
+}
+
+.judges-triad-body blockquote {
+  @apply border-l-2 border-orange-400/45 pl-3 italic text-orange-100/90;
+}
+
+.judges-symbiosis {
+  @apply rounded-xl border border-orange-400/25 bg-gradient-to-b from-[#140a18]/85 to-[#030308]/90 p-4 md:p-5;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 24px rgba(251, 146, 60, 0.12);
+}
+
+#judges .judges-triad-col {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+#judges.is-visible .judges-triad-col--light {
+  animation: judges-triad-appear 560ms ease-out forwards;
+  animation-delay: 80ms;
+}
+
+#judges.is-visible .judges-triad-col--shadow {
+  animation: judges-triad-appear 560ms ease-out forwards;
+  animation-delay: 360ms;
+}
+
+#judges.is-visible .judges-triad-col--dream {
+  animation: judges-triad-appear 620ms ease-out forwards;
+  animation-delay: 640ms;
+}
+
+@keyframes judges-triad-appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Появление секций */
 .reveal {
   @apply translate-y-6 opacity-0 transition-all duration-700 ease-out;
@@ -493,6 +580,17 @@ video.video-chromeless::-webkit-media-controls-enclosure {
 @media (min-width: 1024px) {
   .gallery-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #judges .judges-triad-col,
+  #judges.is-visible .judges-triad-col--light,
+  #judges.is-visible .judges-triad-col--shadow,
+  #judges.is-visible .judges-triad-col--dream {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 

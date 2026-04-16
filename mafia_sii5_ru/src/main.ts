@@ -45,33 +45,71 @@ function enforceShowcaseClipSilent(v: HTMLVideoElement): void {
   v.addEventListener('playing', lock);
 }
 
-/** Порог видимости секции «Трибунал» — звук и автозапуск ролика судей. */
-const JUDGES_VISIBLE_RATIO = 0.12;
+/** Порог видимости только кадра с Judes (не всей секции #judges — иначе ролик крутится, пока на экране текст ниже). */
+const JUDGES_VIDEO_VISIBLE_RATIO = 0.18;
+const JUDGES_DEFAULT_VIDEO_SRC = assetUrl('content/Judes.mp4');
+
+let judgesDefaultLoopEnabled = true;
+
+function swapJudgesVideoSource(video: HTMLVideoElement, src: string, loop: boolean): void {
+  const normalizedCurrent = new URL(video.currentSrc || video.src, window.location.href).pathname;
+  const normalizedNext = new URL(src, window.location.href).pathname;
+  video.loop = loop;
+  if (normalizedCurrent !== normalizedNext) {
+    video.src = src;
+    video.load();
+  } else {
+    video.currentTime = 0;
+  }
+}
+
+function restoreJudgesDefaultVideo(video: HTMLVideoElement): void {
+  judgesDefaultLoopEnabled = true;
+  swapJudgesVideoSource(video, JUDGES_DEFAULT_VIDEO_SRC, true);
+  syncAllPageVideoMuteFromStorage();
+  if (judgesTribunalInView) {
+    void video.play().catch(() => {});
+  }
+}
+
+function playJudgeSpotlight(video: HTMLVideoElement, src: string): void {
+  judgesDefaultLoopEnabled = false;
+  swapJudgesVideoSource(video, src, false);
+  syncAllPageVideoMuteFromStorage();
+  void video.play().catch(() => {});
+}
 
 function initJudgesTribunalViewport(): void {
-  const sec = document.getElementById('judges');
+  const shell = document.querySelector<HTMLElement>('.judges-video-shell');
   const video = document.querySelector<HTMLVideoElement>('.js-judges-video');
-  if (!sec || !video) return;
+  if (!shell || !video) return;
 
   const io = new IntersectionObserver(
     (entries) => {
       const e = entries[entries.length - 1];
       if (!e) return;
 
-      const visible = e.isIntersecting && e.intersectionRatio > JUDGES_VISIBLE_RATIO;
+      const visible =
+        e.isIntersecting && e.intersectionRatio >= JUDGES_VIDEO_VISIBLE_RATIO;
       judgesTribunalInView = visible;
 
       syncAllPageVideoMuteFromStorage();
 
       if (visible) {
-        void video.play().catch(() => {});
+        if (judgesDefaultLoopEnabled || !video.paused) {
+          void video.play().catch(() => {});
+        }
       } else {
         video.pause();
       }
     },
-    { threshold: [0, 0.08, 0.12, 0.2, 0.35] },
+    {
+      /* Чуть «урезаем» viewport — пауза раньше, когда кадр уезжает к краю экрана. */
+      rootMargin: '-6% 0px -10% 0px',
+      threshold: [0, 0.06, 0.12, 0.18, 0.25, 0.35, 0.5, 0.75, 1],
+    },
   );
-  io.observe(sec);
+  io.observe(shell);
 }
 
 /** Фон hero: порядок роликов, без звука, слегка замедленное воспроизведение (0.8×). */
@@ -160,6 +198,7 @@ function initJudgesChromelessVideo(): void {
   const frame = document.querySelector<HTMLElement>('.js-judges-video-frame');
   const video = document.querySelector<HTMLVideoElement>('.js-judges-video');
   if (!frame || !video) return;
+  video.src = JUDGES_DEFAULT_VIDEO_SRC;
   video.controls = false;
   video.disablePictureInPicture = true;
   const toggle = (): void => {
@@ -172,6 +211,28 @@ function initJudgesChromelessVideo(): void {
       e.preventDefault();
       toggle();
     }
+  });
+
+  video.addEventListener('ended', () => {
+    if (!judgesDefaultLoopEnabled) {
+      restoreJudgesDefaultVideo(video);
+    }
+  });
+}
+
+function initJudgesSpotlightSwitch(): void {
+  const video = document.querySelector<HTMLVideoElement>('.js-judges-video');
+  if (!video) return;
+  const triggers = document.querySelectorAll<HTMLButtonElement>('.js-judge-trigger[data-judge-video]');
+  if (!triggers.length) return;
+
+  triggers.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const rel = btn.dataset.judgeVideo;
+      if (!rel) return;
+      const targetSrc = assetUrl(rel);
+      playJudgeSpotlight(video, targetSrc);
+    });
   });
 }
 
@@ -941,6 +1002,7 @@ function boot(): void {
   initVideoViewport();
   initVideoStoryBelowPanels();
   initJudgesChromelessVideo();
+  initJudgesSpotlightSwitch();
   initShowcaseAudioConsentDialog();
   initSmoothAnchors();
 

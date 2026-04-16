@@ -299,10 +299,16 @@
         <div class="mx-auto max-w-6xl px-4 md:px-6">
           <h2
             id="judges-title"
-            class="font-display mb-8 text-center text-2xl font-bold text-violet-200 md:mb-10 md:text-3xl"
+            class="font-display text-center text-lg font-bold tracking-[0.06em] text-cyan-100 md:text-xl"
           >
-            Трибунал
+            ТРИУМВИРАТ СУДЕЙ: ВЕРХОВНЫЙ СУД МАРАФОНА
           </h2>
+          <p class="mt-2 text-center text-sm text-violet-200/90 md:text-base">Единство Сна, Света и Тени</p>
+          <p class="mx-auto mb-8 mt-4 max-w-4xl text-center text-sm leading-relaxed text-slate-300/95 md:mb-10 md:text-base">
+            На марафоне «Созвездие аргументов» за порядком следят не просто люди, а воплощения фундаментальных сил.
+            Этот судейский триумвират образует «идеальный фильтр», через который не пройдёт ни одна фальшивая эмоция
+            или логическая ошибка.
+          </p>
           <div
             class="judges-video-shell overflow-hidden rounded-2xl border border-cyan-500/25 bg-black/50 shadow-[0_0_40px_rgba(34,211,238,0.12)] backdrop-blur-md"
           >
@@ -325,25 +331,112 @@
               </video>
             </div>
           </div>
-          <div
-            class="mt-6 grid grid-cols-1 gap-6 border-t border-white/10 pt-6 sm:grid-cols-3 sm:items-start sm:gap-4"
-          >
-            <div class="text-center sm:text-left">
-              <p class="font-display text-sm font-bold uppercase tracking-wide text-cyan-200 md:text-base">
-                Белый Эльф
+          <div class="judges-triad-wrap mt-8 border-t border-white/10 pt-6">
+            <div class="judges-triad-grid mt-6">
+              <article class="judges-triad-col judges-triad-col--light">
+                <button
+                  type="button"
+                  class="js-judge-trigger judges-triad-trigger"
+                  data-judge-video="content/ELF.mp4"
+                  data-judge-name="Белый Эльф"
+                  aria-label="Воспроизвести персональное видео судьи Белый Эльф"
+                >
+                  <span class="font-display text-sm font-bold uppercase tracking-wide text-cyan-200 md:text-base">
+                    1. БЕЛЫЙ ЭЛЬФ (Левое крыло)
+                  </span>
+                  <span class="mt-1 block text-xs text-cyan-100/90">Архитектор Порядка</span>
+                </button>
+                <div class="judges-triad-body">
+                  <p><strong>Стихия:</strong> Кристальный Свет и Чистая Логика.</p>
+                  <p><strong>Функция:</strong> Обеспечение безупречного соблюдения регламента.</p>
+                  <p>
+                    <strong>Сила:</strong> Его серебряный взор видит структуру каждого аргумента. Он — тот, кто
+                    превращает хаос обсуждения в выверенную математическую таблицу. Если в игре есть математическая
+                    победа, Белый Эльф увидит её первым.
+                  </p>
+                  <blockquote>«Правда не требует эмоций, она требует доказательств».</blockquote>
+                </div>
+              </article>
+
+              <article class="judges-triad-col judges-triad-col--dream">
+                <button
+                  type="button"
+                  class="js-judge-trigger judges-triad-trigger judges-triad-trigger--chief"
+                  data-judge-video="content/morf.mp4"
+                  data-judge-name="Морфейка"
+                  aria-label="Воспроизвести персональное видео главного судьи Морфейка"
+                >
+                  <span class="font-display text-base font-bold tracking-wide text-cyan-50 md:text-lg">
+                    3. МОРФЕЙКА (Центр)
+                  </span>
+                  <span class="mt-1 block text-xs font-medium text-violet-200">Главный Судья / Бог Сновидений</span>
+                </button>
+                <div class="judges-triad-body">
+                  <p><strong>Стихия:</strong> Эфир, Сны и Творящая Энергия.</p>
+                  <p><strong>Функция:</strong> Творец игровой реальности и финальный арбитр.</p>
+                  <p>
+                    <strong>Сила:</strong> Он объединяет свет Эльфа и тьму Аспида. Морфейка погружает город в
+                    «сон», создавая ту самую атмосферу мафии, где стираются границы между реальностью и ролью. Его
+                    слово — закон, его молот — точка в любом споре.
+                  </p>
+                  <blockquote>«Игра — это коллективный сон, и я решаю, когда наступит пробуждение».</blockquote>
+                </div>
+              </article>
+
+              <article class="judges-triad-col judges-triad-col--shadow">
+                <button
+                  type="button"
+                  class="js-judge-trigger judges-triad-trigger"
+                  data-judge-video="content/ASPID.mp4"
+                  data-judge-name="ASPID"
+                  aria-label="Воспроизвести персональное видео судьи ASPID"
+                >
+                  <span class="font-display text-sm font-bold uppercase tracking-wide text-cyan-200 md:text-base">
+                    2. ASPID (Правое крыло)
+                  </span>
+                  <span class="mt-1 block text-xs text-cyan-100/90">Страж Скрытой Истины</span>
+                </button>
+                <div class="judges-triad-body">
+                  <p><strong>Стихия:</strong> Тень, Коварство и Биологический инстинкт.</p>
+                  <p><strong>Функция:</strong> Распознавание лжи и психологический контроль.</p>
+                  <p>
+                    <strong>Сила:</strong> Он олицетворяет древнюю мудрость искушения. ASPID чувствует ложь на
+                    физическом уровне — по дрожанию голоса и расширенным зрачкам. Он — «детектор лжи» марафона,
+                    проверяющий игроков на прочность там, где логика бессильна.
+                  </p>
+                  <blockquote>«Змея слышит не слова, а биение твоего сердца».</blockquote>
+                </div>
+              </article>
+            </div>
+
+            <article class="judges-symbiosis mt-6">
+              <h4 class="font-display text-base font-bold uppercase tracking-[0.08em] text-orange-200 md:text-lg">
+                СИМБИОЗ: «ТРИАДА ПРАВОСУДИЯ»
+              </h4>
+              <p class="mt-3 text-sm leading-relaxed text-slate-200/95 md:text-base">
+                Когда эти три силы соединяются, возникает Симбиоз Абсолютной Объективности:
               </p>
-              <p class="mt-1 text-xs text-[var(--color-text-muted)]">Судья</p>
-            </div>
-            <div class="judges-chief text-center sm:origin-center sm:scale-[1.15]">
-              <p class="font-display text-base font-bold text-cyan-50 md:text-lg">Морфейка</p>
-              <p class="mt-1 text-xs font-medium text-violet-300">Главный судья</p>
-            </div>
-            <div class="text-center sm:text-right">
-              <p class="font-display text-sm font-bold uppercase tracking-wide text-cyan-200 md:text-base">
-                ASPID
+              <ul class="mt-3 space-y-2 text-sm leading-relaxed text-slate-300/95 md:text-base">
+                <li>
+                  <strong class="text-orange-100/95">Логический захват:</strong> Белый Эльф выстраивает факты и
+                  цифры, исключая случайные ошибки.
+                </li>
+                <li>
+                  <strong class="text-orange-100/95">Психологический рентген:</strong> ASPID выявляет скрытые мотивы
+                  и актёрскую игру, отсеивая коварство мафии.
+                </li>
+                <li>
+                  <strong class="text-orange-100/95">Божественный вердикт:</strong> Морфейка балансирует эти два
+                  потока, принимая решения, которые учитывают и букву правил, и дух игры.
+                </li>
+              </ul>
+              <p class="mt-4 text-sm leading-relaxed text-slate-200/95 md:text-base">
+                <strong class="text-orange-100/95">Итог симбиоза:</strong> участники получают игру высшей пробы.
+                Мафия не сможет спрятаться за коварством (его видит ASPID), а мирные не смогут проиграть из-за
+                глупости (логику хранит Эльф). Всё это происходит под магическим куполом Морфейки, превращая обычный
+                турнир в легендарное событие.
               </p>
-              <p class="mt-1 text-xs text-[var(--color-text-muted)]">Судья</p>
-            </div>
+            </article>
           </div>
         </div>
       </section>
