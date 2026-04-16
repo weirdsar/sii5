@@ -1,5 +1,7 @@
 # Зеркало лендинга mafia на GitHub Pages (не Cloudflare — удобнее из РФ без VPN).
-# Репозиторий: Pages → Build: GitHub Actions; первый запуск — включить в настройках.
+#
+# Обязательно один раз: https://github.com/weirdsar/sii5/settings/pages
+# → Build and deployment → Source: «GitHub Actions» (не ветка). Иначе deploy падает с 404.
 name: Deploy mafia to GitHub Pages
 
 on:
@@ -49,5 +51,11 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
 
     steps:
-      - id: deploy
-        uses: actions/deploy-pages@v4
+      - uses: actions/checkout@v4
+
+      - name: Настроить Pages (метаданные для деплоя)
+        uses: actions/configure-pages@v5
+
+      - name: Опубликовать на GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v5
