@@ -36,6 +36,9 @@ let judgesTribunalInView = false;
 
 const showcaseClipSilentLocked = new WeakSet<HTMLVideoElement>();
 
+/** Уголок: процент предзагрузки mp4 витрины (очередь + буфер текущего файла). */
+let showcasePreloadBadgeRoot: HTMLDivElement | null = null;
+
 /** Витрины и пары: только картинка, звук дорожки всегда выключен. */
 function enforceShowcaseClipSilent(v: HTMLVideoElement): void {
   v.muted = true;
@@ -600,24 +603,90 @@ function setShowcaseVideoSrcIfChanged(video: HTMLVideoElement, src: string): voi
 }
 
 /** Дождаться данных по текущему `src` (или ошибки/таймаут) — затем следующий клип в очереди. */
-function waitShowcaseVideoHasData(video: HTMLVideoElement): Promise<void> {
+function waitShowcaseVideoHasData(
+  video: HTMLVideoElement,
+  onBufferedProgress?: (loaded01: number) => void,
+): Promise<void> {
   if (video.error) return Promise.resolve();
   if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) return Promise.resolve();
   if (!video.src) return Promise.resolve();
 
   return new Promise((resolve) => {
+    const reportBuffered = (): void => {
+      if (!onBufferedProgress) return;
+      try {
+        const d = video.duration;
+        if (!Number.isFinite(d) || d <= 0) return;
+        let maxEnd = 0;
+        const buf = video.buffered;
+        for (let i = 0; i < buf.length; i += 1) {
+          maxEnd = Math.max(maxEnd, buf.end(i));
+        }
+        onBufferedProgress(Math.min(1, maxEnd / d));
+      } catch {
+        /* */
+      }
+    };
+
+    const onProgress = (): void => {
+      reportBuffered();
+    };
+
     const done = (): void => {
       video.removeEventListener('loadeddata', done);
       video.removeEventListener('canplay', done);
       video.removeEventListener('error', done);
+      video.removeEventListener('progress', onProgress);
       window.clearTimeout(timeoutId);
       resolve();
     };
     const timeoutId = window.setTimeout(done, 90_000);
+    if (onBufferedProgress) {
+      video.addEventListener('progress', onProgress, { passive: true });
+      queueMicrotask(reportBuffered);
+    }
     video.addEventListener('loadeddata', done, { once: true });
     video.addEventListener('canplay', done, { once: true });
     video.addEventListener('error', done, { once: true });
   });
+}
+
+function ensureShowcasePreloadBadge(): HTMLDivElement | null {
+  if (showcasePreloadBadgeRoot?.isConnected) return showcasePreloadBadgeRoot;
+  const root = document.createElement('div');
+  root.id = 'showcase-preload-badge';
+  root.className = 'showcase-preload-badge';
+  root.setAttribute('role', 'status');
+  root.setAttribute('aria-live', 'polite');
+  root.setAttribute('aria-atomic', 'true');
+  root.setAttribute('aria-label', 'Загрузка роликов героев, 0 процентов');
+  const title = document.createElement('span');
+  title.className = 'showcase-preload-badge__title';
+  title.textContent = 'Видео';
+  const pct = document.createElement('span');
+  pct.className = 'showcase-preload-badge__pct';
+  pct.textContent = '0%';
+  root.append(title, pct);
+  document.body.append(root);
+  showcasePreloadBadgeRoot = root;
+  return root;
+}
+
+function setShowcasePreloadBadgePercent(root: HTMLDivElement, percent: number): void {
+  const pct = Math.min(100, Math.max(0, Math.round(percent)));
+  const pctEl = root.querySelector('.showcase-preload-badge__pct');
+  if (pctEl) pctEl.textContent = `${pct}%`;
+  root.setAttribute('aria-label', `Загрузка роликов героев, ${pct} процентов`);
+  root.classList.add('showcase-preload-badge--visible');
+}
+
+function hideShowcasePreloadBadge(root: HTMLDivElement): void {
+  root.classList.remove('showcase-preload-badge--visible');
+  root.classList.add('showcase-preload-badge--hiding');
+  window.setTimeout(() => {
+    root.remove();
+    if (showcasePreloadBadgeRoot === root) showcasePreloadBadgeRoot = null;
+  }, 420);
 }
 
 type ShowcasePreloadClip = { video: HTMLVideoElement; src: string };
@@ -651,13 +720,34 @@ function collectShowcaseVideoPreloadTasks(): ShowcasePreloadClip[] {
 /** Последовательная фоновая подгрузка всех роликов героев — один «тяжёлый» клип за раз. */
 async function preloadShowcaseVideosSequentially(): Promise<void> {
   const clips = collectShowcaseVideoPreloadTasks();
-  for (const { video, src } of clips) {
-    setShowcaseVideoSrcIfChanged(video, src);
-    await waitShowcaseVideoHasData(video);
+  const total = clips.length;
+  if (total === 0) return;
+
+  const badge = ensureShowcasePreloadBadge();
+  if (!badge) return;
+
+  const paint = (completedWhole: number, buf01: number): void => {
+    const u = Math.min(1, Math.max(0, buf01));
+    setShowcasePreloadBadgePercent(badge, ((completedWhole + u) / total) * 100);
+  };
+
+  paint(0, 0);
+
+  for (let i = 0; i < clips.length; i += 1) {
+    const clip = clips[i]!;
+    paint(i, 0);
+    setShowcaseVideoSrcIfChanged(clip.video, clip.src);
+    await waitShowcaseVideoHasData(clip.video, (b01) => {
+      paint(i, b01);
+    });
+    paint(i + 1, 0);
   }
+
   queueMicrotask(() => {
     syncAllPageVideoMuteFromStorage();
     retryShowcasePlaybackForVisible();
+    setShowcasePreloadBadgePercent(badge, 100);
+    window.setTimeout(() => hideShowcasePreloadBadge(badge), 520);
   });
 }
 

@@ -225,6 +225,55 @@
   }
 }
 
+/* Прогресс предзагрузки mp4 витрины (левый верх — не пересекается с кнопкой атмосферы) */
+.showcase-preload-badge {
+  position: fixed;
+  z-index: 58;
+  top: max(0.65rem, env(safe-area-inset-top, 0px));
+  left: max(0.65rem, env(safe-area-inset-left, 0px));
+  display: flex;
+  max-width: min(46vw, 9.75rem);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  padding: 0.4rem 0.55rem 0.45rem;
+  pointer-events: none;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(167 139 250 / 0.38);
+  background: rgb(10 6 18 / 0.9);
+  box-shadow: 0 0 22px rgb(34 211 238 / 0.14);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.showcase-preload-badge--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.showcase-preload-badge--hiding {
+  opacity: 0;
+  transform: translateY(-3px);
+}
+
+.showcase-preload-badge__title {
+  @apply font-display text-[9px] font-bold uppercase tracking-[0.14em] text-violet-300/85;
+}
+
+.showcase-preload-badge__pct {
+  @apply font-display text-[15px] font-bold leading-none tracking-tight text-cyan-200 tabular-nums;
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-preload-badge {
+    transition-duration: 0.12s;
+  }
+}
+
 .starfield__dots {
   background-image: radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.35), transparent),
     radial-gradient(1px 1px at 40px 70px, rgba(167, 139, 250, 0.4), transparent),
