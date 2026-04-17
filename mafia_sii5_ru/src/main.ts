@@ -4,6 +4,7 @@ import '@fontsource/orbitron/700.css';
 
 import {
   initAtmosphereUi,
+  setAtmosphereToggleLoading,
   setAtmosphereToggleUi,
   startAtmosphereFromUserGesture,
   syncShowcaseVideoVolumesForAtmosphere,
@@ -244,9 +245,16 @@ function initShowcaseAudioConsentDialog(): void {
     syncAllPageVideoMuteFromStorage();
     dlg.close();
     /** Тот же пользовательский жест — сразу запускаем фоновый трек; кнопка остаётся выключателем. */
-    void startAtmosphereFromUserGesture().then((started) => {
+    void (async () => {
+      setAtmosphereToggleLoading(true);
+      let started = false;
+      try {
+        started = await startAtmosphereFromUserGesture();
+      } finally {
+        setAtmosphereToggleLoading(false);
+      }
       setAtmosphereToggleUi(started);
-    });
+    })();
   });
 
   mutedBtn.addEventListener('click', () => {

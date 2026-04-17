@@ -39,6 +39,9 @@ let rafId = 0;
 /** Синхронизация кнопки «Атмосфера» извне (например после выбора в диалоге звука). */
 let applyAtmosphereToggleUi: ((on: boolean) => void) | null = null;
 
+/** Ссылка на кнопку — для состояния «идёт загрузка треков» (декодирование может занять секунды). */
+let atmosphereToggleButton: HTMLButtonElement | null = null;
+
 const readZoneVisible = new WeakMap<Element, boolean>();
 
 const canvas = document.createElement('canvas');
@@ -124,12 +127,19 @@ function applyLowpassForReading(on: boolean): void {
   }
 }
 
-function anyPairStoryOpen(): boolean {
-  return document.querySelector('details.pair-story-details[open]') !== null;
+/** Низкий фильтр только если раскрытая карточка реально в зоне просмотра (не «залипание» при прокрутке вниз). */
+function anyOpenPairStoryInViewport(): boolean {
+  const vh = window.innerHeight;
+  for (const el of document.querySelectorAll<HTMLDetailsElement>('details.pair-story-details[open]')) {
+    const r = el.getBoundingClientRect();
+    const overlap = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+    if (overlap >= 96) return true;
+  }
+  return false;
 }
 
 function computeReadingFocus(): boolean {
-  if (anyPairStoryOpen()) return true;
+  if (anyOpenPairStoryInViewport()) return true;
   const rules = document.getElementById('rules');
   const intro = document.getElementById('pair-marathon-intro');
   if (rules && readZoneVisible.get(rules)) return true;
@@ -151,9 +161,10 @@ function initReadModeObservers(): void {
         const t = e.target;
         const isRules = t.id === 'rules';
         /* Регламент — длинная секция: при чтении видна лишь полоска, ratio маленький — порог ниже, чем у «О дуэтах». */
+        /* Регламент очень длинный: старые пороги давали «режим чтения» из-за узкой полоски внизу экрана. */
         const visible = e.isIntersecting && (isRules
-          ? e.intersectionRatio >= 0.02 || e.intersectionRect.height >= 72
-          : e.intersectionRatio >= 0.32);
+          ? e.intersectionRatio >= 0.1 || e.intersectionRect.height >= 220
+          : e.intersectionRatio >= 0.45);
         readZoneVisible.set(t, visible);
       }
       if (playing) refreshReadingFilter();
@@ -289,7 +300,7 @@ function buildGraph(): boolean {
 
   ctx = new AC();
   masterGain = ctx.createGain();
-  masterGain.gain.value = 0.52;
+  masterGain.gain.value = 0.78;
 
   lowpass = ctx.createBiquadFilter();
   lowpass.type = 'lowpass';
@@ -334,6 +345,22 @@ export async function startAtmosphereFromUserGesture(): Promise<boolean> {
 
 export function setAtmosphereToggleUi(on: boolean): void {
   applyAtmosphereToggleUi?.(on);
+}
+
+/** Визуальная обратная связь на время `decodeAudioData` / сети до первого звука. */
+export function setAtmosphereToggleLoading(loading: boolean): void {
+  const el = atmosphereToggleButton;
+  if (!el) return;
+  el.disabled = loading;
+  el.setAttribute('aria-busy', loading ? 'true' : 'false');
+  el.classList.toggle('atmosphere-toggle--loading', loading);
+  const label = el.querySelector('.atmosphere-toggle__label');
+  if (loading) {
+    if (label) label.textContent = 'Загрузка…';
+    el.setAttribute('aria-label', 'Загружается атмосфера, подождите');
+  } else {
+    el.removeAttribute('aria-busy');
+  }
 }
 
 export function stopAtmosphere(): void {
@@ -434,6 +461,7 @@ export function initAtmosphereUi(): void {
 
   const btn = document.getElementById('atmosphere-toggle') as HTMLButtonElement | null;
   if (!btn) return;
+  atmosphereToggleButton = btn;
 
   const setBtnState = (on: boolean): void => {
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -452,7 +480,13 @@ export function initAtmosphereUi(): void {
       setBtnState(false);
       return;
     }
-    const started = await startAtmosphereFromUserGesture();
+    setAtmosphereToggleLoading(true);
+    let started = false;
+    try {
+      started = await startAtmosphereFromUserGesture();
+    } finally {
+      setAtmosphereToggleLoading(false);
+    }
     setBtnState(started);
   });
 }

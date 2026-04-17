@@ -168,6 +168,35 @@
   animation: atmosphere-wave-pulse 0.9s ease-in-out infinite;
 }
 
+/* Первый старт: декодирование mp3 — кнопка сразу показывает отклик */
+.atmosphere-toggle--loading {
+  cursor: wait;
+  @apply border-cyan-400/50;
+  box-shadow: 0 0 32px rgba(34, 211, 238, 0.22), 0 12px 36px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.atmosphere-toggle--loading .atmosphere-toggle__label {
+  @apply text-cyan-200/95;
+}
+
+.atmosphere-toggle--loading .atmosphere-toggle__wave--1 {
+  animation: atmosphere-loading-wave 0.55s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes atmosphere-loading-wave {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scaleY(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.12);
+  }
+}
+
 @keyframes atmosphere-wave-pulse {
   0%,
   100% {
@@ -184,6 +213,11 @@
   .atmosphere-toggle--on .atmosphere-toggle__wave--1 {
     animation: none;
     opacity: 1;
+  }
+
+  .atmosphere-toggle--loading .atmosphere-toggle__wave--1 {
+    animation: none;
+    opacity: 0.88;
   }
 
   .atmosphere-toggle-root {
