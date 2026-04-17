@@ -432,7 +432,8 @@ function createDualVideoBlock(p: PairEntry): HTMLElement {
   v0.muted = true;
   v0.playsInline = true;
   v0.disablePictureInPicture = true;
-  v0.preload = 'auto';
+  /* src выставляет очередь `preloadShowcaseVideosSequentially` — не конкурируем десятью mp4 сразу. */
+  v0.preload = 'none';
   v0.setAttribute('aria-label', 'Часть 1');
 
   const v1 = document.createElement('video');
@@ -440,7 +441,7 @@ function createDualVideoBlock(p: PairEntry): HTMLElement {
   v1.muted = true;
   v1.playsInline = true;
   v1.disablePictureInPicture = true;
-  v1.preload = 'auto';
+  v1.preload = 'none';
   v1.setAttribute('aria-hidden', 'true');
   v1.setAttribute('aria-label', 'Часть 2');
 
@@ -468,7 +469,7 @@ function createSingleVideoBlock(p: PairEntry): HTMLElement {
   video.playsInline = true;
   video.disablePictureInPicture = true;
   video.loop = true;
-  video.preload = 'auto';
+  video.preload = 'none';
 
   frame.append(video);
   wrap.append(frame);
@@ -558,7 +559,87 @@ function renderPairStoriesList(rootId: string, pairs: PairEntry[]): void {
   }
 }
 
-/** Два фиксированных video: part1 / part2, кроссфейд. */
+/** Нормализованный путь — не сбрасываем буфер, если тот же файл уже в `<video>`. */
+function canonicalMediaPath(src: string): string {
+  try {
+    return new URL(src, window.location.href).pathname;
+  } catch {
+    return src;
+  }
+}
+
+/** Меняем `src` только при другом URL; `load()` не вызываем — не выкидываем уже загруженное. */
+function setShowcaseVideoSrcIfChanged(video: HTMLVideoElement, src: string): void {
+  const next = canonicalMediaPath(src);
+  const cur = video.src ? canonicalMediaPath(video.currentSrc || video.src) : '';
+  if (cur === next) return;
+  video.preload = 'auto';
+  video.src = src;
+}
+
+/** Дождаться данных по текущему `src` (или ошибки/таймаут) — затем следующий клип в очереди. */
+function waitShowcaseVideoHasData(video: HTMLVideoElement): Promise<void> {
+  if (video.error) return Promise.resolve();
+  if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) return Promise.resolve();
+  if (!video.src) return Promise.resolve();
+
+  return new Promise((resolve) => {
+    const done = (): void => {
+      video.removeEventListener('loadeddata', done);
+      video.removeEventListener('canplay', done);
+      video.removeEventListener('error', done);
+      window.clearTimeout(timeoutId);
+      resolve();
+    };
+    const timeoutId = window.setTimeout(done, 90_000);
+    video.addEventListener('loadeddata', done, { once: true });
+    video.addEventListener('canplay', done, { once: true });
+    video.addEventListener('error', done, { once: true });
+  });
+}
+
+type ShowcasePreloadClip = { video: HTMLVideoElement; src: string };
+
+/** Порядок 1…10: как карточки в `#pair-stories-*`; у пары 1 — два файла подряд. */
+function collectShowcaseVideoPreloadTasks(): ShowcasePreloadClip[] {
+  const out: ShowcasePreloadClip[] = [];
+  for (const id of ['pair-stories-1', 'pair-stories-2'] as const) {
+    const root = document.getElementById(id);
+    if (!root) continue;
+
+    root.querySelectorAll<HTMLElement>('.js-video-block').forEach((block) => {
+      if (block.classList.contains('js-video-dual')) {
+        const p1 = block.dataset.part1;
+        const p2 = block.dataset.part2;
+        const v0 = block.querySelector<HTMLVideoElement>('.js-stack-v0');
+        const v1 = block.querySelector<HTMLVideoElement>('.js-stack-v1');
+        if (p1 && p2 && v0 && v1) {
+          out.push({ video: v0, src: p1 }, { video: v1, src: p2 });
+        }
+      } else if (block.classList.contains('js-video-single')) {
+        const src = block.dataset.src;
+        const v = block.querySelector<HTMLVideoElement>('.js-single-player');
+        if (src && v) out.push({ video: v, src });
+      }
+    });
+  }
+  return out;
+}
+
+/** Последовательная фоновая подгрузка всех роликов героев — один «тяжёлый» клип за раз. */
+async function preloadShowcaseVideosSequentially(): Promise<void> {
+  const clips = collectShowcaseVideoPreloadTasks();
+  for (const { video, src } of clips) {
+    setShowcaseVideoSrcIfChanged(video, src);
+    await waitShowcaseVideoHasData(video);
+  }
+  queueMicrotask(() => {
+    syncAllPageVideoMuteFromStorage();
+    retryShowcasePlaybackForVisible();
+  });
+}
+
+/** Два фиксированных video: part1 / part2, кроссфейд (`src` подставляет очередь предзагрузки). */
 function initVideoStacks(): void {
   document.querySelectorAll<HTMLElement>('.js-video-dual').forEach((block) => {
     const p1 = block.dataset.part1;
@@ -568,11 +649,6 @@ function initVideoStacks(): void {
     const v0 = block.querySelector<HTMLVideoElement>('.js-stack-v0');
     const v1 = block.querySelector<HTMLVideoElement>('.js-stack-v1');
     if (!v0 || !v1) return;
-
-    v0.src = p1;
-    v1.src = p2;
-    v0.load();
-    v1.load();
 
     let topIs0 = true;
 
@@ -594,6 +670,7 @@ function initVideoStacks(): void {
     const playTop = (): void => {
       const top = topIs0 ? v0 : v1;
       const bottom = topIs0 ? v1 : v0;
+      if (!top.src) return;
       bottom.pause();
       enforceShowcaseClipSilent(top);
       enforceShowcaseClipSilent(bottom);
@@ -642,17 +719,16 @@ function initVideoStacks(): void {
   });
 }
 
+/** Один mp4 на карточку (`src` подставляет очередь предзагрузки). */
 function initSingleVideoPlayers(): void {
   document.querySelectorAll<HTMLElement>('.js-video-single').forEach((block) => {
     const src = block.dataset.src;
     const video = block.querySelector<HTMLVideoElement>('.js-single-player');
     if (!src || !video) return;
 
-    video.src = src;
-    video.load();
-
     viewportCtl.set(block, {
       playVisible: () => {
+        if (!video.src) return;
         enforceShowcaseClipSilent(video);
         void video.play().catch(() => {});
       },
@@ -868,6 +944,7 @@ function boot(): void {
 
   initVideoStacks();
   initSingleVideoPlayers();
+  void preloadShowcaseVideosSequentially();
   syncAllPageVideoMuteFromStorage();
   initShowcaseTapPlayPause();
   initVideoViewport();
