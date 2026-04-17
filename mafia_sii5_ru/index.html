@@ -16,8 +16,9 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ru_RU" />
     <meta property="og:url" content="https://mafia.sii5.ru/" />
-    <meta property="og:image" content="https://mafia.sii5.ru/content/1-5.png" />
+    <meta property="og:image" content="https://mafia.sii5.ru/content/hero-marathon-1-5.webp" />
     <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preload" as="image" href="content/hero-marathon-1-5.webp" fetchpriority="high" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   </head>
   <body class="min-h-screen overflow-x-hidden">
@@ -62,7 +63,7 @@
     </header>
 
     <main class="relative z-10">
-      <!-- Hero: фон — цикл из 4 роликов (без звука, 0.8×); текст сверху и снизу -->
+      <!-- Hero: фон — статичное изображение (WebP, без тяжёлых mp4); текст сверху и снизу -->
       <section
         id="hero"
         class="relative isolate flex min-h-[min(92dvh,820px)] w-full flex-col overflow-hidden pb-24 pt-4 max-sm:pb-28 sm:min-h-[min(100dvh,920px)] sm:pb-10 sm:pt-6 md:min-h-[min(100dvh,960px)] md:pb-16 md:pt-8"
@@ -74,19 +75,23 @@
           aria-hidden="true"
         >
           <div class="absolute inset-0 bg-black/35"></div>
-          <div class="hero-bg-videos absolute inset-0">
-            <video
-              class="js-hero-bg-0 hero-bg-layer hero-bg-layer--top"
-              muted
-              playsinline
-              preload="auto"
-            ></video>
-            <video
-              class="js-hero-bg-1 hero-bg-layer"
-              muted
-              playsinline
-              preload="auto"
-            ></video>
+          <div class="hero-bg-media absolute inset-0">
+            <picture>
+              <source
+                type="image/webp"
+                media="(min-width: 1024px)"
+                srcset="content/hero-marathon-6-10.webp"
+              />
+              <img
+                class="hero-bg-photo"
+                src="content/hero-marathon-1-5.webp"
+                width="1024"
+                height="558"
+                alt=""
+                decoding="async"
+                fetchpriority="high"
+              />
+            </picture>
           </div>
           <!-- Градиент как на мобильных на всех ширинах: иначе на sm+ базовые from-black/90 почти гасят кадр (ощущение «чёрного экрана»). -->
           <div

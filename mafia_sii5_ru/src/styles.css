@@ -38,20 +38,19 @@
   }
 }
 
-/* Hero: фоновый цикл видео */
-.hero-bg-videos {
+/* Hero: фон — одно изображение (раньше был цикл mp4) */
+.hero-bg-media {
   @apply absolute inset-0 overflow-hidden;
 }
 
-/* Весь кадр в области hero на всех ширинах: object-cover на широких экранах часто даёт crop в «пустоту»/тень — ощущение чёрного экрана; letterbox по краям терпим. */
-.hero-bg-layer {
-  @apply pointer-events-none absolute inset-0 h-full w-full object-contain object-[50%_42%] opacity-0 transition-opacity duration-[600ms] ease-in-out;
-  z-index: 1;
+.hero-bg-media picture {
+  @apply absolute inset-0 block h-full w-full;
 }
 
-.hero-bg-layer.hero-bg-layer--top {
-  @apply opacity-100;
-  z-index: 2;
+/* Как у старых hero-роликов: contain + смещение центра, без «чёрного экрана» от crop. */
+.hero-bg-photo {
+  @apply pointer-events-none absolute inset-0 h-full w-full object-contain object-[50%_42%];
+  z-index: 1;
 }
 
 .hero-text-band {

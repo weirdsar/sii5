@@ -2,6 +2,14 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
+## 2026-04-17 — mafia: hero — фото WebP вместо цикла видео
+
+- **`mafia_sii5_ru/index.html`**: фон первого экрана — **`<picture>`** (по умолчанию **`hero-marathon-1-5.webp`**, с **`min-width: 1024px`** — **`hero-marathon-6-10.webp`**), **`preload`** + **`fetchpriority="high"`**; **`og:image`** на тот же кадр 1–5.
+- **`mafia_sii5_ru/public/content/hero-marathon-1-5.webp`**, **`hero-marathon-6-10.webp`**: иллюстрации пар (конвертация PNG→WebP через одноразовый **`npx sharp-cli`**, без зависимостей в `package.json`).
+- **`mafia_sii5_ru/src/main.ts`**: удалены цикл hero-mp4, **`HERO_BG_SEQUENCE`**, **`initHeroBackgroundCycler`** и вспомогательные функции.
+- **`mafia_sii5_ru/src/styles.css`**: стили **`.hero-bg-media`** / **`.hero-bg-photo`** вместо слоёв video.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
 ## 2026-04-16 — mafia: видео и «огненный» текст внутри карточки пары (10 пар)
 
 - **`mafia_sii5_ru/src/main.ts`**: ролики и панель **`appendVideoStoryBelow`** перенесены в тело **`renderPairStoriesList`** (перед блоками ролей/симбиоза); убран **`renderVideoSlots`**; блоки видео без **`video-showcase-bleed`** / **`video-frame--full`**, класс обёртки **`pair-story-media`**; после раскрытия **`<details>`** — **`initPairStoryDetailsOpenVideoKick`** для старта плеера, когда контент появился в вёрстке.

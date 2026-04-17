@@ -112,16 +112,6 @@ function initJudgesTribunalViewport(): void {
   io.observe(shell);
 }
 
-/** Фон hero: порядок роликов, без звука, слегка замедленное воспроизведение (0.8×). */
-const HERO_BG_SEQUENCE = [
-  assetUrl('content/1-5-part1.mp4'),
-  assetUrl('content/6-10-part1.mp4'),
-  assetUrl('content/1-5-part2.mp4'),
-  assetUrl('content/6-10-part2.mp4'),
-] as const;
-
-const HERO_PLAYBACK_RATE = 0.8;
-
 /** Длина одного «кадра» текста под видео (~2–3 строки крупного шрифта). */
 const STORY_PANEL_SLIDE_CHAR = 106;
 
@@ -388,143 +378,6 @@ function initVideoStoryBelowPanels(): void {
     );
     io.observe(block);
   });
-}
-
-function enforceHeroPlaybackRate(v: HTMLVideoElement): void {
-  try {
-    if (Math.abs(v.playbackRate - HERO_PLAYBACK_RATE) > 0.02) {
-      v.playbackRate = HERO_PLAYBACK_RATE;
-    }
-  } catch {
-    /* редкий отказ движка */
-  }
-}
-
-/** Фоновые ролики hero — только картинка: без звука даже после жеста «со звуком» на странице. */
-function enforceHeroVideosSilent(v: HTMLVideoElement): void {
-  v.muted = true;
-  v.defaultMuted = true;
-  v.volume = 0;
-  v.setAttribute('muted', '');
-}
-
-function lockHeroVideoSilent(v: HTMLVideoElement): void {
-  const fix = (): void => {
-    enforceHeroVideosSilent(v);
-    enforceHeroPlaybackRate(v);
-  };
-  v.addEventListener('volumechange', fix);
-  v.addEventListener('playing', fix);
-  v.addEventListener('loadeddata', fix);
-  fix();
-}
-
-/** Два слоя video: кроссфейд и цикл из четырёх клипов. */
-function initHeroBackgroundCycler(): void {
-  const hero = document.getElementById('hero');
-  const v0 = document.querySelector<HTMLVideoElement>('.js-hero-bg-0');
-  const v1 = document.querySelector<HTMLVideoElement>('.js-hero-bg-1');
-  if (!hero || !v0 || !v1) return;
-
-  const heroMobile = window.matchMedia('(max-width: 639px)').matches;
-  for (const v of [v0, v1]) {
-    /* На мобильных не тянем сразу весь mp4 — меньше конкурирует с текстом и LCP. */
-    v.preload = heroMobile ? 'metadata' : 'auto';
-    lockHeroVideoSilent(v);
-    v.defaultPlaybackRate = HERO_PLAYBACK_RATE;
-    v.playbackRate = HERO_PLAYBACK_RATE;
-    v.addEventListener('loadedmetadata', () => enforceHeroPlaybackRate(v));
-    v.addEventListener('playing', () => enforceHeroPlaybackRate(v));
-    v.addEventListener('ratechange', () => enforceHeroPlaybackRate(v));
-  }
-
-  let clipOnTopIndex = 0;
-  let topIs0 = true;
-
-  const setTopLayer = (zeroOnTop: boolean): void => {
-    topIs0 = zeroOnTop;
-    if (zeroOnTop) {
-      v0.classList.add('hero-bg-layer--top');
-      v1.classList.remove('hero-bg-layer--top');
-    } else {
-      v1.classList.add('hero-bg-layer--top');
-      v0.classList.remove('hero-bg-layer--top');
-    }
-  };
-
-  const nextClipIndex = (i: number): number => (i + 1) % HERO_BG_SEQUENCE.length;
-
-  const playTop = (): void => {
-    const top = topIs0 ? v0 : v1;
-    const bottom = topIs0 ? v1 : v0;
-    bottom.pause();
-    enforceHeroVideosSilent(top);
-    enforceHeroVideosSilent(bottom);
-    enforceHeroPlaybackRate(top);
-    void top.play().catch(() => {});
-  };
-
-  const pauseAll = (): void => {
-    v0.pause();
-    v1.pause();
-  };
-
-  v0.src = HERO_BG_SEQUENCE[0];
-  v0.load();
-  setTopLayer(true);
-  clipOnTopIndex = 0;
-
-  v0.addEventListener('ended', () => {
-    if (!topIs0) return;
-    const next = nextClipIndex(clipOnTopIndex);
-    v1.src = HERO_BG_SEQUENCE[next];
-    v1.load();
-    const onPlaying = (): void => {
-      v1.removeEventListener('playing', onPlaying);
-      clipOnTopIndex = next;
-      setTopLayer(false);
-      enforceHeroPlaybackRate(v1);
-    };
-    v1.addEventListener('playing', onPlaying);
-    void v1.play().catch(() => {
-      v1.removeEventListener('playing', onPlaying);
-      clipOnTopIndex = next;
-      setTopLayer(false);
-    });
-  });
-
-  v1.addEventListener('ended', () => {
-    if (topIs0) return;
-    const next = nextClipIndex(clipOnTopIndex);
-    v0.src = HERO_BG_SEQUENCE[next];
-    v0.load();
-    const onPlaying = (): void => {
-      v0.removeEventListener('playing', onPlaying);
-      clipOnTopIndex = next;
-      setTopLayer(true);
-      enforceHeroPlaybackRate(v0);
-    };
-    v0.addEventListener('playing', onPlaying);
-    void v0.play().catch(() => {
-      v0.removeEventListener('playing', onPlaying);
-      clipOnTopIndex = next;
-      setTopLayer(true);
-    });
-  });
-
-  const io = new IntersectionObserver(
-    (entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) {
-          playTop();
-        } else {
-          pauseAll();
-        }
-      }
-    },
-    { threshold: 0.1 },
-  );
-  io.observe(hero);
 }
 
 function pad2(n: number): string {
@@ -1003,12 +856,11 @@ function initSmoothAnchors(): void {
 }
 
 function boot(): void {
-  /* 1 — глобальные обработчики: атмосфера, hero, таймер, параллакс */
+  /* 1 — глобальные обработчики: атмосфера, таймер, параллакс (фон hero — статичное WebP в HTML) */
   initAtmosphereUi();
   initJudgesTribunalViewport();
   initCountdown();
   initParallaxStarfield();
-  initHeroBackgroundCycler();
 
   /* 2 — витрины: ролики и «огненный» текст внутри раскрывающихся карточек пар */
   renderPairStoriesList('pair-stories-1', pairsBlock1);
