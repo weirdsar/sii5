@@ -10,15 +10,20 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "generate:pair-audio": "node scripts/generate-pair-audio.mjs"
+    "generate:pair-audio": "node scripts/generate-pair-audio.mjs",
+    "generate:igra-pdf": "tsx scripts/generate-igra-pdf.ts"
   },
   "dependencies": {
     "@fontsource-variable/montserrat": "^5.2.8",
     "@fontsource/orbitron": "^5.2.5"
   },
   "devDependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
     "@tailwindcss/vite": "^4.2.2",
+    "dejavu-fonts-ttf": "^2.37.3",
+    "pdf-lib": "^1.17.1",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite": "^6.3.5"
   }

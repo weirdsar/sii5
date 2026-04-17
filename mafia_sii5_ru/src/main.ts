@@ -20,6 +20,7 @@ import {
   initPairCardAudioWarmupNearGrid,
 } from './pairCardAudio';
 import { createPairShowcaseShell, initPairShowcaseHoverJs } from './pairHoverFx';
+import { initLineupSection } from './lineupUi';
 import { assetUrl } from './baseUrl';
 import './styles.css';
 
@@ -431,7 +432,10 @@ function initCountdown(): void {
 function createDualVideoBlock(p: PairEntry): HTMLElement {
   const wrap = document.createElement('div');
   wrap.className = 'pair-story-media js-video-block js-video-dual w-full';
-  wrap.setAttribute('aria-label', `Видео: пара ${p.n}, ${p.a} и ${p.b}`);
+  wrap.setAttribute(
+    'aria-label',
+    `Видео: пара ${p.n}, команда «${p.teamName}», игроки ${p.a} и ${p.b}`,
+  );
   wrap.dataset.pairN = String(p.n);
   const p1 = p.videoPart1Src!;
   const p2 = p.videoPart2Src!;
@@ -476,7 +480,10 @@ function createDualVideoBlock(p: PairEntry): HTMLElement {
 function createSingleVideoBlock(p: PairEntry): HTMLElement {
   const wrap = document.createElement('div');
   wrap.className = 'pair-story-media js-video-block js-video-single w-full';
-  wrap.setAttribute('aria-label', `Видео: пара ${p.n}, ${p.a} и ${p.b}`);
+  wrap.setAttribute(
+    'aria-label',
+    `Видео: пара ${p.n}, команда «${p.teamName}», игроки ${p.a} и ${p.b}`,
+  );
   wrap.dataset.pairN = String(p.n);
   wrap.dataset.src = p.videoSrc!;
 
@@ -549,21 +556,20 @@ function renderPairStoriesList(rootId: string, pairs: PairEntry[]): void {
     details.className = 'pair-story-details reveal';
     details.setAttribute(
       'aria-label',
-      `Пара ${p.n}: ${p.a} и ${p.b} — видео и описание ролей`,
+      `Пара ${p.n}, команда «${p.teamName}», ${p.a} и ${p.b} — видео и описание ролей`,
     );
 
     const summary = document.createElement('summary');
     summary.className = 'pair-story-summary';
     const inner = document.createElement('span');
     inner.className = 'pair-story-summary__inner';
-    const nEl = document.createElement('span');
-    nEl.className = 'pair-story-summary__n';
-    /* Без второй строки с именами — они дублировали витрину и старые карточки «ПАРА N». */
-    nEl.textContent = `Пара ${p.n}`;
-    const a11y = document.createElement('span');
-    a11y.className = 'pair-story-summary__sr';
-    a11y.textContent = `${p.a} и ${p.b}`;
-    inner.append(nEl, a11y);
+    const teamEl = document.createElement('span');
+    teamEl.className = 'pair-story-summary__team';
+    teamEl.textContent = `«${p.teamName}»`;
+    const metaEl = document.createElement('span');
+    metaEl.className = 'pair-story-summary__meta';
+    metaEl.textContent = `Пара ${p.n} · ${p.a} — ${p.b}`;
+    inner.append(teamEl, metaEl);
     summary.append(inner);
 
     const body = document.createElement('div');
@@ -1081,6 +1087,7 @@ function boot(): void {
   initShowcaseAudioConsentDialog();
   initSmoothAnchors();
 
+  initLineupSection();
   renderGallery();
   initGalleryLightbox();
 

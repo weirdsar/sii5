@@ -17,6 +17,8 @@ export type PairEntry = {
   n: number;
   a: string;
   b: string;
+  /** Публичное название команды (как в списке игроков). */
+  teamName: string;
   effectType: PairShowcaseEffect;
   /** Пары 2–10: один файл в `public/content/`. */
   videoSrc?: string;
@@ -31,6 +33,7 @@ export const pairsBlock1: PairEntry[] = [
     n: 1,
     a: 'Аделаида',
     b: 'Грейс',
+    teamName: 'Очевидно преКрасные',
     effectType: 'judges',
     videoPart1Src: assetUrl('content/para1-Adelaida-Grace.mp4'),
     videoPart2Src: assetUrl('content/para1-Adelaida-Grace-part2.mp4'),
@@ -39,6 +42,7 @@ export const pairsBlock1: PairEntry[] = [
     n: 2,
     a: 'Энергия',
     b: 'Себастьян',
+    teamName: 'Бешеный краб',
     effectType: 'flash-grid',
     videoSrc: assetUrl('content/Para2-Energia-Sebastian.mp4'),
   },
@@ -46,6 +50,7 @@ export const pairsBlock1: PairEntry[] = [
     n: 3,
     a: 'Черная лиса',
     b: 'Мечта',
+    teamName: 'Мы вообще из другой галактики',
     effectType: 'instinct-code',
     videoSrc: assetUrl('content/Para3-Lisa-Mechta.mp4'),
   },
@@ -53,6 +58,7 @@ export const pairsBlock1: PairEntry[] = [
     n: 4,
     a: 'Hexe',
     b: 'Лелия',
+    teamName: 'Авантюристки',
     effectType: 'earth-water',
     videoSrc: assetUrl('content/Para4-Hexe-Lelia.mp4'),
   },
@@ -60,6 +66,7 @@ export const pairsBlock1: PairEntry[] = [
     n: 5,
     a: 'Математик',
     b: 'Нафаня',
+    teamName: 'Мафмультсчёт',
     effectType: 'math-charm',
     videoSrc: assetUrl('content/Para5-Matematik-Nafanya.mp4'),
   },
@@ -71,6 +78,7 @@ export const pairsBlock2: PairEntry[] = [
     n: 6,
     a: 'Дичь',
     b: 'Блекджек',
+    teamName: 'Милый лжец',
     effectType: 'predator-target',
     videoSrc: assetUrl('content/Para6-Dich-BlackJack.mp4'),
   },
@@ -78,6 +86,7 @@ export const pairsBlock2: PairEntry[] = [
     n: 7,
     a: 'Колючка',
     b: 'Harley Queen',
+    teamName: '2 Полины',
     effectType: 'fortress-chaos',
     videoSrc: assetUrl('content/Para7-koluchka-harley.mp4'),
   },
@@ -85,6 +94,7 @@ export const pairsBlock2: PairEntry[] = [
     n: 8,
     a: 'Sky Lasso',
     b: 'Кот',
+    teamName: 'Узлы и Когти',
     effectType: 'wind-strings',
     videoSrc: assetUrl('content/Para8-Sky-KOT.mp4'),
   },
@@ -92,6 +102,7 @@ export const pairsBlock2: PairEntry[] = [
     n: 9,
     a: 'Сексолог',
     b: 'Микки',
+    teamName: 'Тайные мастера',
     effectType: 'mind-jester',
     videoSrc: assetUrl('content/Para9-Sexolog-Mikky.mp4'),
   },
@@ -99,6 +110,7 @@ export const pairsBlock2: PairEntry[] = [
     n: 10,
     a: 'Дарксайдер',
     b: 'GOLD',
+    teamName: 'Массаж',
     effectType: 'death-gold',
     videoSrc: assetUrl('content/para10-Darksider-Gold.mp4'),
   },

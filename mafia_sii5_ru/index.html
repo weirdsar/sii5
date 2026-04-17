@@ -204,11 +204,16 @@
           <div
             class="hero-text-band reveal mx-auto mt-auto w-full max-w-4xl px-4 pb-1 text-center max-sm:pt-1 md:px-6"
           >
-            <div class="flex justify-center max-sm:px-1">
+            <div class="flex flex-wrap items-stretch justify-center gap-3 max-sm:px-1 sm:items-center">
               <a
-                class="hero-cta-regulations font-display inline-flex min-h-[44px] w-full max-w-[min(100%,20rem)] items-center justify-center rounded-full border border-violet-300/50 bg-black/45 px-5 py-2.5 text-[11px] font-bold uppercase leading-tight tracking-wide text-violet-100 transition hover:border-violet-200 hover:bg-violet-950/40 sm:min-h-[48px] sm:w-auto sm:max-w-none sm:px-8 sm:py-3 sm:text-sm"
+                class="hero-cta-regulations font-display inline-flex min-h-[44px] w-full max-w-[min(100%,20rem)] flex-1 basis-[14rem] items-center justify-center rounded-full border border-violet-300/50 bg-black/45 px-5 py-2.5 text-[11px] font-bold uppercase leading-tight tracking-wide text-violet-100 transition hover:border-violet-200 hover:bg-violet-950/40 sm:min-h-[48px] sm:w-auto sm:max-w-none sm:flex-none sm:px-8 sm:py-3 sm:text-sm"
                 href="#rules"
                 >Ознакомиться с регламентом</a
+              >
+              <a
+                class="font-display inline-flex min-h-[44px] w-full max-w-[min(100%,20rem)] flex-1 basis-[10rem] items-center justify-center rounded-full border border-cyan-400/45 bg-black/45 px-5 py-2.5 text-[11px] font-bold uppercase leading-tight tracking-wide text-cyan-100 transition hover:border-cyan-300/60 hover:bg-cyan-950/30 sm:min-h-[48px] sm:w-auto sm:max-w-none sm:flex-none sm:px-6 sm:py-3 sm:text-sm"
+                href="#rassadka"
+                >Рассадка</a
               >
             </div>
           </div>
@@ -597,6 +602,39 @@
               </div>
             </article>
           </div>
+        </div>
+      </section>
+
+      <!-- Рассадка игроков за столом: якорь #rassadka; показ чисел — по URL (см. lineupSchedule / initLineupSection) -->
+      <section
+        id="rassadka"
+        class="reveal rassadka--table-hidden border-t border-white/5 bg-black/20 py-16 md:py-24"
+        aria-labelledby="rassadka-title"
+      >
+        <div class="mx-auto max-w-[min(100%,120rem)] px-4 md:px-6">
+          <h2
+            id="rassadka-title"
+            class="font-display mb-3 text-center text-2xl font-bold uppercase tracking-[0.08em] text-cyan-200 md:text-3xl"
+          >
+            Рассадка игроков за столом
+          </h2>
+          <p class="mx-auto mb-2 max-w-3xl text-center text-sm leading-relaxed text-[var(--color-text-muted)] md:text-[15px]">
+            Кто из пары садится на какое место за столом в каждой из 18 игр. В ячейке — номер места от 1 до 10 (таблица
+            рассадки задаётся организаторами в коде сайта). Прямая ссылка на этот блок — добавьте к адресу страницы
+            <code class="rounded bg-black/40 px-1.5 py-0.5 text-cyan-200/95">#rassadka</code>.
+          </p>
+          <div class="mx-auto mb-8 flex justify-center">
+            <button
+              type="button"
+              id="rassadka-table-toggle"
+              class="rassadka-table-toggle"
+              aria-controls="rassadka-root"
+              aria-expanded="false"
+            >
+              Показать таблицу
+            </button>
+          </div>
+          <div id="rassadka-root"></div>
         </div>
       </section>
 

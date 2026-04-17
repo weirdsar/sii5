@@ -2,6 +2,174 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
+## 2026-04-18 — mafia: `igra.pdf` в `public/` — прямая ссылка `/igra.pdf`
+
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**: вывод в **`public/igra.pdf`** и дубликат **`docs/igra.pdf`**; после **`npm run build`** файл в **`dist/igra.pdf`** (деплой: **`https://mafia.sii5.ru/igra.pdf`** при `base` `/`).
+- **`mafia_sii5_ru/docs/LINEUP.md`**, **`mafia_sii5_ru/docs/protokol.MD`**, **`mafia_sii5_ru/src/protocolPdfMaster.ts`**: описание путей.
+- Проверка: **`npm run generate:igra-pdf`**, **`npm run build`**, наличие **`dist/igra.pdf`**.
+
+## 2026-04-18 — mafia: `igra.pdf` — 18 страниц (все игры), удалён выбор одной игры
+
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**: `PDFDocument.create()`, 18× `copyPages` шаблона; на странице **`k`** поле «Игра №» = **`k`**, рассадка из **`LINEUP_SEATS[t][k−1]`**; шрифт один раз на выходном документе.
+- **`mafia_sii5_ru/src/protocolPdfMaster.ts`**: **`PROTOCOL_PDF_GAME_COUNT`**, удалён **`resolveProtocolGameNumber`**.
+- **`mafia_sii5_ru/docs/LINEUP.md`**, **`docs/protokol.MD`**, **`src/lineupPdfTeams.ts`** (комментарий).
+- Проверка: **`npm run build`**, **`npm run generate:igra-pdf`**, в PDF **18** страниц.
+
+## 2026-04-18 — mafia: PDF — зафиксировано форматирование колонки «Игрок» в мастере и LINEUP
+
+- **`mafia_sii5_ru/src/protocolPdfMaster.ts`**: `PROTOCOL_PDF_MASTER_VERSION` **2**, комментарий к **`PLAYER_COLUMN`**, флаг **`preferTeamNameSingleLineFirst`**.
+- **`mafia_sii5_ru/docs/LINEUP.md`**, **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**: отсылки к мастеру как к канону.
+- Проверка: **`npm run generate:igra-pdf`**.
+
+## 2026-04-18 — mafia: PDF протокола — мастер `protocolPdfMaster`, без `protokol.MD`
+
+- **`mafia_sii5_ru/src/protocolPdfMaster.ts`**: единственный источник координат, кеглей и строк шапки; запрет на правки без утверждения макета в комментарии файла.
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**: убран парсинг **`docs/protokol.MD`**; номер игры 1–18 — аргумент CLI или **`MAFIA_PDF_GAME_NO`**; столбец рассадки **`LINEUP_SEATS[t][игра−1]`**.
+- **`mafia_sii5_ru/docs/LINEUP.md`**, **`mafia_sii5_ru/docs/protokol.MD`**: пояснения для людей.
+- Проверка: **`npm run build`**, **`npm run generate:igra-pdf`**, **`npm run generate:igra-pdf -- 2`** — ок.
+
+## 2026-04-18 — mafia: PDF — ячейка «Игрок» двумя уровнями + парсер `protokol.MD` под новый формат
+
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**: колонка `Игрок` — мельче **`«команда»`**, перенос, крупнее **`A - B`** (пробелы вокруг дефиса); подбор пар размеров под высоту ячейки; лог консоли с фактическим номером игры (`gameNoResolved`).
+- Парсер мета: строка вида **`"ключ" = …`**; справа несколько значений в кавычках — берётся последняя непустая не-заглушка (для **`"Стол №"="  ","1"`** → стол **1**); ключи **`Стол №`**, **`Игра №`** нормализуются.
+- **`mafia_sii5_ru/docs/LINEUP.md`**: описание ячейки и правил `protokol.MD`.
+- Проверка: **`npm run generate:igra-pdf`**, **`npm run build`** — ок.
+
+## 2026-04-18 — mafia: заполнение шаблона протокола из `protokol.MD` + авторазмер текста
+
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**: чтение **`docs/protokol.MD`** (`Турнир`, `Дата`, `Стол`, `Игра №`), автоперенос и автоподбор максимального шрифта в рамках ячеек.
+- Для строк `Пара N: A — B` в колонке `Игрок` (места 1..10) добавлен fit-алгоритм: размер 6.8..11.6, до 3 строк, без выхода за рамки.
+- Перепроверка после генерации: в **`docs/igra.pdf`** найдены `Созвездие аргументов`, `25/05/2026`, `Стол=1`, `Игра=1`, строк `Пара ...` = 10.
+- **`mafia_sii5_ru/docs/LINEUP.md`**: добавлены правила заполнения из `protokol.MD` и авторазмера.
+- Проверка: **`npm run generate:igra-pdf`**, **`npm run build`** — ок.
+
+## 2026-04-18 — mafia: `igra.pdf` заполняется поверх шаблона протокола
+
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**: загрузка **`docs/Protokol_igry_odnostoronii_774_novyi_774.pdf`**, наложение `ИГРА № = 1` и строк колонки `Игрок` (места 1..10) по рассадке первой игры; структура шаблона не изменяется.
+- Перепроверка: в сгенерированном **`docs/igra.pdf`** присутствуют строки `Пара N: A — B` в порядке мест (1→10): 6, 8, 10, 3, 5, 9, 2, 7, 4, 1.
+- **`mafia_sii5_ru/docs/LINEUP.md`**: обновлено описание принципа формирования PDF по шаблону.
+- Проверка: **`npm run generate:igra-pdf`**, **`npm run build`** — ок.
+
+## 2026-04-18 — mafia: рассадка — зафиксирован принцип «первая игра как основа»
+
+- **`mafia_sii5_ru/docs/LINEUP.md`**: раздел **«Основа: первая игра (раунд 1)»** — матрица, индекс `0`, сортировка PDF по месту, наследование для игр 2…18, seed.
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**, **`src/lineupGridCore.ts`**, **`src/lineupSchedule.ts`**, **`src/lineupPdfTeams.ts`**: комментарии со ссылкой на документ.
+
+## 2026-04-18 — mafia: PDF `igra.pdf` — колонки: сначала «Место», потом «Команда, игроки»
+
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**, **`docs/LINEUP.md`**, **`docs/igra.pdf`**.
+
+## 2026-04-18 — mafia: PDF `igra.pdf` — две колонки: «команда, игроки» + место
+
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**: убраны № и Пара; одна строка **`«команда», A — B`**; заголовки **«Команда, игроки»** и **«Место»**.
+
+## 2026-04-18 — mafia: PDF `igra.pdf` — строки по номеру места (слота)
+
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**: сортировка строк по **`seat`** (игра 1) по возрастанию; **`npm run generate:igra-pdf`**.
+
+## 2026-04-18 — mafia: PDF `igra.pdf` — шрифт DejaVu Sans вместо woff2
+
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**: встраивание **`DejaVuSans.ttf`** (`dejavu-fonts-ttf`), **`subset: true`** — корректная кириллица в просмотрщиках.
+- **`package.json`**: devDependency **`dejavu-fonts-ttf`**, убран **`@fontsource/noto-sans`**.
+- **`mafia_sii5_ru/docs/LINEUP.md`**, **`docs/igra.pdf`** пересобран.
+- Проверка: **`npm run generate:igra-pdf`**, **`npm run build`** — ок.
+
+## 2026-04-17 — mafia: PDF `docs/igra.pdf` — рассадка на 1-ю игру
+
+- **`mafia_sii5_ru/src/lineupGridCore.ts`**: вынесены **`LINEUP_RANDOM_SEED`** и **`buildRandomizedSeatsGrid`** (без `pairs` / Vite).
+- **`mafia_sii5_ru/src/lineupSchedule.ts`**: **`LINEUP_SEATS`** из **`lineupGridCore`**.
+- **`mafia_sii5_ru/src/lineupPdfTeams.ts`**: подписи команд для PDF (синхронизировать с **`pairs.ts`** при смене состава).
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**, **`npm run generate:igra-pdf`**: **`pdf-lib`** + **`@pdf-lib/fontkit`**, шрифт Montserrat Cyrillic woff2, **`subset: false`** (иначе RangeError на variable font).
+- **`mafia_sii5_ru/docs/igra.pdf`**, **`mafia_sii5_ru/docs/LINEUP.md`**, **`package.json`** (devDeps **pdf-lib**, **@pdf-lib/fontkit**, **tsx**).
+- Проверка: **`npm run generate:igra-pdf`**, **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: рассадка — розовая только строка команды, столбец снова циан
+
+- **`mafia_sii5_ru/src/styles.css`**: **`lineup-col--active`** — прежний циан; пересечение со строкой — циан; розовый только у **`lineup-row--active`** (команда + ячейки строки кроме пересечения по правилу выше).
+
+## 2026-04-17 — mafia: рассадка — строка команды и столбец игры независимо, подсветка розовая
+
+- **`mafia_sii5_ru/src/lineupUi.ts`**: **`data-lineup-team`** на **`tr`** и **`th`**, класс **`lineup-row--active`**; клик/клавиатура по ячейке команды не снимает столбец.
+- **`mafia_sii5_ru/src/styles.css`**: розовые акценты для строки, столбца и пересечения; **`cursor-pointer`** и **`focus-visible`** у команды.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: рассадка — без повторного замера колонки при каждом опросе KV
+
+- **`mafia_sii5_ru/src/lineupUi.ts`**: **`scheduleTeamColMeasure`** только при переходе **скрыто → видно** (`wasHidden && visible`), чтобы опрос **`GET`** не сужал первую колонку по кругу.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: рассадка — видимость таблицы общая (KV + API), пароль на сервере
+
+- **`mafia_sii5_ru/functions/api/lineup-table-visibility.js`**: **`GET`** / **`POST`**, KV **`LINEUP_TABLE_KV`**, пароль **`LINEUP_TABLE_PANEL_PASSWORD`** или **`8888`** по умолчанию; без KV **`GET`** тоже **503**, чтобы опрос не затирал **`localStorage`**.
+- **`mafia_sii5_ru/src/lineupUi.ts`**: опрос **`GET`**, **`POST`** с паролем; fallback **`localStorage`** при недоступном API; **`assetUrl`** для пути API.
+- **`mafia_sii5_ru/src/vite-env.d.ts`**: **`VITE_LINEUP_TABLE_VISIBILITY_API`**.
+- **`mafia_sii5_ru/docs/LINEUP.md`**: настройка Cloudflare KV и пояснение про общую видимость.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: рассадка — пароль 8888 для показа/скрытия таблицы
+
+- **`mafia_sii5_ru/src/lineupUi.ts`**: **`LINEUP_TABLE_TOGGLE_PASSWORD`**, **`prompt`** перед переключением; неверный пароль — без действия.
+- **`mafia_sii5_ru/index.html`**: секция с **`rassadka--table-hidden`** по умолчанию; кнопка **«Показать таблицу»**, **`aria-expanded="false"`**.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: рассадка — кнопка показа/скрытия таблицы заметнее
+
+- **`mafia_sii5_ru/index.html`**, **`mafia_sii5_ru/src/styles.css`**: кнопка в виде «пилюли» с рамкой и свечением; подписи **«Скрыть таблицу»** / **«Показать таблицу»**.
+- **`mafia_sii5_ru/src/lineupUi.ts`**: синхронизация текста и **`title`** / **`aria-label`** с состоянием.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: рассадка — цвет шапки (номер игры) отличен от ячеек (место)
+
+- **`mafia_sii5_ru/src/styles.css`**: **`lineup-table__game`** — фиолетовый текст и лёгкий фон строки шапки; **`lineup-table__cell`** — более явный циан для чисел мест.
+
+## 2026-04-17 — mafia: рассадка — без текста про URL, едва заметная кнопка скрытия таблицы
+
+- **`mafia_sii5_ru/index.html`**: удалён блок **`rassadka-url-hint`**; кнопка **`#rassadka-table-toggle`** (точка «·») для показа/скрытия **`#rassadka-root`**.
+- **`mafia_sii5_ru/src/lineupUi.ts`**: убрана подстановка текста в подсказку; обработчик переключения класса **`rassadka--table-hidden`** на секции и повтор замера ширины колонки при показе; **`aria-label`** таблицы без упоминания параметров URL.
+- **`mafia_sii5_ru/src/styles.css`**: стили **`.rassadka-table-toggle`**, **`#rassadka.rassadka--table-hidden #rassadka-root`**.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: рассадка — первая колонка по ширине ников, выравнивание вправо
+
+- **`mafia_sii5_ru/src/lineupUi.ts`**: **`applyLineupTeamColumnWidth`** — замер **`scrollWidth`** у заголовка «Команда», названий команд и строк ников; запись в **`--lineup-team-col-w`** на обёртке; повтор после **`document.fonts.ready`**, **`resize`** (debounce) и **`ResizeObserver`** на обёртке.
+- **`mafia_sii5_ru/src/styles.css`**: угловая ячейка и **`th.lineup-table__team`** с **`width: var(--lineup-team-col-w)`**; **`text-align: right`**, **`white-space: nowrap`** для названия и ников; убраны жёсткие **`max-w`** первой колонки.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: секция «Рассадка игроков за столом» (10×18) и показ по URL
+
+- **`mafia_sii5_ru/index.html`**: блок рассадки перед галереей (позже якорь **`#rassadka`**).
+- **`mafia_sii5_ru/src/lineupSchedule.ts`**: команды из **`pairs`**, матрица **`LINEUP_SEATS`**, **`isLineupRevealedFromUrl`**.
+- **`mafia_sii5_ru/src/lineupUi.ts`**: разметка таблицы, подсказка по URL, **`initLineupSection`**.
+- **`mafia_sii5_ru/src/main.ts`**: вызов **`initLineupSection`**.
+- **`mafia_sii5_ru/src/styles.css`**, **`mafia_sii5_ru/src/vite-env.d.ts`**, **`mafia_sii5_ru/docs/LINEUP.md`**.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: якорь #rassadka и ссылка «Рассадка» в hero
+
+- **`mafia_sii5_ru/index.html`**: секция **`id="rassadka"`**, дочерние **`rassadka-title`**, **`rassadka-url-hint`**, **`rassadka-root`**; кнопка в hero на **`#rassadka`**; в тексте раздела — ссылка на якорь.
+- **`mafia_sii5_ru/src/lineupUi.ts`**, **`mafia_sii5_ru/src/styles.css`**, **`docs/LINEUP.md`**.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: рассадка — случайная матрица без закономерного шаблона
+
+- **`mafia_sii5_ru/src/lineupSchedule.ts`**: вместо арифметического шаблона — **случайные перестановки** по столбцам, много попыток на столбец + **hill-climbing** обменами в столбце; штрафы за повтор того же места у команды, подряд то же место и за полный дубликат столбца. **`LINEUP_RANDOM_SEED`** для воспроизводимости.
+- **`mafia_sii5_ru/docs/LINEUP.md`**: упоминание seed.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: термин «рассадка» вместо «раскладка»
+
+- Заголовок секции и тексты: **`index.html`**, **`lineupUi.ts`**, **`lineupSchedule.ts`**, **`styles.css`**, **`docs/LINEUP.md`**, **`vite-env.d.ts`**, **`log.md`**.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: пары — названия команд и единообразие ников
+
+- **`mafia_sii5_ru/src/pairs.ts`**: поле **`teamName`** у **`PairEntry`**, десять команд по списку игроков.
+- **`mafia_sii5_ru/src/main.ts`**: шапка аккордеона — **`«команда»`** + строка **`Пара N · A — B`**; **`aria-label`** видео и карточки с командой.
+- **`mafia_sii5_ru/src/styles.css`**: стили **`.pair-story-summary__team`** / **`__meta`** вместо старых **`__n`** / **`__sr`**.
+- **`mafia_sii5_ru/src/pairStories.ts`**: правки текста (ё, **Harley Queen** в симбиозе пары 7).
+- **`mafia_sii5_ru/players.md`**, **`public/content/pair-audio/README.md`**, **`docs/CURSOR_PROMPT_PAIRCARD_AUDIO.md`**: выравнивание с сайтом.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
 ## 2026-04-17 — mafia: бейдж процента предзагрузки витрины
 
 - **`mafia_sii5_ru/src/main.ts`**: при **`preloadShowcaseVideosSequentially`** — фиксированный бейдж «**Видео**» + **%** (очередь файлов + **`buffered`/`duration`** текущего mp4 через **`progress`**), **`aria-live`**, после **100%** — короткая пауза и скрытие.

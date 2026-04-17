@@ -503,10 +503,56 @@ video.video-chromeless::-webkit-media-controls-enclosure {
   #pair-marathon-intro,
   #judges,
   #rules,
-  #gallery {
+  #gallery,
+  #rassadka {
     content-visibility: auto;
     contain-intrinsic-size: 1px 900px;
   }
+}
+
+/* Переключатель видимости таблицы рассадки */
+.rassadka-table-toggle {
+  margin: 0;
+  min-height: 2.5rem;
+  padding: 0.45rem 1.1rem;
+  border: 1px solid rgba(34, 211, 238, 0.38);
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.65);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(165, 243, 252, 0.92);
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.08), 0 0 18px rgba(34, 211, 238, 0.12);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.rassadka-table-toggle:hover {
+  color: #ecfeff;
+  border-color: rgba(34, 211, 238, 0.55);
+  background: rgba(22, 78, 99, 0.35);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.15), 0 0 22px rgba(34, 211, 238, 0.2);
+}
+
+.rassadka-table-toggle:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(34, 211, 238, 0.55),
+    0 0 20px rgba(34, 211, 238, 0.25);
+}
+
+#rassadka.rassadka--table-hidden #rassadka-root {
+  display: none;
+}
+
+/* Якорь «Рассадка»: отступ под шапку при переходе по #rassadka */
+#rassadka {
+  scroll-margin-top: 5.5rem;
 }
 
 .rules-marathon__prose p + p {
@@ -661,16 +707,15 @@ video.video-chromeless::-webkit-media-controls-enclosure {
 }
 
 .pair-story-summary__inner {
-  @apply flex flex-row flex-wrap items-center gap-x-3 gap-y-1 pr-8;
+  @apply flex flex-col items-start gap-1 pr-8;
 }
 
-.pair-story-summary__n {
-  @apply font-display text-sm font-bold tracking-wide text-cyan-300/95;
+.pair-story-summary__team {
+  @apply font-display text-[15px] font-bold leading-snug tracking-wide text-violet-100/95 md:text-base;
 }
 
-/* Имена пары только для скринридеров — в разметке не дублируем витрину */
-.pair-story-summary__sr {
-  @apply sr-only;
+.pair-story-summary__meta {
+  @apply text-left text-[12px] font-medium leading-snug tracking-wide text-slate-400/95 md:text-[13px];
 }
 
 .pair-story-summary::after {
@@ -1448,6 +1493,102 @@ video.video-chromeless::-webkit-media-controls-enclosure {
   .pair-showcase-fx[data-effect='death-gold']:hover {
     transform: none;
   }
+}
+
+/* Рассадка за столом: широкая таблица, горизонтальный скролл; первая колонка липкая */
+.lineup-table-wrap {
+  @apply -mx-4 overflow-x-auto rounded-xl border border-white/10 bg-[var(--color-space-card)]/35 px-2 pb-2 pt-1 md:mx-0 md:px-3;
+  /* до первого замера в JS — запасная ширина первой колонки */
+  --lineup-team-col-w: 12rem;
+}
+
+.lineup-table {
+  @apply w-max min-w-full border-collapse text-left text-sm;
+}
+
+.lineup-table__corner {
+  @apply sticky left-0 z-[2] border-b border-r border-white/10 bg-[#0c0814]/95 px-2 py-2 text-xs font-bold uppercase tracking-wider text-violet-200/90 backdrop-blur-sm md:px-3 md:text-[13px];
+  box-sizing: border-box;
+  width: var(--lineup-team-col-w);
+  min-width: 10.5rem;
+  text-align: right;
+}
+
+/* Номер игры в шапке — другой оттенок, чтобы не сливался с номерами мест в ячейках */
+.lineup-table__game {
+  @apply min-w-[2.25rem] border-b border-white/10 bg-[#0c0814]/55 px-1 py-2 text-center text-xs font-bold tabular-nums text-violet-200/95 md:min-w-[2.5rem] md:px-1.5 md:text-sm;
+}
+
+.lineup-table__team {
+  @apply sticky left-0 z-[1] cursor-pointer border-b border-r border-white/10 bg-[#0a0612]/95 px-2 py-2 align-top backdrop-blur-sm md:px-3;
+  box-sizing: border-box;
+  width: var(--lineup-team-col-w);
+  min-width: 10.5rem;
+  text-align: right;
+  vertical-align: top;
+}
+
+.lineup-table__team-name {
+  @apply block w-full font-display text-[11px] font-bold leading-snug tracking-wide text-violet-100/95 md:text-xs;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.lineup-table__team-nicks {
+  @apply mt-0.5 block w-full text-[11px] leading-snug text-slate-400/95 md:text-[12px];
+  text-align: right;
+  white-space: nowrap;
+}
+
+.lineup-table__cell {
+  @apply border-b border-white/10 px-1 py-2 text-center text-sm font-semibold tabular-nums text-cyan-300/95 md:text-base;
+}
+
+.lineup-table__cell--masked {
+  @apply text-slate-600/80;
+}
+
+/* Выбранная команда (строка): розовая подсветка по всем играм; независима от столбца */
+.lineup-table tbody tr.lineup-row--active .lineup-table__team {
+  z-index: 3;
+  background: rgba(244, 63, 94, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(251, 113, 133, 0.55);
+}
+
+.lineup-table tbody tr.lineup-row--active .lineup-table__cell {
+  background: rgba(244, 63, 94, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(251, 113, 133, 0.38);
+}
+
+/* Выбранный столбец (игра): прежний циан по всем командам */
+.lineup-table__game.lineup-col--active,
+.lineup-table__cell.lineup-col--active {
+  background: rgba(34, 211, 238, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.42);
+}
+
+/* Пересечение: цвет столбца (циан), не розовый */
+.lineup-table tbody tr.lineup-row--active .lineup-table__cell.lineup-col--active {
+  background: rgba(34, 211, 238, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.42);
+}
+
+.lineup-table thead .lineup-table__game {
+  cursor: pointer;
+}
+
+.lineup-table tbody .lineup-table__cell[data-lineup-game] {
+  cursor: pointer;
+}
+
+.lineup-table__game.lineup-col--active:focus-visible {
+  outline: 2px solid rgba(34, 211, 238, 0.75);
+  outline-offset: 1px;
+}
+
+.lineup-table__team:focus-visible {
+  outline: 2px solid rgba(251, 113, 133, 0.75);
+  outline-offset: 1px;
 }
 
 /* Фотогалерея */
