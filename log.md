@@ -2,6 +2,12 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
+## 2026-04-17 — mafia: витрина — видео «на паузе» (IO + content-visibility)
+
+- **`mafia_sii5_ru/src/styles.css`**: из **`content-visibility: auto`** на мобильных убраны **`#showcase-1`** и **`#showcase-2`** — иначе пересечение для вложенных **`.js-video-block`** не срабатывало, **`playVisible`** не вызывался.
+- **`mafia_sii5_ru/src/main.ts`**: у **IntersectionObserver** витрины — пороги с **`0`**, видимость **`isIntersecting || intersectionRatio > 0`**, после **`observe`** — **`requestAnimationFrame` → `retryShowcasePlaybackForVisible`**; при открытии **`details`** — **двойной rAF** перед **`playVisible`**.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
 ## 2026-04-17 — mafia: кнопка атмосферы — состояние загрузки до старта звука
 
 - **`mafia_sii5_ru/src/atmosphere.ts`**: **`setAtmosphereToggleLoading`**, при первом включении — **`aria-busy`**, **`disabled`**, подпись **«Загрузка…»**, класс **`atmosphere-toggle--loading`** на время **`startAtmosphereFromUserGesture`**.

@@ -770,17 +770,23 @@ function initVideoViewport(): void {
       for (const entry of entries) {
         const ctl = viewportCtl.get(entry.target as HTMLElement);
         if (!ctl) continue;
-        if (entry.isIntersecting) {
+        /* Порог 0 — надёжный первый колбэк при малой видимости; без «0» на части движков
+         * с одним threshold ловили «тишину» после content-visibility / раскрытия details. */
+        const visible = entry.isIntersecting || entry.intersectionRatio > 0;
+        if (visible) {
           ctl.playVisible();
         } else {
           ctl.pauseAll();
         }
       }
     },
-    { root: null, threshold: 0.15 },
+    { root: null, threshold: [0, 0.08, 0.15, 0.3, 0.5, 0.75, 1] },
   );
 
   blocks.forEach((b) => observer.observe(b));
+  requestAnimationFrame(() => {
+    retryShowcasePlaybackForVisible();
+  });
 }
 
 /** Раскрытие `<details>` вынимает контент из «схлопнутого» слота — даём плееру шанс стартовать до срабатывания IO. */
@@ -788,15 +794,18 @@ function initPairStoryDetailsOpenVideoKick(): void {
   document.querySelectorAll<HTMLDetailsElement>('.pair-story-details').forEach((details) => {
     details.addEventListener('toggle', () => {
       if (!details.open) return;
+      /* Двойной rAF: после раскрытия details сначала отрабатывает layout, иначе rect/IO ещё «старые». */
       requestAnimationFrame(() => {
-        details.querySelectorAll<HTMLElement>('.js-video-block').forEach((block) => {
-          const ctl = viewportCtl.get(block);
-          if (!ctl) return;
-          const r = block.getBoundingClientRect();
-          const vw = window.innerWidth || document.documentElement.clientWidth;
-          const vh = window.innerHeight || document.documentElement.clientHeight;
-          const visible = r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw;
-          if (visible) ctl.playVisible();
+        requestAnimationFrame(() => {
+          details.querySelectorAll<HTMLElement>('.js-video-block').forEach((block) => {
+            const ctl = viewportCtl.get(block);
+            if (!ctl) return;
+            const r = block.getBoundingClientRect();
+            const vw = window.innerWidth || document.documentElement.clientWidth;
+            const vh = window.innerHeight || document.documentElement.clientHeight;
+            const visible = r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw;
+            if (visible) ctl.playVisible();
+          });
         });
       });
     });

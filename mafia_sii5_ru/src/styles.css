@@ -447,11 +447,11 @@ video.video-chromeless::-webkit-media-controls-enclosure {
   @apply text-[15px] leading-relaxed text-slate-200/95 md:text-base md:leading-relaxed;
 }
 
-/* Ниже первого экрана на мобильных — откладываем отрисовку длинных блоков */
+/* Ниже первого экрана на мобильных — откладываем отрисовку длинных блоков.
+ * Витрины (#showcase-1/2) не включаем: `content-visibility: auto` на секции ломает
+ * IntersectionObserver для `.js-video-block` внутри — видео остаются на паузе. */
 @media (max-width: 767px) {
   #pair-marathon-intro,
-  #showcase-1,
-  #showcase-2,
   #judges,
   #rules,
   #gallery {
