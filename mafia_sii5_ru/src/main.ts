@@ -328,9 +328,11 @@ function slidesForPairStory(story: PairStoryContent, maxLen: number = STORY_PANE
 }
 
 /** Панель с «огненным» текстом под роликом (читаемее, чем поверх кадра). */
-function appendVideoStoryBelow(wrap: HTMLElement): void {
+function appendVideoStoryBelow(wrap: HTMLElement, embedInAccordion = false): void {
   const panel = document.createElement('div');
-  panel.className = 'video-story-below';
+  panel.className = embedInAccordion
+    ? 'video-story-below video-story-below--embed'
+    : 'video-story-below';
   panel.setAttribute('aria-live', 'polite');
   panel.setAttribute('aria-atomic', 'true');
   const textEl = document.createElement('p');
@@ -558,7 +560,7 @@ function initCountdown(): void {
 
 function createDualVideoBlock(p: PairEntry): HTMLElement {
   const wrap = document.createElement('div');
-  wrap.className = 'js-video-block js-video-dual video-showcase-bleed mb-10 w-full';
+  wrap.className = 'pair-story-media js-video-block js-video-dual w-full';
   wrap.setAttribute('aria-label', `Видео: пара ${p.n}, ${p.a} и ${p.b}`);
   wrap.dataset.pairN = String(p.n);
   const p1 = p.videoPart1Src!;
@@ -568,7 +570,7 @@ function createDualVideoBlock(p: PairEntry): HTMLElement {
 
   const frame = document.createElement('div');
   frame.className =
-    'video-frame video-frame--full video-chromeless-frame aspect-video max-h-[85vh] w-full cursor-pointer bg-black outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50';
+    'video-frame video-chromeless-frame aspect-video max-h-[min(72vh,92vw)] w-full cursor-pointer rounded-xl bg-black outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50';
   const inner = document.createElement('div');
   inner.className = 'video-stack-inner';
 
@@ -592,20 +594,20 @@ function createDualVideoBlock(p: PairEntry): HTMLElement {
   inner.append(v0, v1);
   frame.append(inner);
   wrap.append(frame);
-  appendVideoStoryBelow(wrap);
+  appendVideoStoryBelow(wrap, true);
   return wrap;
 }
 
 function createSingleVideoBlock(p: PairEntry): HTMLElement {
   const wrap = document.createElement('div');
-  wrap.className = 'js-video-block js-video-single video-showcase-bleed mb-10 w-full';
+  wrap.className = 'pair-story-media js-video-block js-video-single w-full';
   wrap.setAttribute('aria-label', `Видео: пара ${p.n}, ${p.a} и ${p.b}`);
   wrap.dataset.pairN = String(p.n);
   wrap.dataset.src = p.videoSrc!;
 
   const frame = document.createElement('div');
   frame.className =
-    'video-frame video-frame--full video-chromeless-frame aspect-video max-h-[85vh] w-full cursor-pointer bg-black outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50';
+    'video-frame video-chromeless-frame aspect-video max-h-[min(72vh,92vw)] w-full cursor-pointer rounded-xl bg-black outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50';
 
   const video = document.createElement('video');
   video.className = 'js-single-player video-chromeless h-full w-full bg-black object-contain';
@@ -617,21 +619,8 @@ function createSingleVideoBlock(p: PairEntry): HTMLElement {
 
   frame.append(video);
   wrap.append(frame);
-  appendVideoStoryBelow(wrap);
+  appendVideoStoryBelow(wrap, true);
   return wrap;
-}
-
-/** Рендер цепочки роликов по данным пар (пара 1 — два файла; остальные — по одному). */
-function renderVideoSlots(container: HTMLElement | null, pairs: PairEntry[]): void {
-  if (!container) return;
-  container.replaceChildren();
-  for (const p of pairs) {
-    if (p.videoPart1Src && p.videoPart2Src) {
-      container.append(createDualVideoBlock(p));
-    } else if (p.videoSrc) {
-      container.append(createSingleVideoBlock(p));
-    }
-  }
 }
 
 function renderMarathonIntro(): void {
@@ -667,7 +656,7 @@ function appendPairStorySynergy(parent: HTMLElement, text: string): void {
   parent.append(wrap);
 }
 
-/** Аккордеон с ролями и симбиозом под витриной (после роликов пар). */
+/** Аккордеон пары: видео + «огненный» текст под роликом + роли и симбиоз. */
 function renderPairStoriesList(rootId: string, pairs: PairEntry[]): void {
   const root = document.getElementById(rootId);
   if (!root) return;
@@ -679,7 +668,10 @@ function renderPairStoriesList(rootId: string, pairs: PairEntry[]): void {
 
     const details = document.createElement('details');
     details.className = 'pair-story-details reveal';
-    details.setAttribute('aria-label', `Описание пары ${p.n}: ${p.a} и ${p.b}`);
+    details.setAttribute(
+      'aria-label',
+      `Пара ${p.n}: ${p.a} и ${p.b} — видео и описание ролей`,
+    );
 
     const summary = document.createElement('summary');
     summary.className = 'pair-story-summary';
@@ -697,6 +689,13 @@ function renderPairStoriesList(rootId: string, pairs: PairEntry[]): void {
 
     const body = document.createElement('div');
     body.className = 'pair-story-body';
+
+    if (p.videoPart1Src && p.videoPart2Src) {
+      body.append(createDualVideoBlock(p));
+    } else if (p.videoSrc) {
+      body.append(createSingleVideoBlock(p));
+    }
+
     appendPairStoryChar(body, story.charATitle, story.charAText);
     appendPairStoryChar(body, story.charBTitle, story.charBText);
     appendPairStorySynergy(body, story.synergy);
@@ -831,6 +830,26 @@ function initVideoViewport(): void {
   );
 
   blocks.forEach((b) => observer.observe(b));
+}
+
+/** Раскрытие `<details>` вынимает контент из «схлопнутого» слота — даём плееру шанс стартовать до срабатывания IO. */
+function initPairStoryDetailsOpenVideoKick(): void {
+  document.querySelectorAll<HTMLDetailsElement>('.pair-story-details').forEach((details) => {
+    details.addEventListener('toggle', () => {
+      if (!details.open) return;
+      requestAnimationFrame(() => {
+        details.querySelectorAll<HTMLElement>('.js-video-block').forEach((block) => {
+          const ctl = viewportCtl.get(block);
+          if (!ctl) return;
+          const r = block.getBoundingClientRect();
+          const vw = window.innerWidth || document.documentElement.clientWidth;
+          const vh = window.innerHeight || document.documentElement.clientHeight;
+          const visible = r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw;
+          if (visible) ctl.playVisible();
+        });
+      });
+    });
+  });
 }
 
 function initParallaxStarfield(): void {
@@ -991,15 +1010,16 @@ function boot(): void {
   initParallaxStarfield();
   initHeroBackgroundCycler();
 
-  /* 2 — витрины: ролики пар + панели текста под роликом (отдельно от аккордеона «Герои и симбиозы») */
-  renderVideoSlots(document.getElementById('videos-showcase-1'), pairsBlock1);
-  renderVideoSlots(document.getElementById('videos-showcase-2'), pairsBlock2);
+  /* 2 — витрины: ролики и «огненный» текст внутри раскрывающихся карточек пар */
+  renderPairStoriesList('pair-stories-1', pairsBlock1);
+  renderPairStoriesList('pair-stories-2', pairsBlock2);
 
   initVideoStacks();
   initSingleVideoPlayers();
   syncAllPageVideoMuteFromStorage();
   initShowcaseTapPlayPause();
   initVideoViewport();
+  initPairStoryDetailsOpenVideoKick();
   initVideoStoryBelowPanels();
   initJudgesChromelessVideo();
   initJudgesSpotlightSwitch();
@@ -1009,11 +1029,8 @@ function boot(): void {
   renderGallery();
   initGalleryLightbox();
 
-  /* 3 — тексты: вступление о дуэтах + аккордеоны ролей/симбиоза */
+  /* 3 — вступление о дуэтах */
   renderMarathonIntro();
-
-  renderPairStoriesList('pair-stories-1', pairsBlock1);
-  renderPairStoriesList('pair-stories-2', pairsBlock2);
 
   /* 4 — появление секций при скролле */
   initReveal();

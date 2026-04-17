@@ -243,6 +243,22 @@ video.video-chromeless::-webkit-media-controls-enclosure {
   }
 }
 
+/* Внутри аккордеона пар — не full-bleed: боковая рамка панели на узком экране */
+.video-story-below.video-story-below--embed {
+  @apply rounded-xl border-x border-orange-400/25;
+}
+
+@media (max-width: 639px) {
+  .video-story-below.video-story-below--embed {
+    border-left-width: 1px;
+    border-right-width: 1px;
+  }
+}
+
+.pair-story-media {
+  @apply mb-1 w-full max-w-full;
+}
+
 .video-story-below__text {
   margin: 0 auto;
   max-width: 44rem;
