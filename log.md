@@ -2,6 +2,12 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
+## 2026-04-18 — mafia: `igra.pdf` — 19-я страница чистый бланк
+
+- **`mafia_sii5_ru/src/protocolPdfMaster.ts`**: **`PROTOCOL_PDF_BLANK_TAIL_SHEETS`**, версия мастера **3**.
+- **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**, **`docs/LINEUP.md`**, **`docs/protokol.MD`**.
+- Проверка: **`npm run generate:igra-pdf`**, в PDF **19** страниц.
+
 ## 2026-04-18 — mafia: `igra.pdf` в `public/` — прямая ссылка `/igra.pdf`
 
 - **`mafia_sii5_ru/scripts/generate-igra-pdf.ts`**: вывод в **`public/igra.pdf`** и дубликат **`docs/igra.pdf`**; после **`npm run build`** файл в **`dist/igra.pdf`** (деплой: **`https://mafia.sii5.ru/igra.pdf`** при `base` `/`).

@@ -1,7 +1,7 @@
 /**
  * Сборка **`public/igra.pdf`** (прямая ссылка на сайте: **`/igra.pdf`**) и копия в **`docs/igra.pdf`**.
- * **18 страниц** — по одному листу на каждую игру 1…18 (колонки матрицы рассадки).
- * База: `docs/Protokol_igry_odnostoronii_774_novyi_774.pdf` (одна страница копируется 18 раз).
+ * **19 страниц**: 18 листов с рассадкой (игры 1…18) + 1 чистый бланк шаблона в конце.
+ * База: `docs/Protokol_igry_odnostoronii_774_novyi_774.pdf` (страница шаблона копируется для каждого листа).
  *
  * Все координаты и типографика — **`src/protocolPdfMaster.ts`** (мастер).
  * Скрипт не читает `docs/protokol.MD`. Меняются только данные пар / рассадки (та же матрица, что на сайте).
@@ -23,6 +23,7 @@ import {
   HEADER_BODY_RGB,
   HEADER_TEXT,
   PLAYER_COLUMN,
+  PROTOCOL_PDF_BLANK_TAIL_SHEETS,
   PROTOCOL_PDF_GAME_COUNT,
   TABLE_NO_FIELD,
   TOURNAMENT_FIELD,
@@ -385,12 +386,17 @@ async function main(): Promise<void> {
     fillOneGamePage(page, font, pageW, gameColIndex, grid, bodyColor, cellDims, uniformTeamSmall);
   }
 
+  for (let b = 0; b < PROTOCOL_PDF_BLANK_TAIL_SHEETS; b += 1) {
+    const [blank] = await outPdf.copyPages(templatePdf, [templatePageIndex]);
+    outPdf.addPage(blank);
+  }
+
   const bytes = await outPdf.save();
   await writeFile(outPathPublic, bytes);
   await writeFile(outPathDocs, bytes);
   // eslint-disable-next-line no-console -- служебный скрипт
   console.log(
-    `Записано: ${outPathPublic} и ${outPathDocs} (${bytes.byteLength} байт), страниц: ${PROTOCOL_PDF_GAME_COUNT}, seed 0x${LINEUP_RANDOM_SEED.toString(16)}`,
+    `Записано: ${outPathPublic} и ${outPathDocs} (${bytes.byteLength} байт), страниц: ${PROTOCOL_PDF_GAME_COUNT + PROTOCOL_PDF_BLANK_TAIL_SHEETS} (игр ${PROTOCOL_PDF_GAME_COUNT} + чистых ${PROTOCOL_PDF_BLANK_TAIL_SHEETS}), seed 0x${LINEUP_RANDOM_SEED.toString(16)}`,
   );
 }
 

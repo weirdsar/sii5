@@ -7,17 +7,20 @@
  * Разрешено менять только данные вне этого файла:
  * - состав и подписи пар (рассадка / `lineupPdfTeams.ts` и связанные данные).
  *
- * Файл **`public/igra.pdf`** (деплой: **`/igra.pdf`**): **18 страниц** (игры 1…18), каждая — копия печатного шаблона + наложение; порядок страниц = порядку игр.
+ * Файл **`public/igra.pdf`** (деплой: **`/igra.pdf`**): **18 листов с рассадкой** (игры 1…18) + **`PROTOCOL_PDF_BLANK_TAIL_SHEETS`** чистый бланк шаблона в конце без наложения текста.
  */
 
 /**
  * Версия макета наложения. Менять при любом **утверждённом** изменении геометрии/типографики PDF;
  * согласовать с описанием в `docs/LINEUP.md` (раздел про `igra.pdf`).
  */
-export const PROTOCOL_PDF_MASTER_VERSION = '2' as const;
+export const PROTOCOL_PDF_MASTER_VERSION = '3' as const;
 
-/** Сколько игр / листов в одном `igra.pdf` (как столбцов в матрице рассадки). */
+/** Сколько игр с заполненной рассадкой (= столбцов матрицы `LINEUP_SEATS`). */
 export const PROTOCOL_PDF_GAME_COUNT = 18 as const;
+
+/** В конце `igra.pdf` — столько чистых листов (только печатный шаблон, без программного текста). */
+export const PROTOCOL_PDF_BLANK_TAIL_SHEETS = 1 as const;
 
 /** Тексты шапки (не из `protokol.MD`). */
 export const HEADER_TEXT = {

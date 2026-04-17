@@ -1,4 +1,4 @@
-<!-- PDF: 18 страниц (игры 1–18), `public/igra.pdf` → на сайте /igra.pdf; шапка из `src/protocolPdfMaster.ts`; этот файл скриптом не читается. -->
+<!-- PDF: 19 стр. (18 игр + чистый бланк), `public/igra.pdf` → /igra.pdf; макет `src/protocolPdfMaster.ts`; этот файл скриптом не читается. -->
 
 "дата"="25/04/2026"
 "Стол №"="  ","  1"
