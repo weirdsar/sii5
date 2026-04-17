@@ -18,17 +18,23 @@ export const LINEUP_SEATS: number[][] = buildRandomizedSeatsGrid();
 
 /**
  * Показ чисел в таблице рассадки по URL.
- * — Без параметра или с `lineup=0` / `hide` / `false` — ячейки скрыты (плейсхолдер «—»).
- * — Если задан `VITE_LINEUP_REVEAL_KEY` в сборке: только `?lineup=<точное значение ключа>` (или то же в `showLineup`) для показа рассадки.
- * — Иначе (ключ не задан): `?lineup=1`, `true`, `yes`, `show`.
+ * — Если в сборке задан **`VITE_LINEUP_REVEAL_KEY`**: числа только при **`?lineup=<точное значение>`** (или **`showLineup`**); без параметра — «—».
+ * — Если ключ **не** задан (публичный сайт): по умолчанию **показываем** матрицу; скрыть — **`?lineup=0`**, **`hide`**, **`false`**, **`off`**.
  */
 export function isLineupRevealedFromUrl(search: string = typeof window !== 'undefined' ? window.location.search : ''): boolean {
   const p = new URLSearchParams(search);
   const raw = (p.get('lineup') ?? p.get('showLineup'))?.trim();
-  if (!raw) return false;
+  const key = (import.meta.env.VITE_LINEUP_REVEAL_KEY as string | undefined)?.trim();
+
+  if (key) {
+    if (!raw) return false;
+    const lo = raw.toLowerCase();
+    if (raw === '0' || lo === 'false' || lo === 'hide' || lo === 'off') return false;
+    return raw === key;
+  }
+
+  if (!raw) return true;
   const lo = raw.toLowerCase();
   if (raw === '0' || lo === 'false' || lo === 'hide' || lo === 'off') return false;
-  const key = (import.meta.env.VITE_LINEUP_REVEAL_KEY as string | undefined)?.trim();
-  if (key) return raw === key;
-  return lo === '1' || lo === 'true' || lo === 'yes' || lo === 'show';
+  return true;
 }
