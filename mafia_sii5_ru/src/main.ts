@@ -13,6 +13,12 @@ import { SHOWCASE_AUDIO_STORAGE_KEY } from './audioConstants';
 import { galleryItems, type GalleryItem } from './gallery';
 import { marathonPairIntro, pairStoryByNumber, type PairStoryContent } from './pairStories';
 import { pairsBlock1, pairsBlock2, type PairEntry } from './pairs';
+import {
+  bindPairShowcaseAudio,
+  initPairCardAudioUserActivation,
+  initPairCardAudioWarmupNearGrid,
+} from './pairCardAudio';
+import { createPairShowcaseShell, initPairShowcaseHoverJs } from './pairHoverFx';
 import { assetUrl } from './baseUrl';
 import './styles.css';
 
@@ -447,7 +453,11 @@ function createDualVideoBlock(p: PairEntry): HTMLElement {
 
   inner.append(v0, v1);
   frame.append(inner);
-  wrap.append(frame);
+  frame.classList.add('relative', 'z-[8]');
+  const shell = createPairShowcaseShell(p.effectType);
+  shell.append(frame);
+  wrap.append(shell);
+  bindPairShowcaseAudio(shell, p.n);
   appendVideoStoryBelow(wrap, true);
   return wrap;
 }
@@ -472,7 +482,11 @@ function createSingleVideoBlock(p: PairEntry): HTMLElement {
   video.preload = 'none';
 
   frame.append(video);
-  wrap.append(frame);
+  frame.classList.add('relative', 'z-[8]');
+  const shell = createPairShowcaseShell(p.effectType);
+  shell.append(frame);
+  wrap.append(shell);
+  bindPairShowcaseAudio(shell, p.n);
   appendVideoStoryBelow(wrap, true);
   return wrap;
 }
@@ -932,6 +946,10 @@ function initSmoothAnchors(): void {
 }
 
 function boot(): void {
+  /* Аудио витрины пар: жест пользователя + ленивая подгрузка при приближении к блоку пар */
+  initPairCardAudioUserActivation();
+  initPairCardAudioWarmupNearGrid();
+
   /* 1 — глобальные обработчики: атмосфера, таймер, параллакс (фон hero — статичное WebP в HTML) */
   initAtmosphereUi();
   initJudgesTribunalViewport();
@@ -950,6 +968,7 @@ function boot(): void {
   initVideoViewport();
   initPairStoryDetailsOpenVideoKick();
   initVideoStoryBelowPanels();
+  initPairShowcaseHoverJs();
   initJudgesChromelessVideo();
   initJudgesSpotlightSwitch();
   initShowcaseAudioConsentDialog();

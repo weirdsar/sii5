@@ -2,6 +2,52 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
+## 2026-04-17 — mafia: 10 уникальных hover-эффектов на витрине пар (`data-effect`)
+
+- **`mafia_sii5_ru/src/pairs.ts`**: у каждой пары **`effectType`** (10 ключей по ТЗ).
+- **`mafia_sii5_ru/src/pairHoverFx.ts`**: оболочка **`pair-showcase-fx`** + оверлеи; **`initPairShowcaseHoverJs`** — вспышка 100 ms (**`flash-grid`**), прицел **`requestAnimationFrame`** (**`predator-target`**).
+- **`mafia_sii5_ru/src/main.ts`**: кадр видео внутри shell с **`data-effect`**.
+- **`mafia_sii5_ru/src/styles.css`**: **`@keyframes`**, фильтры, сетка, виньетки; **`prefers-reduced-motion`**.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: instinct-code — «матрица» на весь кадр при hover
+
+- **`mafia_sii5_ru/src/pairHoverFx.ts`**: для пары 3 — сетка **10** колонок, в каждой лента из **16+16** строк (дубликат для бесшовного **`translateY(-50%)`**).
+- **`mafia_sii5_ru/src/styles.css`**: **`pair-fx-matrix-grid`** на **`inset: 0`**, колонки с разными **`animation-duration`** / **`animation-delay`**; лёгкий градиентный фон под цифрами.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: earth-water (пара 4) — эффект читается на тёмном видео
+
+- **`mix-blend-mode: overlay`** на чёрном кадре почти не виден; добавлен слой **`pair-fx-earth-shine`** (градиент без blend + лёгкий сдвиг по hover), волна — **`screen`** и более яркий radial.
+- Нижняя «тяжесть»: вместо внешней тени под **`overflow-hidden`** — **`inset`** box-shadow + **`border-bottom`**.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: аудио на hover витрины пар (`pairCardAudio`)
+
+- **`mafia_sii5_ru/src/pairCardAudio.ts`**: после жеста пользователя — **`pointerenter`** / **`pointerleave`** на **`.pair-showcase-fx`**, ambient **loop** + fade **0↔0.4** за **300 ms**, one-shot hover; смена карточки — fade-out предыдущего ambient; **`preload="none"`**, **`src`** только после «прогрева» (мышь возле **`#pair-stories-*`** или первый hover).
+- **`mafia_sii5_ru/src/main.ts`**: **`initPairCardAudioUserActivation`**, **`initPairCardAudioWarmupNearGrid`**, **`bindPairShowcaseAudio(shell, p.n)`**.
+- **`mafia_sii5_ru/public/content/pair-audio/README.md`**, **`mafia_sii5_ru/docs/CURSOR_PROMPT_PAIRCARD_AUDIO.md`**: карта файлов и промпт для Cursor.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: pairCardAudio — слышимость без файлов
+
+- В **`public/content/pair-audio/`** не было **`.webm`** → **404** и тишина. Добавлен **Web Audio fallback** (triangle ambient + короткий sine-пинг hover), **`pointerenter`/`pointerleave`** без дубля с mouse; **`enterGeneration`** при смене пары/leave; при появлении файлов — приоритет **HTMLAudio**.
+- **`README.md`** в **`pair-audio`**: шаги «клик по странице → hover по видео».
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: hero — заголовок «загорается» огнём по hover
+
+- **`mafia_sii5_ru/index.html`**: класс **`hero-title`** на **`#hero-title`**.
+- **`mafia_sii5_ru/src/styles.css`**: при **`:hover`** — огненный **`linear-gradient`**, **`background-clip: text`**, анимация **`background-position`**, **`drop-shadow`** янтарно-красный; **`prefers-reduced-motion`** — без анимации.
+- Проверка: **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
+## 2026-04-17 — mafia: сгенерированные WAV для 10 пар
+
+- **`mafia_sii5_ru/scripts/generate-pair-audio.mjs`**: синтез **моно PCM WAV** (2 с loop ambient, короткий hover) без зависимостей.
+- **`npm run generate:pair-audio`** → **`public/content/pair-audio/pair-{01..10}-{ambient|hover}.wav`**.
+- **`pairCardAudio.ts`**, **`package.json`**: пути **`.wav`**, скрипт **`generate:pair-audio`**.
+- Проверка: **`npm run generate:pair-audio`**, **`npm run build`** в **`mafia_sii5_ru`** — ок.
+
 ## 2026-04-17 — mafia: ролики пар — последовательная фоновая подгрузка, без лишнего сброса буфера
 
 - **`mafia_sii5_ru/src/main.ts`**: у витринных `<video>` изначально **`preload="none"`**; **`preloadShowcaseVideosSequentially`** по очереди (пары 1…10, у пары 1 — два файла) выставляет **`src`** без **`load()`**; повторно тот же URL не назначается (**`canonicalMediaPath`**). После очереди — **`syncAllPageVideoMuteFromStorage`** + **`retryShowcasePlaybackForVisible`**.

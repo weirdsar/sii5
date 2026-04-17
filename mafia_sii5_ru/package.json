@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate:pair-audio": "node scripts/generate-pair-audio.mjs"
   },
   "dependencies": {
     "@fontsource-variable/montserrat": "^5.2.8",
