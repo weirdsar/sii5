@@ -53,6 +53,148 @@
   z-index: 1;
 }
 
+/* Мягкое «северное сияние» поверх градиента (без JS) */
+.hero-bg-aurora {
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: soft-light;
+  background:
+    radial-gradient(ellipse 100% 72% at 18% 22%, rgba(147, 197, 253, 0.38), transparent 52%),
+    radial-gradient(ellipse 88% 68% at 90% 52%, rgba(192, 132, 252, 0.32), transparent 56%),
+    radial-gradient(ellipse 72% 48% at 50% 100%, rgba(34, 211, 238, 0.14), transparent 50%);
+  background-size: 185% 185%, 165% 165%, 140% 140%;
+  background-position: 0% 8%, 100% 55%, 48% 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-bg-aurora {
+    animation: hero-bg-aurora-drift 26s ease-in-out infinite alternate;
+  }
+
+  /* Лёгкий Ken Burns по скроллу: только там, где есть scroll-driven animations */
+  @supports (animation-timeline: view()) {
+    #hero {
+      view-timeline-name: --mafia-hero;
+      view-timeline-axis: block;
+    }
+
+    .hero-bg-photo {
+      animation: mafia-hero-photo-scroll linear both;
+      animation-timeline: --mafia-hero;
+      animation-range: entry 0% cover 48%;
+    }
+  }
+
+  /* Счётчик: короткий каскад при появлении верхней полосы */
+  #hero .hero-top-bar.is-visible #countdown > .hero-timer-cell {
+    animation: hero-timer-rise 0.52s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  #hero .hero-top-bar.is-visible #countdown > .hero-timer-cell:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+
+  #hero .hero-top-bar.is-visible #countdown > .hero-timer-cell:nth-child(2) {
+    animation-delay: 0.11s;
+  }
+
+  #hero .hero-top-bar.is-visible #countdown > .hero-timer-cell:nth-child(3) {
+    animation-delay: 0.17s;
+  }
+
+  #hero .hero-top-bar.is-visible #countdown > .hero-timer-cell:nth-child(4) {
+    animation-delay: 0.23s;
+  }
+
+  /* Нижние CTA: выезд + постоянный мягкий «пульс» свечения */
+  #hero .hero-text-band.is-visible a.hero-cta-shimmer:not(.hero-cta-shimmer--cyan) {
+    animation:
+      hero-cta-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both,
+      hero-cta-glow-violet 4.8s ease-in-out 0.65s infinite;
+  }
+
+  #hero .hero-text-band.is-visible a.hero-cta-shimmer--cyan {
+    animation:
+      hero-cta-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both,
+      hero-cta-glow-cyan 4.8s ease-in-out 0.55s infinite;
+  }
+}
+
+@keyframes hero-bg-aurora-drift {
+  0% {
+    background-position: 0% 12%, 100% 58%, 42% 100%;
+  }
+
+  100% {
+    background-position: 100% 0%, 0% 38%, 58% 0%;
+  }
+}
+
+@keyframes mafia-hero-photo-scroll {
+  from {
+    transform: scale(1.048) translate3d(0, -0.35%, 0);
+  }
+
+  to {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hero-timer-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes hero-cta-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-cta-glow-violet {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(167, 139, 250, 0),
+      0 0 0 0 rgba(0, 0, 0, 0);
+  }
+
+  50% {
+    box-shadow:
+      0 0 36px 1px rgba(167, 139, 250, 0.32),
+      0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
+@keyframes hero-cta-glow-cyan {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(34, 211, 238, 0),
+      0 0 0 0 rgba(0, 0, 0, 0);
+  }
+
+  50% {
+    box-shadow:
+      0 0 34px 1px rgba(34, 211, 238, 0.28),
+      0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
 .hero-text-band {
   @apply rounded-xl px-2 py-1;
 }
@@ -158,6 +300,24 @@
 
 .atmosphere-toggle--on .atmosphere-toggle__label {
   @apply text-cyan-100;
+}
+
+/* Мобильный: при включённой атмосфере только иконка — подпись «Атмосфера» убрана с экрана */
+@media (max-width: 767px) {
+  .atmosphere-toggle-root:has(.atmosphere-toggle--on) {
+    max-width: none;
+    width: auto;
+  }
+
+  .atmosphere-toggle-root .atmosphere-toggle--on {
+    width: auto;
+    min-width: 0;
+    padding: 0.65rem 0.75rem;
+  }
+
+  .atmosphere-toggle--on .atmosphere-toggle__label {
+    display: none;
+  }
 }
 
 .atmosphere-toggle__wave {
@@ -307,6 +467,64 @@
     0 0 24px rgba(167, 139, 250, 0.2),
     0 0 40px rgba(34, 211, 238, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Виджет погоды: данные подгружаются при загрузке страницы (Open-Meteo) */
+.hero-weather-widget__body {
+  min-height: 2.35rem;
+}
+
+.hero-weather-widget__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.45rem;
+  row-gap: 0.12rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hero-weather-widget__row:last-child {
+  border-bottom-width: 0;
+  padding-bottom: 0;
+}
+
+.hero-weather-widget__day {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: rgb(221 214 254 / 0.92);
+}
+
+.hero-weather-widget__temps {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: rgb(165 243 252 / 0.95);
+}
+
+.hero-weather-widget__desc {
+  flex: 1 1 8.5rem;
+  min-width: min(100%, 8.5rem);
+  color: rgb(203 213 225 / 0.92);
+}
+
+.hero-weather-widget__precip {
+  flex-basis: 100%;
+  font-size: 0.65rem;
+  color: rgb(148 163 184 / 0.95);
+}
+
+.hero-weather-widget__precip:empty {
+  display: none;
+}
+
+@media (min-width: 400px) {
+  .hero-weather-widget__precip {
+    flex-basis: auto;
+    flex-grow: 1;
+    text-align: right;
+    font-size: 0.68rem;
+  }
 }
 
 /* Полноширинный горизонтальный ряд под витриной */
@@ -533,6 +751,7 @@ video.video-chromeless::-webkit-media-controls-enclosure {
 }
 
 .rassadka-table-toggle:hover {
+  animation: none;
   color: #ecfeff;
   border-color: rgba(34, 211, 238, 0.55);
   background: rgba(22, 78, 99, 0.35);
@@ -540,6 +759,7 @@ video.video-chromeless::-webkit-media-controls-enclosure {
 }
 
 .rassadka-table-toggle:focus-visible {
+  animation: none;
   outline: none;
   box-shadow:
     0 0 0 2px rgba(34, 211, 238, 0.55),
@@ -678,6 +898,136 @@ video.video-chromeless::-webkit-media-controls-enclosure {
 
 .reveal.is-visible {
   @apply translate-y-0 opacity-100;
+}
+
+/* Заголовки секций: «живой» градиент в тексте */
+.wow-heading {
+  background-image: linear-gradient(
+    102deg,
+    #cffafe 0%,
+    #22d3ee 22%,
+    #e9d5ff 48%,
+    #22d3ee 72%,
+    #a5f3fc 100%
+  );
+  background-size: 220% auto;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.22));
+}
+
+/* Шапка: бегущий неон по нижней границе */
+.site-header-wow::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(34, 211, 238, 0.35) 22%,
+    rgba(192, 132, 252, 0.55) 50%,
+    rgba(34, 211, 238, 0.35) 78%,
+    transparent 100%
+  );
+  background-size: 220% 100%;
+  background-position: 0% 0;
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wow-heading {
+    animation: wow-heading-shimmer 16s ease-in-out infinite alternate;
+  }
+
+  .site-header-wow::after {
+    animation: site-header-border-flow 9s linear infinite;
+  }
+
+  .starfield__dots {
+    animation: starfield-drift 140s linear infinite;
+  }
+
+  .rassadka-table-toggle:not(:hover):not(:active) {
+    animation: rassadka-toggle-breathe 3.8s ease-in-out infinite;
+  }
+
+  .footer-heart-wow {
+    animation: footer-heart-wow 2.6s ease-in-out infinite;
+    transform-origin: center;
+  }
+}
+
+@keyframes wow-heading-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes site-header-border-flow {
+  0% {
+    background-position: 0% 0;
+  }
+
+  100% {
+    background-position: 220% 0;
+  }
+}
+
+@keyframes starfield-drift {
+  0% {
+    background-position:
+      0 0,
+      0 0,
+      0 0,
+      0 0,
+      0 0;
+  }
+
+  100% {
+    background-position:
+      200px 140px,
+      -160px 120px,
+      180px -80px,
+      120px 200px,
+      -140px 60px;
+  }
+}
+
+@keyframes rassadka-toggle-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(34, 211, 238, 0.08),
+      0 0 18px rgba(34, 211, 238, 0.12);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(34, 211, 238, 0.18),
+      0 0 32px rgba(34, 211, 238, 0.26);
+  }
+}
+
+@keyframes footer-heart-wow {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.12);
+  }
 }
 
 /* Описания пар: аккордеон (список строк, не сетка карточек «ПАРА N») */
@@ -1630,8 +1980,47 @@ video.video-chromeless::-webkit-media-controls-enclosure {
   @apply relative block overflow-hidden rounded-xl border border-white/10 bg-black/50 p-0 text-left transition hover:border-cyan-400/30 hover:shadow-lg hover:shadow-cyan-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/45;
 }
 
+.gallery-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    108deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.16) 50%,
+    transparent 62%
+  );
+  transform: translateX(-130%);
+  opacity: 0;
+}
+
 .gallery-tile__img {
   @apply aspect-square w-full object-cover;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gallery-tile:hover .gallery-tile__img {
+    transform: scale(1.07);
+  }
+
+  .gallery-tile:hover::after {
+    animation: gallery-tile-shine 0.85s ease-out forwards;
+  }
+}
+
+@keyframes gallery-tile-shine {
+  0% {
+    transform: translateX(-130%);
+    opacity: 0.55;
+  }
+
+  100% {
+    transform: translateX(130%);
+    opacity: 0;
+  }
 }
 
 .gallery-tile__cap {
@@ -1640,4 +2029,35 @@ video.video-chromeless::-webkit-media-controls-enclosure {
 
 #gallery-lightbox::backdrop {
   background: rgba(0, 0, 0, 0.82);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wow-heading {
+    animation: none;
+    background-size: 100% auto;
+    background-position: 50% 50%;
+  }
+
+  .site-header-wow::after {
+    animation: none;
+    background-position: 50% 0;
+    opacity: 0.7;
+  }
+
+  .starfield__dots {
+    animation: none;
+  }
+
+  .rassadka-table-toggle {
+    animation: none;
+  }
+
+  .gallery-tile__img {
+    transform: none;
+    transition-duration: 0.12s;
+  }
+
+  .footer-heart-wow {
+    animation: none;
+  }
 }

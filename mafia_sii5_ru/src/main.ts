@@ -21,6 +21,7 @@ import {
 } from './pairCardAudio';
 import { createPairShowcaseShell, initPairShowcaseHoverJs } from './pairHoverFx';
 import { initLineupSection } from './lineupUi';
+import { initHeroWeatherForecast } from './weatherForecast';
 import { assetUrl } from './baseUrl';
 import './styles.css';
 
@@ -1067,6 +1068,7 @@ function boot(): void {
   initAtmosphereUi();
   initJudgesTribunalViewport();
   initCountdown();
+  initHeroWeatherForecast();
   initParallaxStarfield();
 
   /* 2 — витрины: ролики и «огненный» текст внутри раскрывающихся карточек пар */

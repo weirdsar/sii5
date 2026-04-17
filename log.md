@@ -2,6 +2,26 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
+## 2026-04-18 — mafia: виджет погоды 25–26 апр. (Open-Meteo при загрузке)
+
+- **`mafia_sii5_ru/index.html`**: блок в карточке «Когда и где» — **`#hero-weather-widget`** / **`#hero-weather-widget-body`**.
+- **`mafia_sii5_ru/src/weatherForecast.ts`**: **`fetch`** к **`api.open-meteo.com`** (без ключа), точка **51.47, 45.98** (~с.&nbsp;Усовка), **`Europe/Saratov`**, срез **`forecast_days=16`**, строки на **2026-04-25** и **2026-04-26**; таймаут **9&nbsp;с**; **`aria-busy`** снимается после ответа.
+- **`mafia_sii5_ru/src/main.ts`**: **`initHeroWeatherForecast()`** в **`boot`**.
+- **`mafia_sii5_ru/src/styles.css`**: компактная вёрстка строк прогноза.
+- Проверка: **`npm run build`**.
+
+## 2026-04-18 — mafia: ещё «вау»-эффекты (секции, шапка, звёзды, галерея, футер)
+
+- **`mafia_sii5_ru/index.html`**: класс **`site-header-wow`** на **`header`**; **`wow-heading`** на ключевых **`h2`** (дуэты, витрины I/II, трибунал, рассадка, галерея); **`footer-heart-wow`** на иконке сердца в футере.
+- **`mafia_sii5_ru/src/styles.css`**: градиентный «шиммер» заголовков; бегущая линия по нижней границе шапки; медленный дрейф слоя **`starfield__dots`**; пульс тени у **`rassadka-table-toggle`** (idle); у **`gallery-tile`** — лёгкий zoom превью + вспышка градиентом при hover; пульс сердца в футере; блок **`prefers-reduced-motion: reduce`** для этих эффектов.
+- Проверка: **`npm run build`**.
+
+## 2026-04-18 — mafia: hero — «вау»-анимации (аврора, scroll-zoom, каскад, свечение CTA)
+
+- **`mafia_sii5_ru/index.html`**: слой **`hero-bg-aurora`** над градиентом; классы **`hero-cta-shimmer`** / **`hero-cta-shimmer--cyan`** на кнопках hero.
+- **`mafia_sii5_ru/src/styles.css`**: дрейф авроры; при **`prefers-reduced-motion: no-preference`** — каскад ячеек счётчика, комбинированная анимация CTA (подъём + пульс **`box-shadow`**), при поддержке **`animation-timeline: view()`** — лёгкий zoom/сдвиг фото по скроллу секции **`#hero`**.
+- Проверка: **`npm run build`**.
+
 ## 2026-04-18 — mafia: таблица рассадки на сайте — числа по умолчанию без URL
 
 - **`mafia_sii5_ru/src/lineupSchedule.ts`**: при отсутствии **`VITE_LINEUP_REVEAL_KEY`** `isLineupRevealedFromUrl()` по умолчанию **true**; скрытие чисел — явные **`lineup=0`** / **`hide`** и т.д. С секретом в сборке логика без изменений.
