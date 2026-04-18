@@ -2,13 +2,17 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
-## 2026-04-18 — mafia: секция «Представление команд» (4 текста из `member.md`, 6 — позже)
+## 2026-04-18 — mafia: представления пар 5–6 (`docs/member.md`)
 
-- **`mafia_sii5_ru/src/teamPresentations.ts`**: **`TEAM_PRESENTATION_PARAGRAPHS`** для пар **1–4** (сверено с `docs/member.md`); пары **5–10** — **`null`** и плейсхолдер в UI; **`renderTeamPresentationsSection()`**, порядок пар из **`pairs.ts`**.
-- **`mafia_sii5_ru/index.html`**: секция **`#team-presentations`** после «О дуэтах марафона».
-- **`mafia_sii5_ru/src/main.ts`**: вызов рендера перед **`initReveal`**.
-- **`mafia_sii5_ru/src/styles.css`**: стили карточек; **`#team-presentations`** в **`content-visibility`** (моб.).
-- **`mafia_sii5_ru/src/atmosphere.ts`**: зона чтения для **`#team-presentations`**.
+- **`mafia_sii5_ru/src/teamPresentations.ts`**: тексты для пар **«Мафмультсчёт»** и **«Милый лжец»**; лёгкая вычитка и имена как в **`pairs.ts`** (Нафаня, Блекджек).
+
+## 2026-04-18 — mafia: представления команд внутри витрин (без отдельной секции)
+
+- **`mafia_sii5_ru/src/teamPresentations.ts`**: **`TEAM_PRESENTATION_PARAGRAPHS`** (1–4 текста, 5–10 — **`null`**); **`appendPairTeamPresentation()`** — блок в **`pair-story-body`**.
+- **`mafia_sii5_ru/src/main.ts`**: после видео в аккордеоне пары вызывается **`appendPairTeamPresentation(body, p.n)`**; отдельная секция и **`renderTeamPresentationsSection`** убраны.
+- **`mafia_sii5_ru/index.html`**: удалена секция **`#team-presentations`**.
+- **`mafia_sii5_ru/src/styles.css`**: стили **`.pair-story-presentation*`**; из **`content-visibility`** убран **`#team-presentations`**.
+- **`mafia_sii5_ru/src/atmosphere.ts`**: убраны наблюдатель и зона чтения для **`#team-presentations`**.
 - Проверка: **`npm run build`**.
 
 ## 2026-04-18 — mafia: виджет погоды 25–26 апр. (Open-Meteo при загрузке)
@@ -383,6 +387,17 @@
 - Коммит **`f79c0b8`** откачен в **`main`** через **`git revert`** (новый коммит **`8e6b236`**): восстановлены **`atmosphere.ts`**, **`audioConstants.ts`**, полный **`main.ts`** с инициализацией витрин/атмосферы, **`index.html`**, **`styles.css`**, **`vite.config.ts`** как до проблемного пуша.
 - Запись «убраны сетки ПАРА / панели под роликами» от **2026-04-16** отменена этим откатом (сетки и панели снова в коде).
 - Проверка: **`npm run build`** в `mafia_sii5_ru` после revert — ок.
+
+## 2026-04-15 — mafia.sii5.ru: представление команд — пары 7–10
+
+- **`mafia_sii5_ru/src/teamPresentations.ts`**: для пар 7–10 добавлены абзацы из `docs/member.md` (вместо `null` и заглушки «скоро появится»); блок по-прежнему рендерится в карточке пары после видео, перед ролями (`appendPairTeamPresentation`).
+- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
+
+## 2026-04-15 — mafia.sii5.ru: member.md (пары 7–10) + названия команд в данных
+
+- **`mafia_sii5_ru/docs/member.md`**: вычитка блока про пары 7–10 (типографика, ёлочки, ники как на сайте: Harley Queen, Sky Lasso, Микки, Дарксайдер, GOLD).
+- **`mafia_sii5_ru/src/pairs.ts`**, **`players.md`**, **`src/lineupPdfTeams.ts`**: пары 7–8 — команды «Две Полины», «Острые козырьки» (как в member).
+- Проверка: **`npm run build`** в `mafia_sii5_ru` — ок.
 
 ## 2026-04-15 — mafia.sii5.ru: регламент — полный текст после трибунала
 

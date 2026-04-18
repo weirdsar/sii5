@@ -22,7 +22,7 @@ import {
 import { createPairShowcaseShell, initPairShowcaseHoverJs } from './pairHoverFx';
 import { initLineupSection } from './lineupUi';
 import { initHeroWeatherForecast } from './weatherForecast';
-import { renderTeamPresentationsSection } from './teamPresentations';
+import { appendPairTeamPresentation } from './teamPresentations';
 import { assetUrl } from './baseUrl';
 import './styles.css';
 
@@ -558,7 +558,7 @@ function renderPairStoriesList(rootId: string, pairs: PairEntry[]): void {
     details.className = 'pair-story-details reveal';
     details.setAttribute(
       'aria-label',
-      `Пара ${p.n}, команда «${p.teamName}», ${p.a} и ${p.b} — видео и описание ролей`,
+      `Пара ${p.n}, команда «${p.teamName}», ${p.a} и ${p.b} — видео, представление команды и описание ролей`,
     );
 
     const summary = document.createElement('summary');
@@ -582,6 +582,8 @@ function renderPairStoriesList(rootId: string, pairs: PairEntry[]): void {
     } else if (p.videoSrc) {
       body.append(createSingleVideoBlock(p));
     }
+
+    appendPairTeamPresentation(body, p.n);
 
     appendPairStoryChar(body, story.charATitle, story.charAText);
     appendPairStoryChar(body, story.charBTitle, story.charBText);
@@ -1094,9 +1096,8 @@ function boot(): void {
   renderGallery();
   initGalleryLightbox();
 
-  /* 3 — вступление о дуэтах и представления команд */
+  /* 3 — вступление о дуэтах */
   renderMarathonIntro();
-  renderTeamPresentationsSection();
 
   /* 4 — появление секций при скролле */
   initReveal();

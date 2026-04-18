@@ -1,13 +1,6 @@
-import { pairsBlock1, pairsBlock2, type PairEntry } from './pairs';
-
-/** Пары 1–10 в порядке номера (для секции представлений). */
-export function getPairsInOrder(): PairEntry[] {
-  return [...pairsBlock1, ...pairsBlock2].sort((a, b) => a.n - b.n);
-}
-
 /**
  * Тексты представления команд (источник правок — `docs/member.md`).
- * `null` — текст добавим позже.
+ * Пустой массив или отсутствующий ключ — заглушка «скоро появится». Рендер — внутри карточки пары (`appendPairTeamPresentation`).
  */
 export const TEAM_PRESENTATION_PARAGRAPHS: Record<number, string[] | null> = {
   1: [
@@ -34,65 +27,74 @@ export const TEAM_PRESENTATION_PARAGRAPHS: Record<number, string[] | null> = {
     'Г-жа Лелия часто сомневается в верности выбранной стратегии, однако её хорошая интуиция подводит её достаточно редко!',
     'Ну что ж, покажите всем, на что способны настоящие авантюристки. Удачи вам и пусть фортуна будет благосклонна!',
   ],
-  5: null,
-  6: null,
-  7: null,
-  8: null,
-  9: null,
-  10: null,
+  5: [
+    'Как же нашли друг друга эти столь не похожие друг на друга игроки? Может быть, через сложные вычисления и алгоритмы? А нет… чисто по велению судьбы, которая завязала их в этакий «математический узел».',
+    'Г-н Математик всегда пытается найти оптимальное решение, аргументируя игровые действия с точки зрения своей, не всегда доступной другим игрокам логики.',
+    'Г-жа Нафаня — адепт правильной игры в мафию: именно она за столом объяснит самые базовые вещи, про которые другие игроки или не знают, или уже забыли.',
+    'Возведите свои шансы на победу в куб — и пусть счёт игры всегда будет в вашу пользу!',
+  ],
+  6: [
+    'Атмосфера театрализованного представления не покинет вас, пока за столом игроки этого дуэта! Да, да… это наши актёры, речи которых в столе то наполнены драматизмом, то юмором и шутками.',
+    'Г-жа Дичь неподражаема и неповторима… ей достаточно сказать: «я красная, прикинь», — и всё… в её цвете уже можно не сомневаться 😉 Если ей ещё удастся справиться с волнением, которое присуще всем творческим людям, победить её станет невозможно!',
+    'Г-н Блекджек заряжает стол своим весельем и хорошим настроением, «закупая» руки игроков, однако тратить на это мероприятие все свои фолы надо прекращать!',
+    'Что ж, дорогие наши актёры, пусть ваша харизма ослепляет, а импровизация сбивает с толку. Желаем вам виртуозно сыграть свои роли и привести команду к безоговорочной победе!',
+  ],
+  7: [
+    'Проницательность и молодой задор, невозмутимость и стихийная энергия… Полины — взаимодополняющие противоположности, но это и делает их взаимодействие интересным.',
+    'Г-жа Колючка своим «орлиным» взором с нуля видит тройку чёрных игроков, и сбить её с этого пути вряд ли у кого получится!',
+    'Г-жа Harley Queen при необходимости докажет свой цвет так ярко, что весь стол завибрирует красным, поглощая все остальные цвета спектра!',
+    'Полиночки, вместе вы — непобедимая сила. Идите к цели уверенно, поддерживайте друг друга, пусть удача сопутствует вам во всём!',
+  ],
+  8: [
+    'Иногда бывает так: столкнёт судьба двух совершенно незнакомых людей, и кажется, что ни к чему хорошему это не приведет, а вдруг… окажется, что именно такой дуэт-микс и обыграет сыгранные команды!',
+    'Г-н Кот — интеллигентно и уверенно предъявит свои аргументы «в стол», а г-н Sky Lasso поставит свой «паровоз на рельсы» и (чух-чух-чух) довезёт свою команду к победе!',
+    'Новая команда — это новые возможности и чистый лист: рвите, метайте, играйте в своё удовольствие!',
+  ],
+  9: [
+    'Чувственность и азарт — эта эмоциональная пара пришла на турнир ТОЛЬКО ЗА ПОБЕДОЙ… Посмотрим, получится ли у них проявить своё «тайное мастерство» так убедительно, чтобы оставить позади всех!',
+    'Г-жа Сексолог навечно остаётся в памяти у всех игроков, кто хоть раз имел удовольствие сидеть с ней за одним столом: кому победами на Донской карте, а кому и незабываемыми песнями на первом слоте 😉',
+    'Яркая игра и нестандартные решения г-на Микки также мало кого оставляют равнодушным, а его «пламенные» речи после некоторых игр можно записывать и давать прослушивать «новичкам», чтобы знали: мафия — это игра на выживание, а не детские забавы!',
+    'Ну что же, пусть результат турнира станет достойным подтверждением вашего мастерства!',
+  ],
+  10: [
+    'А вот и наши львы!',
+    'Так случилось, что в этом дуэте оба игрока родились именно под этим знаком зодиака, а мы помним, что Лев — огненный знак, стремящийся к лидерству, успеху и признанию.',
+    'Г-н Дарксайдер — генератор энергии и эмоций: действует импульсивно и агрессивно в достижении целей, быстро принимает решения и не боится рисковать.',
+    'Г-н GOLD — спокоен, невозмутим; его «рев» слышен только тогда, когда это действительно нужно.',
+    'Они такие разные, но при этом оба верят в свою «опизденительность» и всегда стремятся к успеху.',
+    'Посмотрим, сможет ли этот «царский тандем» добиться победы!',
+  ],
 };
 
 const PENDING_TEXT = 'Текст представления скоро появится здесь.';
 
-/** Заполняет `#team-presentations-root` карточками пар 1–10. */
-export function renderTeamPresentationsSection(): void {
-  const root = document.getElementById('team-presentations-root');
-  if (!root) return;
+/** Блок внутри `.pair-story-body`: после видео, перед ролями. */
+export function appendPairTeamPresentation(container: HTMLElement, pairNumber: number): void {
+  const paras = TEAM_PRESENTATION_PARAGRAPHS[pairNumber];
+  const wrap = document.createElement('div');
+  wrap.className = 'pair-story-presentation';
 
-  root.replaceChildren();
-  for (const p of getPairsInOrder()) {
-    const paras = TEAM_PRESENTATION_PARAGRAPHS[p.n];
+  const label = document.createElement('h4');
+  label.className = 'pair-story-presentation__label';
+  label.textContent = 'Представление команды';
 
-    const art = document.createElement('article');
-    art.className = 'team-presentation';
-    art.setAttribute('aria-labelledby', `team-presentation-title-${p.n}`);
+  const prose = document.createElement('div');
+  prose.className = 'pair-story-presentation__prose';
 
-    const head = document.createElement('header');
-    head.className = 'team-presentation__head';
-
-    const badge = document.createElement('span');
-    badge.className = 'team-presentation__badge';
-    badge.textContent = `Пара ${p.n}`;
-
-    const title = document.createElement('h3');
-    title.className = 'team-presentation__title';
-    title.id = `team-presentation-title-${p.n}`;
-    title.textContent = `«${p.teamName}»`;
-
-    const roster = document.createElement('p');
-    roster.className = 'team-presentation__roster';
-    roster.textContent = `${p.a} — ${p.b}`;
-
-    head.append(badge, title, roster);
-
-    const body = document.createElement('div');
-    body.className = 'team-presentation__body';
-
-    if (paras && paras.length > 0) {
-      for (const line of paras) {
-        const pr = document.createElement('p');
-        pr.className = 'team-presentation__p';
-        pr.textContent = line;
-        body.append(pr);
-      }
-    } else {
-      const pr = document.createElement('p');
-      pr.className = 'team-presentation__p team-presentation__p--pending';
-      pr.textContent = PENDING_TEXT;
-      body.append(pr);
+  if (paras && paras.length > 0) {
+    for (const line of paras) {
+      const p = document.createElement('p');
+      p.className = 'pair-story-presentation__p';
+      p.textContent = line;
+      prose.append(p);
     }
-
-    art.append(head, body);
-    root.append(art);
+  } else {
+    const p = document.createElement('p');
+    p.className = 'pair-story-presentation__p pair-story-presentation__p--pending';
+    p.textContent = PENDING_TEXT;
+    prose.append(p);
   }
+
+  wrap.append(label, prose);
+  container.append(wrap);
 }

@@ -142,10 +142,8 @@ function computeReadingFocus(): boolean {
   if (anyOpenPairStoryInViewport()) return true;
   const rules = document.getElementById('rules');
   const intro = document.getElementById('pair-marathon-intro');
-  const teamPresentations = document.getElementById('team-presentations');
   if (rules && readZoneVisible.get(rules)) return true;
   if (intro && readZoneVisible.get(intro)) return true;
-  if (teamPresentations && readZoneVisible.get(teamPresentations)) return true;
   return false;
 }
 
@@ -156,7 +154,6 @@ function refreshReadingFilter(): void {
 function initReadModeObservers(): void {
   const rules = document.getElementById('rules');
   const intro = document.getElementById('pair-marathon-intro');
-  const teamPresentations = document.getElementById('team-presentations');
 
   const io = new IntersectionObserver(
     (entries) => {
@@ -176,7 +173,6 @@ function initReadModeObservers(): void {
   );
   if (rules) io.observe(rules);
   if (intro) io.observe(intro);
-  if (teamPresentations) io.observe(teamPresentations);
 
   document.addEventListener(
     'toggle',

@@ -17,8 +17,8 @@ export const LINEUP_PDF_TEAMS: LineupPdfTeamRow[] = [
   { n: 4, teamName: 'Авантюристки', a: 'Hexe', b: 'Лелия' },
   { n: 5, teamName: 'Мафмультсчёт', a: 'Математик', b: 'Нафаня' },
   { n: 6, teamName: 'Милый лжец', a: 'Дичь', b: 'Блекджек' },
-  { n: 7, teamName: '2 Полины', a: 'Колючка', b: 'Harley Queen' },
-  { n: 8, teamName: 'Узлы и Когти', a: 'Sky Lasso', b: 'Кот' },
+  { n: 7, teamName: 'Две Полины', a: 'Колючка', b: 'Harley Queen' },
+  { n: 8, teamName: 'Острые козырьки', a: 'Sky Lasso', b: 'Кот' },
   { n: 9, teamName: 'Тайные мастера', a: 'Сексолог', b: 'Микки' },
   { n: 10, teamName: 'Массаж', a: 'Дарксайдер', b: 'GOLD' },
 ];
