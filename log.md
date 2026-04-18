@@ -2,6 +2,15 @@
 
 **Постоянная память проекта.** Файл `log.md` фиксирует решения, затронутые пути и проверки между сессиями и для внешнего контроля архитектора. **После каждого существенного изменения** (код, конфиги, данные, поведение сайта) добавляй новую секцию вида `## ГГГГ-ММ-ДД — краткий заголовок`: что сделано, какие файлы затронуты, итоги `npm run build` / `npx astro check` при необходимости. Длинные фрагменты кода в лог не копировать — достаточно путей к файлам.
 
+## 2026-04-18 — mafia: секция «Представление команд» (4 текста из `member.md`, 6 — позже)
+
+- **`mafia_sii5_ru/src/teamPresentations.ts`**: **`TEAM_PRESENTATION_PARAGRAPHS`** для пар **1–4** (сверено с `docs/member.md`); пары **5–10** — **`null`** и плейсхолдер в UI; **`renderTeamPresentationsSection()`**, порядок пар из **`pairs.ts`**.
+- **`mafia_sii5_ru/index.html`**: секция **`#team-presentations`** после «О дуэтах марафона».
+- **`mafia_sii5_ru/src/main.ts`**: вызов рендера перед **`initReveal`**.
+- **`mafia_sii5_ru/src/styles.css`**: стили карточек; **`#team-presentations`** в **`content-visibility`** (моб.).
+- **`mafia_sii5_ru/src/atmosphere.ts`**: зона чтения для **`#team-presentations`**.
+- Проверка: **`npm run build`**.
+
 ## 2026-04-18 — mafia: виджет погоды 25–26 апр. (Open-Meteo при загрузке)
 
 - **`mafia_sii5_ru/index.html`**: блок в карточке «Когда и где» — **`#hero-weather-widget`** / **`#hero-weather-widget-body`**.

@@ -22,6 +22,7 @@ import {
 import { createPairShowcaseShell, initPairShowcaseHoverJs } from './pairHoverFx';
 import { initLineupSection } from './lineupUi';
 import { initHeroWeatherForecast } from './weatherForecast';
+import { renderTeamPresentationsSection } from './teamPresentations';
 import { assetUrl } from './baseUrl';
 import './styles.css';
 
@@ -1093,8 +1094,9 @@ function boot(): void {
   renderGallery();
   initGalleryLightbox();
 
-  /* 3 — вступление о дуэтах */
+  /* 3 — вступление о дуэтах и представления команд */
   renderMarathonIntro();
+  renderTeamPresentationsSection();
 
   /* 4 — появление секций при скролле */
   initReveal();
