@@ -15,7 +15,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PDFDocument, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
-import { buildRandomizedSeatsGrid, LINEUP_RANDOM_SEED } from '../src/lineupGridCore.ts';
+import { LINEUP_SEATS_MATRIX } from '../src/lineupGridCore.ts';
 import { LINEUP_PDF_TEAMS } from '../src/lineupPdfTeams.ts';
 import {
   DATE_FIELD,
@@ -341,7 +341,7 @@ function fillOneGamePage(
 }
 
 async function main(): Promise<void> {
-  const grid = buildRandomizedSeatsGrid();
+  const grid = LINEUP_SEATS_MATRIX;
   const columns = grid[0]?.length ?? 0;
   if (columns !== PROTOCOL_PDF_GAME_COUNT) {
     throw new Error(
@@ -396,7 +396,7 @@ async function main(): Promise<void> {
   await writeFile(outPathDocs, bytes);
   // eslint-disable-next-line no-console -- служебный скрипт
   console.log(
-    `Записано: ${outPathPublic} и ${outPathDocs} (${bytes.byteLength} байт), страниц: ${PROTOCOL_PDF_GAME_COUNT + PROTOCOL_PDF_BLANK_TAIL_SHEETS} (игр ${PROTOCOL_PDF_GAME_COUNT} + чистых ${PROTOCOL_PDF_BLANK_TAIL_SHEETS}), seed 0x${LINEUP_RANDOM_SEED.toString(16)}`,
+    `Записано: ${outPathPublic} и ${outPathDocs} (${bytes.byteLength} байт), страниц: ${PROTOCOL_PDF_GAME_COUNT + PROTOCOL_PDF_BLANK_TAIL_SHEETS} (игр ${PROTOCOL_PDF_GAME_COUNT} + чистых ${PROTOCOL_PDF_BLANK_TAIL_SHEETS}), рассадка: docs/rassadka.md`,
   );
 }
 

@@ -1,127 +1,22 @@
 /**
- * Детерминированная сетка мест без импорта из `pairs` / Vite — для сайта и скрипта PDF.
+ * Матрица рассадки для сайта и PDF.
  *
- * Смысл матрицы и приоритет **первой игры** (индекс столбца `0`) как основы протокола — в `docs/LINEUP.md`
- * («Основа: первая игра»). Смена `LINEUP_RANDOM_SEED` меняет всю матрицу сразу (сайт + PDF).
+ * Смысл и приоритет **первой игры** (столбец с индексом `0`) — в `docs/LINEUP.md`.
+ * Источник порядка по турам: **`docs/rassadka.md`** (строки = команды в порядке `lineupTeams` / пары 1…10).
+ *
+ * Формат: **`LINEUP_SEATS_MATRIX[индексКоманды][индексИгры]`** — номер места 1…10.
  */
 
-const TEAMS = 10;
-const GAMES = 18;
-
-/** Смените число — получится другая (но стабильная при сборке) рассадка. Должно совпадать с сайтом. */
-export const LINEUP_RANDOM_SEED = 0x5eedc0de;
-
-function mulberry32(seed: number): () => number {
-  let a = seed >>> 0;
-  return (): number => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function randIntBelow(rnd: () => number, n: number): number {
-  return Math.floor(rnd() * n);
-}
-
-function randomSeatColumn(rnd: () => number): number[] {
-  const a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  for (let i = 9; i > 0; i -= 1) {
-    const j = randIntBelow(rnd, i + 1);
-    const tmp = a[i]!;
-    a[i] = a[j]!;
-    a[j] = tmp;
-  }
-  return a;
-}
-
-function penaltyForColumn(grid: number[][], g: number, col: number[]): number {
-  let p = 0;
-  for (let t = 0; t < TEAMS; t += 1) {
-    const s = col[t]!;
-    for (let pg = 0; pg < g; pg += 1) {
-      if (grid[t]![pg] === s) p += 6;
-    }
-    if (g > 0 && grid[t]![g - 1] === s) p += 14;
-  }
-  for (let pg = 0; pg < g; pg += 1) {
-    let dupCol = true;
-    for (let t = 0; t < TEAMS; t += 1) {
-      if (col[t] !== grid[t]![pg]) {
-        dupCol = false;
-        break;
-      }
-    }
-    if (dupCol) p += 80;
-  }
-  return p;
-}
-
-function totalPenaltyGrid(grid: number[][]): number {
-  let p = 0;
-  for (let t = 0; t < TEAMS; t += 1) {
-    for (let g = 0; g < GAMES; g += 1) {
-      const s = grid[t]![g]!;
-      for (let pg = 0; pg < g; pg += 1) {
-        if (grid[t]![pg] === s) p += 6;
-      }
-      if (g > 0 && grid[t]![g - 1] === s) p += 14;
-    }
-  }
-  for (let g1 = 0; g1 < GAMES; g1 += 1) {
-    for (let g2 = g1 + 1; g2 < GAMES; g2 += 1) {
-      let dup = true;
-      for (let t = 0; t < TEAMS; t += 1) {
-        if (grid[t]![g1] !== grid[t]![g2]) {
-          dup = false;
-          break;
-        }
-      }
-      if (dup) p += 80;
-    }
-  }
-  return p;
-}
-
-/** Матрица `LINEUP_SEATS[команда][игра]` — значения 1…10. */
-export function buildRandomizedSeatsGrid(): number[][] {
-  const rnd = mulberry32(LINEUP_RANDOM_SEED);
-  const grid: number[][] = Array.from({ length: TEAMS }, () => Array(GAMES).fill(0));
-  const trialsPerColumn = 520;
-
-  for (let g = 0; g < GAMES; g += 1) {
-    let best = randomSeatColumn(rnd);
-    let bestPen = penaltyForColumn(grid, g, best);
-    for (let k = 0; k < trialsPerColumn - 1; k += 1) {
-      const cand = randomSeatColumn(rnd);
-      const pen = penaltyForColumn(grid, g, cand);
-      if (pen < bestPen) {
-        bestPen = pen;
-        best = cand;
-      }
-    }
-    for (let t = 0; t < TEAMS; t += 1) grid[t]![g] = best[t]!;
-  }
-
-  const hillSteps = 9000;
-  for (let iter = 0; iter < hillSteps; iter += 1) {
-    const g = randIntBelow(rnd, GAMES);
-    let i = randIntBelow(rnd, TEAMS);
-    let j = randIntBelow(rnd, TEAMS);
-    if (j === i) j = (j + 1) % TEAMS;
-    const before = totalPenaltyGrid(grid);
-    const si = grid[i]![g]!;
-    const sj = grid[j]![g]!;
-    grid[i]![g] = sj;
-    grid[j]![g] = si;
-    const after = totalPenaltyGrid(grid);
-    if (after > before) {
-      grid[i]![g] = si;
-      grid[j]![g] = sj;
-    }
-  }
-
-  return grid;
-}
+/** Матрица `LINEUP_SEATS[команда][игра]` — значения 1…10. Согласована с `docs/rassadka.md`. */
+export const LINEUP_SEATS_MATRIX: number[][] = [
+  [3, 7, 8, 6, 1, 5, 2, 9, 4, 10, 7, 2, 10, 5, 1, 9, 3, 6],
+  [5, 6, 4, 9, 8, 1, 3, 10, 7, 2, 10, 7, 8, 1, 4, 5, 2, 9],
+  [1, 10, 5, 2, 3, 6, 8, 4, 9, 7, 8, 6, 3, 2, 9, 10, 1, 5],
+  [7, 5, 9, 1, 2, 10, 4, 3, 6, 8, 5, 9, 1, 10, 8, 7, 4, 3],
+  [4, 3, 6, 5, 10, 2, 7, 8, 1, 9, 3, 4, 2, 7, 5, 8, 6, 1],
+  [2, 1, 3, 4, 9, 8, 5, 7, 10, 6, 6, 8, 5, 4, 2, 3, 9, 10],
+  [8, 9, 7, 10, 5, 3, 1, 6, 2, 4, 9, 10, 4, 6, 3, 1, 7, 8],
+  [6, 2, 1, 7, 4, 9, 10, 5, 8, 3, 2, 3, 6, 9, 10, 4, 5, 7],
+  [9, 8, 10, 3, 7, 4, 6, 2, 5, 1, 1, 5, 7, 3, 6, 2, 8, 4],
+  [10, 4, 2, 8, 6, 7, 9, 1, 3, 5, 4, 1, 9, 8, 7, 6, 10, 2],
+];

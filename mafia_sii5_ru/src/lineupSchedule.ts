@@ -1,20 +1,18 @@
 /**
  * Рассадка за столом: 10 команд × 18 игр, в ячейке — номер места 1…10.
- * В каждом столбце — перестановка мест (каждое место занято ровно одной командой).
- * Подбор случайный (фиксированный seed), с минимизацией повторов одного и того же места у команды
- * и без повторяющихся целых столбцов; см. `buildRandomizedSeatsGrid` в `lineupGridCore.ts`.
+ * Матрица задаётся явно в `lineupGridCore.ts` и совпадает с **`docs/rassadka.md`**.
  *
  * Принцип **первой игры** (столбец с индексом 0) как основы для протокола и PDF — в `docs/LINEUP.md`.
  */
 
-import { buildRandomizedSeatsGrid } from './lineupGridCore';
+import { LINEUP_SEATS_MATRIX } from './lineupGridCore';
 import { pairsBlock1, pairsBlock2, type PairEntry } from './pairs';
 
 /** Команды в порядке пар 1…10 (как на сайте). */
 export const lineupTeams: PairEntry[] = [...pairsBlock1, ...pairsBlock2].sort((a, b) => a.n - b.n);
 
 /** Матрица мест: `LINEUP_SEATS[teamIndex][gameIndex]` ∈ 1…10. */
-export const LINEUP_SEATS: number[][] = buildRandomizedSeatsGrid();
+export const LINEUP_SEATS: number[][] = LINEUP_SEATS_MATRIX;
 
 /**
  * Показ чисел в таблице рассадки по URL.

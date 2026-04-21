@@ -16,14 +16,14 @@
    - подписи пар — **`src/lineupPdfTeams.ts`** (с **`pairs.ts`** при смене состава);
    - скрипт: **`npm run generate:igra-pdf`** → **`scripts/generate-igra-pdf.ts`**, шрифт **DejaVu Sans** (`dejavu-fonts-ttf`).
 5. **Игры 2…18**: те же правила, другой индекс столбца **`g = 1 … 17`**. Любые новые бланки (вторая игра, весь турнир и т.д.) **наследуют** этот принцип: та же матрица, тот же смысл ячейки, при необходимости — та же сортировка по месту для «снимка за столом».
-6. **Воспроизводимость**: один **`LINEUP_RANDOM_SEED`** в **`src/lineupGridCore.ts`** — одна и та же матрица на сайте, в PDF и в любом коде, который вызывает **`buildRandomizedSeatsGrid()`**.
+6. **Источник матрицы**: явный массив **`LINEUP_SEATS_MATRIX`** в **`src/lineupGridCore.ts`**, совпадающий с **`docs/rassadka.md`** — одна и та же матрица на сайте, в PDF и в любом коде, который импортирует эти данные.
 
 Полный бланк протокола (судьи, фолы и т.д.) — отдельный файл, например **`docs/Protokol_igry_*.pdf`**; блок рассадки в нём должен **согласовываться** с пунктами выше.
 
 ---
 
 - **Прямая ссылка на раздел:** к URL страницы добавьте **`#rassadka`** (например `https://mafia.sii5.ru/#rassadka` или с вашим `base`).
-- Данные на сайте: **`src/lineupSchedule.ts`** — **`LINEUP_SEATS`**; алгоритм и seed — **`src/lineupGridCore.ts`**.
+- Данные на сайте: **`src/lineupSchedule.ts`** — **`LINEUP_SEATS`**; каноническая матрица — **`src/lineupGridCore.ts`** (**`LINEUP_SEATS_MATRIX`**, по **`docs/rassadka.md`**).
 - **PDF бланков:** **`npm run generate:igra-pdf`** → **`public/igra.pdf`** (+ **`docs/igra.pdf`**), **19 страниц** (18 игр + чистый лист); скачивание: **`https://mafia.sii5.ru/igra.pdf`** (при `base` `/`); макет — **`src/protocolPdfMaster.ts`** (**`PROTOCOL_PDF_GAME_COUNT`**, **`PROTOCOL_PDF_BLANK_TAIL_SHEETS`**).
 - **Блок таблицы на странице** по умолчанию скрыт. Кнопка «Показать / скрыть таблицу» отправляет пароль на **`GET`/`POST`** **`/api/lineup-table-visibility`** (с учётом `base`: см. **`assetUrl`** в **`src/lineupUi.ts`**; при необходимости переопределите **`VITE_LINEUP_TABLE_VISIBILITY_API`**). Состояние **общее для всех посетителей**: после успешного показа таблица видна у всех, пока кто-то с паролем не скроет её снова. Опрос **`GET`** каждые **8** с.
   - **Cloudflare Pages:** в каталоге **`functions/api/lineup-table-visibility.js`** — функция читает/пишет KV. В проекте Pages создайте namespace KV и привяжите binding с именем **`LINEUP_TABLE_KV`**. Переменная окружения **`LINEUP_TABLE_PANEL_PASSWORD`** (секрет) — если не задана, пароль по умолчанию **`8888`** (на сервере и в клиентском fallback при ответе **503** / без API).
